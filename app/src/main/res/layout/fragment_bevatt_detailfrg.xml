@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gy.widget.layout.FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/rlyt_title"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#7f7f7f">
+            <TextView
+                style="@style/tv_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/app_name"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_test"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="248dp"
+            style="@style/tv_btn"
+            android:text="indicator"
+            android:background="#7f7f7f"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/vp_pager"
+            android:layout_below="@id/rlyt_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"/>
+    </RelativeLayout>
+</com.gy.widget.layout.FrameLayout>
