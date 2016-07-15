@@ -7,7 +7,7 @@ import android.util.Log;
  *
  */
 public class LogUtils {
-    private static boolean isDebug = true;
+    public static boolean isDebug = true;
 
     public static void enableLog () {
         isDebug = true;
