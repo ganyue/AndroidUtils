@@ -3,7 +3,6 @@ package com.gy.utils.img;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import com.gy.utils.R;
 import com.gy.utils.file.SdcardUtils;
 import com.gy.utils.log.LogUtils;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
@@ -29,9 +28,6 @@ public class ImageLoaderUtils {
             LogUtils.i("ImageLoaderUtils", "init image loader");
 
             DisplayImageOptions displayImageOptions = new DisplayImageOptions.Builder()
-                    .showImageOnLoading(R.drawable.bg_default_gray)
-                    .showImageForEmptyUri(R.drawable.bg_default_gray)
-                    .showImageOnFail(R.drawable.bg_default_gray)
                     .cacheOnDisk(true)
                     .cacheInMemory(true)
                     .considerExifParams(true)
