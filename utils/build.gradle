@@ -20,5 +20,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile files('libs/volley.jar')
     compile files('libs/universal-image-loader-1.9.5.jar')
 }

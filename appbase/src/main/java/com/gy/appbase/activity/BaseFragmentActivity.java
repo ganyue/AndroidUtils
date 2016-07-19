@@ -2,14 +2,10 @@ package com.gy.appbase.activity;
 
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import com.gy.appbase.controller.BaseFragmentActivityController;
-import com.gy.appbase.inject.ViewInject;
 import com.gy.appbase.inject.ViewInjectInterpreter;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by ganyu on 2016/5/19.

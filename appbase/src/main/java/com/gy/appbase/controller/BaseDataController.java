@@ -54,7 +54,7 @@ public abstract class BaseDataController extends BaseFragmentActivityController{
         }
 
         if (mDataLoadCallbacks == null) {
-            mDataLoadCallbacks = new HashMap<>();
+            mDataLoadCallbacks = new HashMap<String, IDataLoadCallback>();
         }
 
         if (callback != null) {

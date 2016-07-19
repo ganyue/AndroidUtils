@@ -26,6 +26,7 @@ public class WindowConstants {
     private int windowHeight;
     private int notificationBarHeight;
     private int contentHeight;
+    private float density;
 
     private WindowConstants (Activity activity) {
         if (!isInited) {
@@ -39,6 +40,8 @@ public class WindowConstants {
             View contentV = view.findViewById(android.R.id.content);
             notificationBarHeight = contentV.getTop();
             contentHeight = contentV.getHeight();
+
+            density = activity.getResources().getDisplayMetrics().density;
 
             isInited = true;
         }
@@ -60,4 +63,7 @@ public class WindowConstants {
         return contentHeight;
     }
 
+    public float convertDpToPix (int dp) {
+        return dp * density;
+    }
 }
