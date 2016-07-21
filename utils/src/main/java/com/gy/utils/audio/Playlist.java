@@ -19,7 +19,10 @@ public class Playlist implements Parcelable{
     private List<Track> tracks;
 
     public Playlist () {
-        mode = AudioPlayerConst.Mode.REPEAT_ALL;
+    }
+
+    public Playlist (List<Track> tracks) {
+        setTracks(tracks);
     }
 
     public int getMode() {

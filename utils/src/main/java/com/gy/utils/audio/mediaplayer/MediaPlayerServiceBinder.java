@@ -18,8 +18,13 @@ public class MediaPlayerServiceBinder extends Binder implements IAudioPlayer{
     }
 
     @Override
-    public boolean play(Playlist playlist) {
-        return service.play(playlist);
+    public boolean isBinderAlive() {
+        return service != null;
+    }
+
+    @Override
+    public boolean initPlaylist(Playlist playlist) {
+        return service.initPlaylist(playlist);
     }
 
     @Override
@@ -30,6 +35,16 @@ public class MediaPlayerServiceBinder extends Binder implements IAudioPlayer{
     @Override
     public boolean playOrPause() {
         return service.playOrPause();
+    }
+
+    @Override
+    public boolean prev() {
+        return service.prev();
+    }
+
+    @Override
+    public boolean next() {
+        return service.next();
     }
 
     @Override

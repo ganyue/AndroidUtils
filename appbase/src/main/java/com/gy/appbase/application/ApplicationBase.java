@@ -21,11 +21,12 @@ public class ApplicationBase extends Application{
         super.onCreate();
 
         application = this;
+//        initCrashHandler();
         ImageLoaderUtils.getImageLoader(this); //init image loader
         HttpUtils.getInstance(this);//init http utils
     }
 
-    public Application getApplication () {
+    public static Application getApplication () {
         return application;
     }
 

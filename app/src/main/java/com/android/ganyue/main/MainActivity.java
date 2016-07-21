@@ -11,6 +11,7 @@ import android.widget.SimpleAdapter;
 
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
+import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.TcpTestFrg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity{
             UdpTestFrg.class,
             DaoTestFrg.class,
             FileUtilTestFrg.class,
+            MediaTestFrg.class,
     };
 
     @Override

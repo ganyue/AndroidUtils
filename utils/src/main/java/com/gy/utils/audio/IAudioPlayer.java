@@ -5,9 +5,11 @@ package com.gy.utils.audio;
  *
  */
 public interface IAudioPlayer {
-    boolean play (Playlist playlist);
+    boolean initPlaylist(Playlist playlist);
     boolean stop ();
     boolean playOrPause ();
+    boolean prev ();
+    boolean next ();
     boolean seek (int pos);
     int getPosition ();
     boolean isPlaying ();

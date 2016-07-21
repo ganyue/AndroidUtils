@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <Button
+        android:id="@+id/btn_pre"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Pre"/>
+
+    <Button
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Play"
+        android:layout_below="@id/btn_pre"/>
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="next"
+        android:layout_below="@id/btn_play"/>
+    <Button
+        android:id="@+id/btn_init"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="init"
+        android:layout_below="@id/btn_next"/>
+    <Button
+        android:id="@+id/btn_seek"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="seek"
+        android:layout_below="@id/btn_init"/>
+
+    <TextView
+        android:id="@+id/tv_log"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_seek"
+        android:layout_margin="40dp"/>
+</RelativeLayout>
