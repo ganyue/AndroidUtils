@@ -1,1 +1,1 @@
-include ':app', ':dao', ':weidget', ':utils', ':appbase'
+include ':app', ':dao', ':weidget', ':utils', ':appbase', ':laosiji'
