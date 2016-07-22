@@ -123,9 +123,10 @@ public class AudioUtils {
                 Playlist playlist = intent.getParcelableExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O);
                 boolean isPlaying = intent.getBooleanExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_IS_PLAYING_B, false);
                 int position = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_POSITION_I, 0);
+                int operation = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_OPERATION_I, 0);
 
                 for (OnAudioListener listener: mOnAudioListeners) {
-                    listener.onStateChanged(sender, playlist, position, isPlaying);
+                    listener.onStateChanged(sender, playlist, operation, position, isPlaying);
                 }
             } else if (type == AudioPlayerConst.PlayerConsts.BCastType.ERROR) {
                 String sender = intent.getStringExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_SENDER_S);
@@ -147,7 +148,7 @@ public class AudioUtils {
     }
 
     public interface OnAudioListener {
-        void onStateChanged (String sender, Playlist playlist, int position, boolean isPlaying);
+        void onStateChanged (String sender, Playlist playlist, int operation, int position, boolean isPlaying);
         void onComplete (String sender, Playlist playlist);
         void onError (String sender, int extra);
     }

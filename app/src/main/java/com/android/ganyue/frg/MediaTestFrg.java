@@ -17,6 +17,7 @@ import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.audio.AudioUtils;
 import com.gy.utils.audio.Playlist;
 import com.gy.utils.audio.Track;
+import com.gy.utils.log.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,26 @@ public class MediaTestFrg extends BaseFragment {
                 MApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).seek(10000);
             }
         });
+
+        MApplication.getAudioUtils().addOnAudioListener(onAudioListener);
     }
+
+    private AudioUtils.OnAudioListener onAudioListener = new AudioUtils.OnAudioListener() {
+        @Override
+        public void onStateChanged(String sender, Playlist playlist, int operation, int position, boolean isPlaying) {
+            LogUtils.d("yue.gan", "sender : " + sender + " operation : " + operation + " position : " + position + " isplaying : " + isPlaying);
+        }
+
+        @Override
+        public void onComplete(String sender, Playlist playlist) {
+            LogUtils.d("yue.gan", "sender : " + sender + " playlist : " + playlist);
+        }
+
+        @Override
+        public void onError(String sender, int extra) {
+            LogUtils.d("yue.gan", "sender : " + sender + " extra : " + extra);
+        }
+    };
 
     @Override
     protected BaseFragmentActivityController instanceController() {

@@ -27,6 +27,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     private MediaPlayerServiceBinder binder;
     private AudioManager audioManager;
     private AudioPlayerConst.PlayerState state;
+    private int operation;
     private boolean startAfterPrepare;
 
     @Override
@@ -39,6 +40,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         state = AudioPlayerConst.PlayerState.UNINITED;
         startAfterPrepare = false;
+        operation = AudioPlayerConst.PlayerConsts.Operation.NONE;
     }
 
     @Override
@@ -90,6 +92,8 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O, playlist);
         intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_IS_PLAYING_B, isPlaying());
         intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_POSITION_I, getPosition());
+        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_OPERATION_I, operation);
+        operation = AudioPlayerConst.PlayerConsts.Operation.NONE;
         sendBroadcast(intent);
     }
 
@@ -123,7 +127,6 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             mediaPlayer.setDataSource(dataSource);
             mediaPlayer.prepareAsync();
             state = AudioPlayerConst.PlayerState.PREPARING;
-            onStateChanged();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,6 +141,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             mediaPlayer.stop();
         }
         state = AudioPlayerConst.PlayerState.STOPED;
+        operation = AudioPlayerConst.PlayerConsts.Operation.STOP;
         onStateChanged();
         return true;
     }
@@ -145,27 +149,42 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     @Override
     public boolean playOrPause() {
         if (state == AudioPlayerConst.PlayerState.PLAYING) {
+            //暂停
             mediaPlayer.pause();
             state = AudioPlayerConst.PlayerState.PAUSE;
+            operation = AudioPlayerConst.PlayerConsts.Operation.PAUSE;
+            onStateChanged();
         } else if (state == AudioPlayerConst.PlayerState.PAUSE
-                || state == AudioPlayerConst.PlayerState.STOPED
-                || state == AudioPlayerConst.PlayerState.PREPARED) {
+                || state == AudioPlayerConst.PlayerState.STOPED) {
+            //播放
             audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mediaPlayer.start();
             state = AudioPlayerConst.PlayerState.PLAYING;
+            operation = AudioPlayerConst.PlayerConsts.Operation.PLAY;
+            onStateChanged();
+        } else if (state == AudioPlayerConst.PlayerState.PREPARED) {
+            //开始
+            audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            mediaPlayer.start();
+            state = AudioPlayerConst.PlayerState.PLAYING;
+            operation = AudioPlayerConst.PlayerConsts.Operation.START;
+            onStateChanged();
         } else if (state == AudioPlayerConst.PlayerState.PREPARING){
+            //正在prepare
             startAfterPrepare = true;
         } else if (state == AudioPlayerConst.PlayerState.UNINITED) {
+            //初始化
+            operation = AudioPlayerConst.PlayerConsts.Operation.START;
             startAfterPrepare = true;
             preparePlayer();
         }
-        onStateChanged();
         return true;
     }
 
     @Override
     public boolean prev() {
         if (playlist == null) return false;
+        operation = AudioPlayerConst.PlayerConsts.Operation.PREV;
         playlist.prev();
         startAfterPrepare = true;
         return preparePlayer();
@@ -174,6 +193,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     @Override
     public boolean next() {
         if (playlist == null) return false;
+        operation = AudioPlayerConst.PlayerConsts.Operation.NEXT;
         playlist.next();
         startAfterPrepare = true;
         return preparePlayer();
@@ -185,6 +205,9 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             return false;
         }
         mediaPlayer.seekTo(pos);
+        mediaPlayer.start();
+        state = AudioPlayerConst.PlayerState.PLAYING;
+        operation = AudioPlayerConst.PlayerConsts.Operation.SEEK;
         onStateChanged();
         return true;
     }
@@ -206,6 +229,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     public void setMode(int mode) {
         if (playlist == null) return;
         playlist.setMode(mode);
+        operation = AudioPlayerConst.PlayerConsts.Operation.MODE_CHANGED;
         onStateChanged();
     }
 
@@ -250,6 +274,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
                 state = AudioPlayerConst.PlayerState.PLAYING;
                 startAfterPrepare = false;
             }
+            onStateChanged();
         }
     };
 
@@ -262,9 +287,11 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O, playlist);
             sendBroadcast(intent);
 
+            state = AudioPlayerConst.PlayerState.PAUSE;
             playlist.next();
             startAfterPrepare = true;
             preparePlayer();
+            operation = AudioPlayerConst.PlayerConsts.Operation.COMPLETE_AUTO_NEXT;
         }
     };
 
@@ -278,6 +305,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_EXTRA_I, extra);
             sendBroadcast(intent);
 
+            state = AudioPlayerConst.PlayerState.PAUSE;
             long currentErrorTime = SystemClock.currentThreadTimeMillis();
             long timeInterval = currentErrorTime - lastErrorTime;
             lastErrorTime = currentErrorTime;
@@ -286,6 +314,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
                 return true;
             }
             playlist.next();
+            operation = AudioPlayerConst.PlayerConsts.Operation.ERROR_AUTO_NEXT;
             startAfterPrepare = true;
             return preparePlayer();
         }
