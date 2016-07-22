@@ -12,7 +12,7 @@ import com.gy.appbase.inject.ViewInjectInterpreter;
  *
  */
 public abstract class BaseFragmentActivity extends FragmentActivity {
-    private BaseFragmentActivityController mController;
+    protected BaseFragmentActivityController mController;
     public void setController (BaseFragmentActivityController controller) {
         mController = controller;
     }
@@ -24,6 +24,9 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (mController == null) {
+            instanceController();
+        }
         setContent(savedInstanceState);
         findViews(savedInstanceState);
         initViews(savedInstanceState);

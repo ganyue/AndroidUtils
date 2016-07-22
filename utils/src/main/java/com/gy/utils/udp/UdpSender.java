@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by ganyu on 2016/5/20.
@@ -14,13 +15,12 @@ import java.net.SocketException;
 public class UdpSender extends Thread {
     private DatagramSocket mSocket;
     private boolean isRun;
-    private UdpMessageQueue mMessage;
+    private ArrayBlockingQueue<UdpMessage> mMessage;
     private OnSendListener onSendListener;
-    private final Object mLock = new Object();
 
     public UdpSender (DatagramSocket socket) {
         mSocket = socket;
-        mMessage = new UdpMessageQueue();
+        mMessage = new ArrayBlockingQueue<>(64);
     }
 
     public UdpSender (int localPort) {
@@ -28,7 +28,7 @@ public class UdpSender extends Thread {
             mSocket = new DatagramSocket(null);
             mSocket.setReuseAddress(true);
             mSocket.bind(new InetSocketAddress(localPort));
-            mMessage = new UdpMessageQueue();
+            mMessage = new ArrayBlockingQueue<>(64);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -42,10 +42,7 @@ public class UdpSender extends Thread {
     }
 
     public void send (String msg, String ip, int port) {
-        mMessage.addMessage(new UdpMessage(msg, ip, port));
-        synchronized (mLock) {
-            mLock.notify();
-        }
+        mMessage.offer(new UdpMessage(msg, ip, port));
     }
 
     @Override
@@ -55,14 +52,12 @@ public class UdpSender extends Thread {
         }
 
         isRun = true;
+        UdpMessage msg = null;
         while (isRun) {
-            UdpMessage msg = mMessage.getMessage();
             try {
+                msg = mMessage.take();
                 if (msg == null) {
-                    synchronized (mLock) {
-                        mLock.wait();
-                        continue;
-                    }
+                    return;
                 }
 
                 byte[] data = msg.message.getBytes();

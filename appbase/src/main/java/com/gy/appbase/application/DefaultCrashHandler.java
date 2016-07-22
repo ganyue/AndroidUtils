@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by ganyu on 2016/7/19.
+ *
  */
 public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
 

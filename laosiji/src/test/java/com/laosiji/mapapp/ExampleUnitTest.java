@@ -1,4 +1,4 @@
-package com.laosiji.mapapp;
+package com.lsj.mapapp;
 
 import org.junit.Test;
 
