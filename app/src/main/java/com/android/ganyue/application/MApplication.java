@@ -16,8 +16,8 @@ public class MApplication extends BaseApplication {
         super.onCreate();
 
         LogUtils.d("yue.gan", "start init media service");
-        AudioUtils.getInstance(this);
-        SDKInitializer.initialize(this);
+        AudioUtils.getInstance(this);       //初始化audio播放器
+        SDKInitializer.initialize(this);    //初始化百度地图api
     }
 
     public static AudioUtils getAudioUtils () {

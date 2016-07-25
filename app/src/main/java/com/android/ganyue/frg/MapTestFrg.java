@@ -6,17 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.ganyue.R;
-import com.android.ganyue.bean.Dao1;
 import com.android.ganyue.controller.FuncCtrl;
+import com.baidu.mapapi.map.MapView;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
-import com.gy.dao.database.DBHelper;
+import com.gy.appbase.inject.ViewInject;
 
 /**
  * Created by ganyu on 2016/4/30.
  * Nsd test
  */
 public class MapTestFrg extends BaseFragment {
+
+    @ViewInject (R.id.mv_map)
+    private MapView mapView;
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -7,6 +7,7 @@ import android.support.annotation.CallSuper;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
 import com.gy.utils.log.LogUtils;
+import com.gy.utils.wifi.WifiUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
@@ -30,18 +31,19 @@ public class BaseApplication extends Application{
         initCrashHandler();         //设置全局异常处理器
         getImageLoader();           //初始化 image loader
         getHttpUtils();             //初始化 http utils
+        getWifiUtils();             //初始化网络状态监听
     }
 
     public static boolean isDebug () {
         return isDebug;
     }
 
-    public static Application getApplication () {
-        return application;
-    }
-
     public void initCrashHandler () {
         new DefaultCrashHandler(application);
+    }
+
+    public static Application getApplication () {
+        return application;
     }
 
     public static ImageLoader getImageLoader () {
@@ -50,5 +52,9 @@ public class BaseApplication extends Application{
 
     public static HttpUtils getHttpUtils () {
         return HttpUtils.getInstance(application);
+    }
+
+    public static WifiUtils getWifiUtils () {
+        return WifiUtils.getInstance(application);
     }
 }

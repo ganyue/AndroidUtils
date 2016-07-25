@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.android.ganyue.application.MApplication;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.MapTestFrg;
@@ -22,6 +23,8 @@ import com.android.ganyue.frg.BevaTtAlbumDetailFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.android.ganyue.frg.NsdTestFrg;
 import com.gy.utils.file.FileUtils;
+import com.gy.utils.log.LogUtils;
+import com.gy.utils.wifi.WifiUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +74,8 @@ public class MainActivity extends Activity{
                 FuncActivity.startSelf(MainActivity.this, (String) data.get("text"));
             }
         });
+
+        MApplication.getWifiUtils().addOnNetworkChangedListener(onNetworkChangedListener);
     }
 
     private void addData (String dataKey, String dataVal, List<Map<String, ?>> container) {
@@ -78,6 +83,13 @@ public class MainActivity extends Activity{
         data.put(dataKey, dataVal);
         container.add(data);
     }
+
+    private WifiUtils.OnNetworkChangedListener onNetworkChangedListener = new WifiUtils.OnNetworkChangedListener() {
+        @Override
+        public void onNetworkChanged(boolean isConnected, int type) {
+            LogUtils.d("yue.gan", "net connected : " + isConnected + " type : " + type);
+        }
+    };
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
