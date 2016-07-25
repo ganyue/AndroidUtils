@@ -14,13 +14,14 @@ public class UdpReceiver extends Thread {
 
     private DatagramSocket mSocket;
     private boolean isRun;
-    private OnReceiveListener onReceiveListener;
+    private UdpMessageProcessor udpMessageProcessor;
 
     public UdpReceiver (int port) {
         try {
             mSocket = new DatagramSocket(null);
             mSocket.setReuseAddress(true);
             mSocket.bind(new InetSocketAddress(port));
+            udpMessageProcessor = new UdpMessageProcessor();
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -29,12 +30,13 @@ public class UdpReceiver extends Thread {
     public UdpReceiver(DatagramSocket socket) {
         super();
         mSocket = socket;
+        udpMessageProcessor = new UdpMessageProcessor();
     }
 
     private UdpReceiver(){}
 
-    public void setOnReceiveListener (OnReceiveListener listener) {
-        onReceiveListener = listener;
+    public void setOnReceiveListener (UdpMessageProcessor.OnReceiveListener listener) {
+        udpMessageProcessor.setOnReceiveListener(listener);
     }
 
     @Override
@@ -43,37 +45,32 @@ public class UdpReceiver extends Thread {
             return;
         }
 
+        udpMessageProcessor.start();
+
         isRun = true;
         byte[] buff = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buff, 1024);
         while (isRun) {
             try {
                 mSocket.receive(packet);
-                if (onReceiveListener != null) {
-                    onReceiveListener.onReceive(packet.getData(), packet.getOffset(), packet.getLength(),
-                            packet.getAddress().getHostName(), packet.getPort());
-                }
+                udpMessageProcessor.onReceive(packet.getData(), packet.getOffset(), packet.getLength(),
+                        packet.getAddress().getHostName(), packet.getPort());
             } catch (IOException e) {
-                if (onReceiveListener != null) {
-                    onReceiveListener.onReceiveError(e);
-                }
+                udpMessageProcessor.onReceiveError(e);
             }
         }
     }
 
     public void release() {
         isRun = false;
-        onReceiveListener = null;
         interrupt();
         if (mSocket != null && !mSocket.isClosed()) {
             mSocket.disconnect();
             mSocket.close();
         }
         mSocket = null;
+
+        udpMessageProcessor.release();
     }
 
-    public interface OnReceiveListener {
-        void onReceive(byte[] buff, int offset, int len, String fromIp, int fromPort);
-        void onReceiveError(Exception e);
-    }
 }

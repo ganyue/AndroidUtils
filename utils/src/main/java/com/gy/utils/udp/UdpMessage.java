@@ -6,6 +6,8 @@ package com.gy.utils.udp;
  */
 public class UdpMessage {
     public String message;
+    public byte[] bMessage;
+    public Exception exception;
     public String ip;
     public int port;
 
@@ -13,5 +15,15 @@ public class UdpMessage {
         this.message = message;
         this.ip = ip;
         this.port = port;
+    }
+
+    public UdpMessage (byte[] bMessage, String ip, int port) {
+        this.bMessage = bMessage;
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public UdpMessage (Exception e) {
+        exception = e;
     }
 }

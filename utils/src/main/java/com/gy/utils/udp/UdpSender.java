@@ -1,5 +1,7 @@
 package com.gy.utils.udp;
 
+import android.text.TextUtils;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,6 +15,9 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  */
 public class UdpSender extends Thread {
+
+    private final int MAX_MESSAGE_QUEUE_SIZE = 64;
+
     private DatagramSocket mSocket;
     private boolean isRun;
     private ArrayBlockingQueue<UdpMessage> mMessage;
@@ -20,7 +25,7 @@ public class UdpSender extends Thread {
 
     public UdpSender (DatagramSocket socket) {
         mSocket = socket;
-        mMessage = new ArrayBlockingQueue<>(64);
+        mMessage = new ArrayBlockingQueue<>(MAX_MESSAGE_QUEUE_SIZE);
     }
 
     public UdpSender (int localPort) {
@@ -28,7 +33,7 @@ public class UdpSender extends Thread {
             mSocket = new DatagramSocket(null);
             mSocket.setReuseAddress(true);
             mSocket.bind(new InetSocketAddress(localPort));
-            mMessage = new ArrayBlockingQueue<>(64);
+            mMessage = new ArrayBlockingQueue<>(MAX_MESSAGE_QUEUE_SIZE);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -60,7 +65,16 @@ public class UdpSender extends Thread {
                     return;
                 }
 
-                byte[] data = msg.message.getBytes();
+                byte[] data;
+
+                if (!TextUtils.isEmpty(msg.message)) {
+                    data = msg.message.getBytes();
+                } else if (msg.bMessage != null && msg.bMessage.length > 0){
+                    data = msg.bMessage;
+                } else {
+                    continue;
+                }
+
                 InetAddress address = InetAddress.getByName(msg.ip);
                 DatagramPacket packet = new DatagramPacket(data, data.length, address, msg.port);
                 boolean handled = false;

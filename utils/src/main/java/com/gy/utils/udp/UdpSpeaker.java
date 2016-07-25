@@ -1,5 +1,7 @@
 package com.gy.utils.udp;
 
+import android.util.SparseArray;
+
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -9,8 +11,12 @@ import java.util.List;
 /**
  * Created by ganyu on 2016/5/19.
  *
+ * use UdpSpeaker.get(port) method to get a speaker
  */
-public class UdpSpeaker implements UdpSender.OnSendListener, UdpReceiver.OnReceiveListener{
+public class UdpSpeaker implements UdpSender.OnSendListener, UdpMessageProcessor.OnReceiveListener {
+
+    private static SparseArray<UdpSpeaker> mSpeakers;
+
     private DatagramSocket mSocket;
     private int mLocalPort;
     private boolean isInited;
@@ -19,7 +25,17 @@ public class UdpSpeaker implements UdpSender.OnSendListener, UdpReceiver.OnRecei
     private UdpSender mSender;
     private UdpReceiver mReceiver;
 
-    public UdpSpeaker (int localPort) {
+    public static UdpSpeaker get (int localPort) {
+        if (mSpeakers == null || mSpeakers.indexOfKey(localPort) < 0) {
+            return new UdpSpeaker(localPort);
+        }
+
+        return mSpeakers.get(localPort, new UdpSpeaker(localPort));
+    }
+
+    private UdpSpeaker (){}
+
+    private UdpSpeaker (int localPort) {
         mLocalPort = localPort;
         init();
     }
@@ -40,6 +56,10 @@ public class UdpSpeaker implements UdpSender.OnSendListener, UdpReceiver.OnRecei
             mSender.start();
             mReceiver.start();
             isInited = true;
+            if (mSpeakers == null) {
+                mSpeakers = new SparseArray<>();
+            }
+            mSpeakers.put(mLocalPort, this);
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -62,11 +82,11 @@ public class UdpSpeaker implements UdpSender.OnSendListener, UdpReceiver.OnRecei
     }
 
     @Override
-    public void onReceive(byte[] buff, int offset, int len, String fromIp, int fromPort) {
+    public void onReceive(byte[] buff, String fromIp, int fromPort) {
         if (mCallbacks == null) {
             return;
         }
-        String msg = new String (buff, offset, len);
+        String msg = new String (buff);
         for (UdpSpeakerCallback callback : mCallbacks) {
             callback.onReceive(msg, fromIp, fromPort);
         }
