@@ -5,7 +5,8 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.android.ganyue"
+//        applicationId "com.android.ganyue"
+        applicationId "com.lsj.mapapp"
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
@@ -25,5 +26,6 @@ dependencies {
     compile project(':weidget')
     compile project(':dao')
     compile project(':utils')
+    compile project(':map')
     compile project(path: ':appbase')
 }

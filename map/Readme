@@ -1,0 +1,7 @@
+要使用百度地图api
+
+1、在app项目中的包名需要修改，也就是gradle 里头的application id
+2、在app项目中的application里头，调用 SDKInitializer.initialize(application);
+3、如果更换了app包名，或者签名的签名文件，需要在manifest.xml里头修改相关key
+4、debug签名可能不同，会导致开发时候验证不通过，需要使用这个module里头响应的 keystore（jks）签名或打包
+5、百度的文档写的很烂，不如直接下个百度给的demo来看看各个功能怎么使用

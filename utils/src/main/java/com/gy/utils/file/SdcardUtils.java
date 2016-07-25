@@ -11,7 +11,9 @@ import java.io.File;
  */
 public class SdcardUtils {
     /**
-     * 检查sd卡是否可读写
+     * <p>检查sd卡是否可读写
+     * <p>需要的时候，知道外存能否读写就行了， 何必再搞个外存设备的监听呢
+     *
      */
     public static boolean isExternalStorageUsable () {
         String state = Environment.getExternalStorageState();

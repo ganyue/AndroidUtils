@@ -13,6 +13,7 @@ import com.android.ganyue.R;
 import com.android.ganyue.controller.FuncCtrl;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
+import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.udp.UdpSpeaker;
 import com.gy.utils.udp.UdpSpeakerCallback;
 
@@ -31,49 +32,33 @@ public class UdpTestFrg extends BaseFragment {
     }
 
     private static int count = 0;
-    private UdpSpeaker udpSpeaker18000;
     private UdpSpeaker udpSpeaker17000;
-    private UdpSpeaker udpSpeaker18001;
+
+    @ViewInject (R.id.tv_log)
     private TextView logText;
 
-    Float a;
-    Integer b;
-    boolean c;
-    String d;
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
-        Field[] fields = getClass().getDeclaredFields();
-        for (Field field : fields) {
-            String name = field.getName();
-            Class type = field.getType();
-            String typeName = type.getName();
-            boolean isPrim = type.isPrimitive();
-            Log.d("haha", "haha");
-        }
-        logText = (TextView) view.findViewById(R.id.tv_log);
-        udpSpeaker18000 = new UdpSpeaker(18000);
-        udpSpeaker18000.addCallback(udpSpeakerCallback);
-        udpSpeaker17000 = new UdpSpeaker(17000);
+
+        udpSpeaker17000 = UdpSpeaker.get(17000);
         udpSpeaker17000.addCallback(udpSpeakerCallback);
-        udpSpeaker18001 = new UdpSpeaker(18001);
-        udpSpeaker18001.addCallback(udpSpeakerCallback);
 
         view.findViewById(R.id.btn_keepAlive).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpSpeaker17000.send(getKeepAliveStr(), "255.255.255.255", 18000);
+                udpSpeaker17000.send(getKeepAliveStr(), "255.255.255.255", 17000);
             }
         });
         view.findViewById(R.id.btn_sdcardInfo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpSpeaker17000.send(getSDcardInfoStr(), "255.255.255.255", 18000);
+                udpSpeaker17000.send(getSDcardInfoStr(), "255.255.255.255", 17000);
             }
         });
         view.findViewById(R.id.btn_battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpSpeaker17000.send(getBatteryInfoStr(), "255.255.255.255", 18000);
+                udpSpeaker17000.send(getBatteryInfoStr(), "255.255.255.255", 17000);
             }
         });
 
