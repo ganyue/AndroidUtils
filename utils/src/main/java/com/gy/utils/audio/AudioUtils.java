@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.IBinder;
 
 import com.gy.utils.audio.mediaplayer.MediaPlayerService;
@@ -59,6 +60,7 @@ public class AudioUtils {
         mApp = new WeakReference<>(application);
         mAudioCallbackReceiver = new AudioPlayerCallbackReceiver();
         IntentFilter intentFilter = new IntentFilter(ACTION_AUDIO_PLAYER_CALLBACK_RECEIVER);
+        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         mApp.get().registerReceiver(mAudioCallbackReceiver, intentFilter);
 
         initPlayers();
@@ -112,6 +114,16 @@ public class AudioUtils {
     class AudioPlayerCallbackReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(action)) {
+                //收到诸如耳机插入，拔出之类的消息，需要暂停播放器
+                if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                    mMediaPlayer.playOrPause();
+                }
+                return;
+            }
+
             if (mOnAudioListeners == null) {
                 return;
             }

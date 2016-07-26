@@ -1,5 +1,7 @@
 package com.android.ganyue.application;
 
+import android.content.Intent;
+
 import com.baidu.mapapi.SDKInitializer;
 import com.gy.appbase.application.BaseApplication;
 import com.gy.utils.audio.AudioUtils;

@@ -140,7 +140,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         if (getPosition() > 0) {
             mediaPlayer.stop();
         }
-        state = AudioPlayerConst.PlayerState.STOPED;
+        state = AudioPlayerConst.PlayerState.STOP;
         operation = AudioPlayerConst.PlayerConsts.Operation.STOP;
         onStateChanged();
         return true;
@@ -155,7 +155,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             operation = AudioPlayerConst.PlayerConsts.Operation.PAUSE;
             onStateChanged();
         } else if (state == AudioPlayerConst.PlayerState.PAUSE
-                || state == AudioPlayerConst.PlayerState.STOPED) {
+                || state == AudioPlayerConst.PlayerState.STOP) {
             //播放
             audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mediaPlayer.start();
@@ -319,4 +319,13 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
             return preparePlayer();
         }
     };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.release();
+        mediaPlayer = null;
+        binder = null;
+        playlist = null;
+    }
 }

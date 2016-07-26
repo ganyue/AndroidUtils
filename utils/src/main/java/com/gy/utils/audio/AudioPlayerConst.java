@@ -13,7 +13,7 @@ public class AudioPlayerConst {
         PREPARED,
         PLAYING,
         PAUSE,
-        STOPED
+        STOP,
     }
 
     public static final class Mode {
