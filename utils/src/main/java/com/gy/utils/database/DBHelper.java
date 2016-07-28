@@ -1,4 +1,4 @@
-package com.gy.dao.database;
+package com.gy.utils.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
-import com.gy.dao.database.annotation.DBTable;
+import com.gy.utils.database.annotation.DBTable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     /**
      * 查询
+     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx");
      */
     public List query (Class bean, String sql, String[] selectionArgs) {
         SQLiteDatabase db = getReadableDatabase();
@@ -69,7 +70,37 @@ public class DBHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    /**
+     * 分页查询
+     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx", null, 10, 10);
+     */
+    public List query (Class bean, String sql, String[] selectionArgs, int num, int offset) {
+        SQLiteDatabase db = getReadableDatabase();
+        sql += " limit " + num + "," + offset;
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+
+        List result = cursorToList(bean, cursor);
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return result;
+    }
+
+    /**
+     * 更新到表名是Object相应类名的表，该表名获取方法是{@link #getTableName(Class)}
+     * <p> e.g: dbHelper.update(obj, "xxx=xxx", null);
+     */
     public int update (Object obj, String sql, String[] selectionArgs) {
+        return update(getTableName(obj.getClass()), obj, sql, selectionArgs);
+    }
+
+    /**
+     * 更新到指定名字的表
+     * <p> e.g: dbHelper.update(xxx, obj, "xxx=xxx", null);
+     */
+    public int update (String tableName, Object obj, String sql, String[] selectionArgs) {
         Field[] fields = obj.getClass().getDeclaredFields();
         ContentValues contentValues = new ContentValues();
         for (Field field: fields) {
@@ -90,27 +121,38 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         SQLiteDatabase db = getWritableDatabase();
-        String tableName = getTableName(obj.getClass());
         int result = db.update(tableName, contentValues, sql, selectionArgs);
         db.close();
         return result;
     }
 
     /**
-     * 删除
+     * 删除的表名见方法：{@link #getTableName(Class)}
+     * <p> e.g: dbHelper.delete(cls, "xxx=xxx", null);
      */
     public int delete (Class bean, String sql, String[] selectionArgs) {
+        return delete(getTableName(bean), sql, selectionArgs);
+    }
+
+    /**
+     * 删除
+     * <p> e.g: dbHelper.delete(xxx, "xxx=xxx", null);
+     */
+    public int delete (String tableName, String sql, String[] selectionArgs) {
         SQLiteDatabase db = getWritableDatabase();
-        String tableName = getTableName(bean);
         int result = db.delete(tableName, sql, selectionArgs);
         db.close();
         return result;
     }
 
+    public long insertOrReplace(Object obj) {
+        return insertOrReplace(getTableName(obj.getClass()), obj);
+    }
     /**
      * 插入
+     * <p>如果插入不成功，直接替换掉</p>
      */
-    public long insert (Object obj) {
+    public long insertOrReplace(String tableName, Object obj) {
         Field[] fields = obj.getClass().getDeclaredFields();
         ContentValues contentValues = new ContentValues();
         for (Field field: fields) {
@@ -131,8 +173,7 @@ public class DBHelper extends SQLiteOpenHelper {
         }
 
         SQLiteDatabase db = getWritableDatabase();
-        String tableName = getTableName(obj.getClass());
-        long result = db.insert(tableName, null, contentValues);
+        long result = db.insertWithOnConflict(tableName, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         return result;
     }
@@ -208,12 +249,15 @@ public class DBHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public String getCreateSql (Class bean) {
+        return getCreateSql(bean, getTableName(bean));
+    }
+
     /**
      * 生成创建表的sql语句
      */
-    public String getCreateSql (Class bean) {
+    public String getCreateSql (Class bean, String tableName) {
         String createSqlStr = "create table if not exists ";
-        String tableName = getTableName(bean);
         String[] primaryKey = getTablePrimaryKeys(bean);
         createSqlStr += tableName;
 

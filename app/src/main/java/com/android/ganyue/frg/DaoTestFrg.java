@@ -1,9 +1,6 @@
 package com.android.ganyue.frg;
 
-import android.media.MediaPlayer;
-import android.media.audiofx.Visualizer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +10,7 @@ import com.android.ganyue.R;
 import com.android.ganyue.controller.FuncCtrl;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
-import com.gy.dao.database.DBHelper;
-import com.gy.dao.preference.SharedPreferenceUtils;
-
-import java.util.List;
+import com.gy.utils.database.DBHelper;
 
 /**
  * Created by ganyu on 2016/4/30.
@@ -34,12 +28,12 @@ public class DaoTestFrg extends BaseFragment {
     protected void initViews(View view, Bundle savedInstanceState) {
         Class[] beans = {Dao1.class};
 //        dbHelper = new DBHelper(getActivity(), "test", 1, beans);
-//        dbHelper.insert(new Dao1());
+//        dbHelper.insertOrReplace(new Dao1());
 //        Dao1 dao1 = new Dao1();
 //        dao1.integ = 4;
 //        dao1.flt = 4.1f;
 //        dao1.str = "haha1";
-//        dbHelper.insert(dao1);
+//        dbHelper.insertOrReplace(dao1);
 //        int count = dbHelper.getColumnCount(beans[0]);
 //        List list = dbHelper.query(beans[0], "select * from "+dbHelper.getTableName(beans[0]), null);
 //        dbHelper.delete(beans[0], "str=?", new String[]{"haha1"});

@@ -24,7 +24,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':appbase')
     compile project(':weidget')
-    compile project(':dao')
     compile project(':utils')
     compile project(':map')
     compile project(path: ':appbase')

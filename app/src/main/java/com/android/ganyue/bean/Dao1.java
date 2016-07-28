@@ -1,6 +1,6 @@
 package com.android.ganyue.bean;
 
-import com.gy.dao.database.annotation.DBTable;
+import com.gy.utils.database.annotation.DBTable;
 
 /**
  * Created by sam_gan on 2016/6/22.

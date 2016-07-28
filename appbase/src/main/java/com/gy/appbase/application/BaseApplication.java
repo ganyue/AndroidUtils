@@ -57,4 +57,5 @@ public class BaseApplication extends Application{
     public static WifiUtils getWifiUtils () {
         return WifiUtils.getInstance(application);
     }
+
 }

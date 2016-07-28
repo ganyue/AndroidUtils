@@ -1,11 +1,10 @@
-package com.gy.dao.preference;
+package com.gy.utils.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
  * Created by sam_gan on 2016/6/22.
