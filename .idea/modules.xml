@@ -5,7 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/AndroidUtils.iml" filepath="$PROJECT_DIR$/AndroidUtils.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/appbase/appbase.iml" filepath="$PROJECT_DIR$/appbase/appbase.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libgdx/libgdx.iml" filepath="$PROJECT_DIR$/libgdx/libgdx.iml" />
       <module fileurl="file://$PROJECT_DIR$/map/map.iml" filepath="$PROJECT_DIR$/map/map.iml" />
+      <module fileurl="file://$PROJECT_DIR$/testlibgdx/testlibgdx.iml" filepath="$PROJECT_DIR$/testlibgdx/testlibgdx.iml" />
       <module fileurl="file://$PROJECT_DIR$/utils/utils.iml" filepath="$PROJECT_DIR$/utils/utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/weidget/weidget.iml" filepath="$PROJECT_DIR$/weidget/weidget.iml" />
     </modules>

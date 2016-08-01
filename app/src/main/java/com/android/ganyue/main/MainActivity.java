@@ -12,6 +12,7 @@ import android.widget.SimpleAdapter;
 import com.android.ganyue.application.MApplication;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
+import com.android.ganyue.frg.GameTestFrg;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.TcpTestFrg;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity{
             FileUtilTestFrg.class,
             MediaTestFrg.class,
             MapTestFrg.class,
+            GameTestFrg.class
     };
 
     @Override

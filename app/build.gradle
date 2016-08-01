@@ -27,4 +27,5 @@ dependencies {
     compile project(':utils')
     compile project(':map')
     compile project(path: ':appbase')
+    compile project(':libgdx')
 }

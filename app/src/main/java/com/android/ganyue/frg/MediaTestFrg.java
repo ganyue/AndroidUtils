@@ -1,17 +1,13 @@
 package com.android.ganyue.frg;
 
-import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.android.ganyue.R;
 import com.android.ganyue.application.MApplication;
 import com.android.ganyue.controller.FuncCtrl;
-import com.android.ganyue.utils.nsd.NsdTest;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.audio.AudioUtils;
@@ -35,6 +31,7 @@ public class MediaTestFrg extends BaseFragment {
 
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
+
         view.findViewById(R.id.btn_pre).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

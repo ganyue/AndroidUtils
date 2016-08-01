@@ -1,1 +1,1 @@
-include ':app', ':weidget', ':utils', ':appbase', ':map'
+include ':app', ':weidget', ':utils', ':appbase', ':map', ':testlibgdx', ':libgdx'
