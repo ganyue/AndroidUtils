@@ -16,6 +16,7 @@ import com.badlogic.gdx.backends.android.BaseGdxViewIniter;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
+import com.gy.utils.constants.WindowConstants;
 
 /**
  * Created by ganyu on 2016/4/30.
@@ -34,6 +35,7 @@ public class GameTestFrg extends BaseFragment {
 
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
+        WindowConstants.getInstance(mActivity);
         BaseGdxViewIniter baseGdxViewIniter = new BaseGdxViewIniter(mActivity);
         View gameView = baseGdxViewIniter.initializeForView(
                 new TestGameAdapter(),

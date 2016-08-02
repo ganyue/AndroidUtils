@@ -1,0 +1,145 @@
+
+lear.png
+format: RGBA4444
+filter: Nearest,Nearest
+repeat: none
+lear
+  rotate: false
+  xy: 0, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0001
+lear
+  rotate: false
+  xy: 0, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0018
+lear
+  rotate: false
+  xy: 0, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0019
+lear
+  rotate: false
+  xy: 0, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0002
+lear
+  rotate: false
+  xy: 300, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0003
+lear
+  rotate: false
+  xy: 0, 0
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0004
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0005
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0007
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0009
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0010
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0011
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0012
+lear
+  rotate: false
+  xy: 300, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0013
+lear
+  rotate: false
+  xy: 600, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0006
+lear
+  rotate: false
+  xy: 600, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0008
+lear
+  rotate: false
+  xy: 300, 0
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0014
+lear
+  rotate: false
+  xy: 600, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0015
+lear
+  rotate: false
+  xy: 900, 540
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0016
+lear
+  rotate: false
+  xy: 600, 0
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0017
+lear
+  rotate: false
+  xy: 900, 270
+  size: 300, 270
+  orig: 300, 270
+  offset: 0, 0
+  index: 0020

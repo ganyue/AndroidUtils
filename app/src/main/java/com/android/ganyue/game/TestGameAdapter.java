@@ -1,6 +1,7 @@
 package com.android.ganyue.game;
 
 import com.android.ganyue.game.actors.Beva;
+import com.android.ganyue.game.stages.BevaStage;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.gy.utils.constants.WindowConstants;
 
 /**
  * Created by ganyu on 2016/7/29.
@@ -17,14 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 public class TestGameAdapter extends ApplicationAdapter {
 
     private Stage stage;
-    private Beva beva;
 
     @Override
     public void create () {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
-        beva = new Beva(0, 0, 300, 270);
-        beva.init(stage);
+        stage = new BevaStage();
     }
 
     @Override

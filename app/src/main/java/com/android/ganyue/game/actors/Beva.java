@@ -21,7 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  */
 public class Beva extends Actor {
 
-    enum State {
+    public enum State {
         body, clap, lear, lfoot, rfoot, play, rear, tail, def,
     }
     private State state;
@@ -41,7 +41,6 @@ public class Beva extends Actor {
     private Animation currentAnim;
 
     public ImageButton bodyButton;
-    public ImageButton clapButton;
 
     private float x;
     private float y;
@@ -63,30 +62,25 @@ public class Beva extends Actor {
         TextureAtlas bodyAtlas = new TextureAtlas(Gdx.files.internal("anim/body/body.atlas"));
         TextureAtlas clapAtlas = new TextureAtlas(Gdx.files.internal("anim/clap/clap.atlas"));
         TextureAtlas defAtlas = new TextureAtlas(Gdx.files.internal("anim/default/default.atlas"));
+//        TextureAtlas learAtlas = new TextureAtlas(Gdx.files.internal("anim/lear/lear.atlas"));
         bodyAnim = new Animation(0.1f, bodyAtlas.findRegions("body"));
         clapAnim = new Animation(0.1f, clapAtlas.findRegions("clap"));
         defaultAnim = new Animation(0.1f, defAtlas.findRegions("default"));
+//        learAnim = new Animation(0.1f, learAtlas.findRegions("lear"));
 
         currentAnim = defaultAnim;
         bodyRect = new Rectangle(width * 0.5f, height * 0.2f, height * 0.3f, height * 0.3f);
         clapRect = new Rectangle(bodyRect.x + bodyRect.width, bodyRect.y, height * 0.3f, height * 0.3f);
 
-        TextureRegionDrawable drawable1 = new TextureRegionDrawable(bodyAtlas.findRegion("body", 1));
-        TextureRegionDrawable drawable2 = new TextureRegionDrawable(bodyAtlas.findRegion("body", 7));
-        bodyButton = new ImageButton(drawable1, drawable2);
+        TextureRegion clearReagion = new TextureRegion(bodyAtlas.findRegion("body", 1), 0, 0, 10, 10);
+        TextureRegionDrawable clearDrawable = new TextureRegionDrawable(clearReagion);
+        bodyButton = new ImageButton(clearDrawable);
         bodyButton.setSize(bodyRect.width, bodyRect.height);
         bodyButton.setPosition(x + bodyRect.x, y + bodyRect.y);
         bodyButton.addListener(bodyListener);
 
-        clapButton = new ImageButton(drawable1, drawable2);
-        clapButton.setSize(clapRect.width, clapRect.height);
-        clapButton.setPosition(x + clapRect.x, y + clapRect.y);
-        clapButton.addListener(radioListener);
-
         stage.addActor(this);
         stage.addActor(bodyButton);
-        stage.addActor(clapButton);
-//        this.addListener(bodyListener);
     }
 
     public void changeState (State state) {
@@ -122,7 +116,7 @@ public class Beva extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         stateTime += Gdx.graphics.getDeltaTime();
         update();
-        batch.draw(currentFrame, x, y);
+        batch.draw(currentFrame, x, y, width, height);
     }
 
     @Override
@@ -143,20 +137,5 @@ public class Beva extends Actor {
             state = State.body;
         }
     };
-
-    private InputListener radioListener = new InputListener() {
-        @Override
-        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            Log.d("yue.gan", "touch down : " + x + "-" + y);
-            return true;
-        }
-
-        @Override
-        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-            Log.d("yue.gan", "touch up : " + x + "-" + y);
-            changeState(State.clap);
-        }
-    };
-
 
 }
