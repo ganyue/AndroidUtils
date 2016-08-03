@@ -15,5 +15,8 @@ public interface IAudioPlayer {
     boolean isPlaying ();
     void setMode (int mode);
     int getMode ();
+    void setVolume (int volume);
+    int getVolume ();
+    boolean isAlive ();
     Playlist getPlaylist();
 }

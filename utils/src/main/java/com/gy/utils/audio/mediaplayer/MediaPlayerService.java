@@ -240,6 +240,25 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     }
 
     @Override
+    public void setVolume(int volume) {
+        float maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int vol = (int) (volume * maxVol / 100f);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 1);
+    }
+
+    @Override
+    public int getVolume() {
+        float maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        float vol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        return (int) (vol / maxVol * 100);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return mediaPlayer != null;
+    }
+
+    @Override
     public Playlist getPlaylist() {
         return playlist;
     }

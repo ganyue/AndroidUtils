@@ -73,6 +73,21 @@ public class MediaPlayerServiceBinder extends Binder implements IAudioPlayer{
     }
 
     @Override
+    public void setVolume(int volume) {
+        service.setVolume(volume);
+    }
+
+    @Override
+    public int getVolume() {
+        return service.getVolume();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return service.isAlive();
+    }
+
+    @Override
     public Playlist getPlaylist() {
         return service.getPlaylist();
     }
