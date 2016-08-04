@@ -1,4 +1,4 @@
-package com.gy.utils.download.mine;
+package com.gy.utils.download;
 
 import android.text.TextUtils;
 

@@ -1,4 +1,4 @@
-package com.gy.utils.download.mine;
+package com.gy.utils.download;
 
 /**
  * Created by ganyu on 2016/7/27.

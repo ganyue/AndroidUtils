@@ -1,4 +1,4 @@
-package com.gy.utils.download.mine;
+package com.gy.utils.download;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -48,8 +48,8 @@ public class MDownloadManager {
     private void init () {
         //如果下载的数据库没创建，则创建
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getFinishedTableName()));
-        db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getUnfinishedTableName()));
+        db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getFinishedTableName()));      //已完成表
+        db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getUnfinishedTableName()));    //未完成表
         db.close();
 
         //使用Collections.synchronizedXXX封装的list或map防止异步操作导致的崩溃或者阻塞

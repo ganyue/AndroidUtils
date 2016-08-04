@@ -9,6 +9,7 @@ import com.gy.utils.constants.WindowConstants;
 
 /**
  * Created by ganyu on 2016/8/2.
+ *
  */
 public class BevaStage extends Stage {
 
