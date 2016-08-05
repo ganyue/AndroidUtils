@@ -35,7 +35,7 @@ public class DownloadManager {
         return mInstance;
     }
 
-    public DownloadManager(DBHelper dbHelper) {
+    private DownloadManager(DBHelper dbHelper) {
         this.dbHelper = dbHelper;
         maxDownloadNum = 1;
         init();
