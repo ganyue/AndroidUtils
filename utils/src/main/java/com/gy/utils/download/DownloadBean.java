@@ -21,6 +21,9 @@ public class DownloadBean {
     public String md5;
     public String extraMsg;
 
+    public DownloadBean() {
+    }
+
     public DownloadBean (String url, String storePath) {
         this.url = url;
         this.storePath = storePath;
@@ -38,6 +41,7 @@ public class DownloadBean {
     //文件名后带上url的hashcode, 方便将来希望看看是否已下载过的时候拿它来做比较
     private void initFileName () {
         if (TextUtils.isEmpty(url)) {
+            fileName = "";
             return;
         }
 

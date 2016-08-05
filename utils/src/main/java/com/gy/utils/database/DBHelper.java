@@ -32,7 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         if (beans == null || beans.length <= 0) {
-            throw new IllegalArgumentException("beans can not be null");
+            return;
         }
 
         String createSql;
@@ -48,9 +48,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (beans == null || beans.length <= 0) {
-            throw new IllegalArgumentException("beans can not be null");
-        }
+        //TODO need to be override by child class to update database of certain version
     }
 
     /**

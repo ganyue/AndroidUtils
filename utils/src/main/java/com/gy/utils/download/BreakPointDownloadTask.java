@@ -57,9 +57,9 @@ public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{
                 //first download
                 bean.storedLen = 0;
             }
-            bean.contentLen = connection.getContentLength();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Range", "bytes=" + bean.storedLen + "-" + (bean.contentLen - bean.storedLen));
+            connection.setRequestProperty("Range", "bytes=" + bean.storedLen + "-");
+            bean.contentLen = connection.getContentLength() + bean.storedLen;
 
             int responsCode = connection.getResponseCode();
             if (responsCode < 400) {
