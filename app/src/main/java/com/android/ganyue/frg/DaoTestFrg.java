@@ -1,6 +1,7 @@
 package com.android.ganyue.frg;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import com.android.ganyue.controller.FuncCtrl;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.database.DBHelper;
+import com.gy.utils.log.LogUtils;
+import com.gy.utils.preference.SharedPreferenceUtils;
 
 /**
  * Created by ganyu on 2016/4/30.
@@ -50,6 +53,16 @@ public class DaoTestFrg extends BaseFragment {
 //        SharedPreferenceUtils.getInstance(mActivity).save(dao1.getClass(), dao1);
 //        Dao1 dao12 = (Dao1) SharedPreferenceUtils.getInstance(mActivity).get(Dao1.class);
 //        Log.d("yue.gan", "empty");
+
+        SharedPreferenceUtils sharedPreferenceUtils = SharedPreferenceUtils.getInstance(mActivity);
+        Dao1 dao1 = new Dao1();dao1.flt = 1f; dao1.integ = 3; dao1.str = "haha";
+        sharedPreferenceUtils.save("1", dao1);
+        dao1 = new Dao1();dao1.flt = 2f; dao1.integ = 2; dao1.str = "hehe";
+        sharedPreferenceUtils.save("2", dao1);
+        Dao1 d = (Dao1) sharedPreferenceUtils.get("1", Dao1.class);
+        Dao1 d1 = (Dao1) sharedPreferenceUtils.get("2", Dao1.class);
+        LogUtils.d("yue.gan", "done");
+
     }
 
     @Override

@@ -100,9 +100,14 @@ public class SharedPreferenceUtils {
         return preferences.getFloat(key, 0);
     }
 
-    //save a object
-    public void save (Class clazz, Object obj) {
-        String nameSpace = clazz.getSimpleName() + "_";
+    /**
+     * <p>存储一个对象，目前支持int，float， String， boolean， 可以存储多个（需不同昵称）</p>
+     * @param nickname  昵称
+     * @param obj       要存储的对象
+     */
+    public void save (String nickname, Object obj) {
+        Class clazz = obj.getClass();
+        String nameSpace = clazz.getSimpleName() + "_" + nickname + "_";
         Field[] fields = clazz.getDeclaredFields();
 
         String fieldTypeName;
@@ -129,10 +134,15 @@ public class SharedPreferenceUtils {
         }
     }
 
-    //get object
-    public Object get (Class clazz) {
+    /**
+     *
+     * @param nickname 昵称
+     * @param clazz     类
+     * @return          生成的指定类的对象，对象值从该昵称对应的preference中取的
+     */
+    public Object get (String nickname, Class clazz) {
         try {
-            String nameSpace = clazz.getSimpleName() + "_";
+            String nameSpace = clazz.getSimpleName() + "_" + nickname + "_";
             Object object = clazz.newInstance();
             Field[] fields = clazz.getDeclaredFields();
             String fieldTypeName;
