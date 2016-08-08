@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <Button
+        android:id="@+id/btn_record"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="record"/>
+
+    <Button
+        android:id="@+id/btn_stop_record"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="stop_record"
+        android:layout_below="@id/btn_record"/>
+
+    <Button
+        android:id="@+id/btn_play"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="play"
+        android:layout_below="@id/btn_stop_record"/>
+
+    <Button
+        android:id="@+id/btn_stop_play"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="stop play"
+        android:layout_below="@id/btn_play"/>
+
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="delete"
+        android:layout_below="@id/btn_stop_play"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/btn_delete">
+        <Button
+            android:id="@+id/btn_plus"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="plus play freq"/>
+        <TextView
+            android:id="@+id/tv_playfreq"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColor="#000000"
+            android:gravity="center"/>
+        <Button
+            android:id="@+id/btn_add"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="add play freq"/>
+    </LinearLayout>
+
+</RelativeLayout>

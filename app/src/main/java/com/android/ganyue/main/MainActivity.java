@@ -1,8 +1,6 @@
 package com.android.ganyue.main;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,8 +20,7 @@ import com.gy.utils.constants.WindowConstants;
 import com.android.ganyue.R;
 import com.android.ganyue.frg.BevaTtAlbumDetailFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
-import com.android.ganyue.frg.NsdTestFrg;
-import com.gy.utils.file.FileUtils;
+import com.android.ganyue.frg.ARecordTestFrg;
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.wifi.WifiUtils;
 
@@ -39,7 +36,7 @@ import java.util.Map;
 public class MainActivity extends Activity{
 
     private final Class[] types = {
-            NsdTestFrg.class,
+            ARecordTestFrg.class,
             HorizontalIndicatorFrg.class,
             BevaTtAlbumDetailFrg.class,
             WifiConnectTestFrg.class,
