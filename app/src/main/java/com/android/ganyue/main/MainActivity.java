@@ -16,6 +16,7 @@ import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.TcpTestFrg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
+import com.android.ganyue.frg.XunFeiTestFrg;
 import com.gy.utils.constants.WindowConstants;
 import com.android.ganyue.R;
 import com.android.ganyue.frg.BevaTtAlbumDetailFrg;
@@ -46,7 +47,8 @@ public class MainActivity extends Activity{
             FileUtilTestFrg.class,
             MediaTestFrg.class,
             MapTestFrg.class,
-            GameTestFrg.class
+            GameTestFrg.class,
+            XunFeiTestFrg.class,
     };
 
     @Override

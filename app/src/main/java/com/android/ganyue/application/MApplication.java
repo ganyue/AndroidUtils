@@ -6,6 +6,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.gy.appbase.application.BaseApplication;
 import com.gy.utils.audio.AudioUtils;
 import com.gy.utils.log.LogUtils;
+import com.gy.xunfei.XunfeiUtils;
 
 /**
  * Created by ganyu on 2016/7/21.
@@ -18,7 +19,8 @@ public class MApplication extends BaseApplication {
         super.onCreate();
 
         LogUtils.d("yue.gan", "start init media service");
-//        AudioUtils.getInstance(this);       //初始化audio播放器
+        AudioUtils.getInstance(this);       //初始化audio播放器
+        XunfeiUtils.getInstance(this);      //初始化讯飞sdk
         SDKInitializer.initialize(this);    //初始化百度地图api
     }
 

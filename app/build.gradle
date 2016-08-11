@@ -28,4 +28,5 @@ dependencies {
     compile project(':map')
     compile project(path: ':appbase')
     compile project(':libgdx')
+    compile project(':xunfei')
 }

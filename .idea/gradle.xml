@@ -14,9 +14,9 @@
             <option value="$PROJECT_DIR$/appbase" />
             <option value="$PROJECT_DIR$/libgdx" />
             <option value="$PROJECT_DIR$/map" />
-            <option value="$PROJECT_DIR$/testlibgdx" />
             <option value="$PROJECT_DIR$/utils" />
             <option value="$PROJECT_DIR$/weidget" />
+            <option value="$PROJECT_DIR$/xunfei" />
           </set>
         </option>
         <option name="myModules">
@@ -26,9 +26,9 @@
             <option value="$PROJECT_DIR$/appbase" />
             <option value="$PROJECT_DIR$/libgdx" />
             <option value="$PROJECT_DIR$/map" />
-            <option value="$PROJECT_DIR$/testlibgdx" />
             <option value="$PROJECT_DIR$/utils" />
             <option value="$PROJECT_DIR$/weidget" />
+            <option value="$PROJECT_DIR$/xunfei" />
           </set>
         </option>
       </GradleProjectSettings>
