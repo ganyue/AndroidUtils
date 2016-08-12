@@ -11,19 +11,20 @@ import java.net.Socket;
 public class TcpReceiver extends Thread {
 
     private InputStream mSockInStream;
-    private TcpReceiverListener mTcpReceiverListener;
+    private TcpMessageProcessor tcpMessageProcessor;
     private boolean isRun;
 
     public TcpReceiver (Socket socket) {
         try {
             mSockInStream = socket.getInputStream();
+            tcpMessageProcessor = new TcpMessageProcessor();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void setTcpReceiverListener (TcpReceiverListener listener) {
-        mTcpReceiverListener = listener;
+    public void setTcpReceiverListener (TcpMessageProcessor.TcpReceiveListener listener) {
+        tcpMessageProcessor.setOnReceiveListener(listener);
     }
 
     @Override
@@ -31,6 +32,7 @@ public class TcpReceiver extends Thread {
         if (mSockInStream == null) {
             return;
         }
+        tcpMessageProcessor.start();
         isRun = true;
 
         byte[] buff = new byte[1024];
@@ -41,20 +43,26 @@ public class TcpReceiver extends Thread {
                 if (len <= 0) {
                     break;
                 }
-                if (mTcpReceiverListener != null) {
-                    mTcpReceiverListener.onReceive(buff, 0, len);
-                }
+                tcpMessageProcessor.onReceive(buff, 0, len);
             } catch (IOException e) {
                 e.printStackTrace();
-                if (mTcpReceiverListener != null) {
-                    mTcpReceiverListener.onReceiveError(e);
-                }
+                tcpMessageProcessor.onReceiveError(e);
             }
         }
     }
 
-    public interface TcpReceiverListener {
-        void onReceive (byte[] buf, int offset, int len);
-        void onReceiveError (Exception e);
+    public void release () {
+        isRun = false;
+        interrupt();
+        try {
+            if (mSockInStream != null) {
+                mSockInStream.close();
+                mSockInStream = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        tcpMessageProcessor.release();
     }
+
 }

@@ -4,7 +4,10 @@ import android.text.TextUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sam_gan on 2016/6/3.
@@ -13,15 +16,16 @@ import java.net.Socket;
 public class TcpSender extends Thread {
 
     private OutputStream mSockOutStream;
-    private TcpMessageQueue mMessage;
-    private final Object mLock = new Object();
+    private ArrayBlockingQueue<TcpMessage> mMessage;
     private TcpSenderListener mTcpSenderListener;
+    private WeakReference<Socket> mSocket;
     private boolean isRun;
 
     public TcpSender(Socket socket) {
-        mMessage = new TcpMessageQueue();
+        mMessage = new ArrayBlockingQueue<TcpMessage>(64);
         try {
             mSockOutStream = socket.getOutputStream();
+            mSocket = new WeakReference<Socket>(socket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,10 +36,7 @@ public class TcpSender extends Thread {
     }
 
     public void send(String msg) {
-        mMessage.addMessage(new TcpMessage("", 0, msg));
-        synchronized (mLock) {
-            mLock.notify();
-        }
+        mMessage.offer(new TcpMessage("", 0, msg));
     }
 
     @Override
@@ -45,14 +46,14 @@ public class TcpSender extends Thread {
         }
         isRun = true;
 
+        TcpMessage message = null;
         while (isRun) {
-            TcpMessage message = mMessage.getMessage();
             try {
+                //3秒后如果没有消息发送则发送一个简单消息来确认tcp连接是否活着
+                message = mMessage.poll(3000, TimeUnit.MILLISECONDS);
                 if (message == null || TextUtils.isEmpty(message.message)) {
-                    synchronized (mLock) {
-                        mLock.wait();
-                        continue;
-                    }
+                    mSocket.get().sendUrgentData(0xFF);
+                    continue;
                 }
                 boolean handled = false;
                 if (mTcpSenderListener != null) {
@@ -83,7 +84,6 @@ public class TcpSender extends Thread {
     public void release () {
         isRun = false;
         mMessage.clear();
-        mTcpSenderListener = null;
         interrupt();
         if (mSockOutStream != null) {
             try {
@@ -93,6 +93,7 @@ public class TcpSender extends Thread {
             }
         }
         mSockOutStream = null;
+        mTcpSenderListener = null;
     }
 
     public interface TcpSenderListener {

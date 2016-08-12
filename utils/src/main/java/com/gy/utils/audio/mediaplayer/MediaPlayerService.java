@@ -53,6 +53,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) return START_STICKY;
         int cmd = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_CMD_I, AudioPlayerConst.PlayerConsts.Cmds.CMD_UNKNOWN);
 
         switch (cmd) {

@@ -1,5 +1,6 @@
 package com.gy.utils.tcp;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class TcpClient extends Thread{
     private TcpReceiver mReceiver;
     private boolean isInited;
     private List<TcpClientListener> tcpClientListeners;
+    private boolean isConnected = false;
 
     public void addTcpClientListener (TcpClientListener tcpClientListener) {
         if (tcpClientListeners == null) {
@@ -49,6 +51,18 @@ public class TcpClient extends Thread{
         isInited = false;
     }
 
+    public String getDstIp () {
+        return dstIp;
+    }
+
+    public int getDstPort () {
+        return dstPort;
+    }
+
+    public boolean isConnected () {
+        return isConnected;
+    }
+
     private void init () {
         if (!isInited) {
             mSender = new TcpSender(mSocket);
@@ -70,6 +84,7 @@ public class TcpClient extends Thread{
         if (mSocket == null) {
             try {
                 mSocket = new Socket(dstIp, dstPort);
+                isConnected = true;
             } catch (Exception e) {
                 e.printStackTrace();
                 if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
@@ -109,6 +124,7 @@ public class TcpClient extends Thread{
 
         @Override
         public void onSendFailed(String msg, Exception e) {
+            isConnected = false;
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
                     tcpClientListener.onSendFailed(msg, e, dstIp, dstPort);
@@ -117,7 +133,7 @@ public class TcpClient extends Thread{
         }
     };
 
-    private TcpReceiver.TcpReceiverListener tcpReceiverListener = new TcpReceiver.TcpReceiverListener() {
+    private TcpMessageProcessor.TcpReceiveListener tcpReceiverListener = new TcpMessageProcessor.TcpReceiveListener() {
         @Override
         public void onReceive(byte[] buf, int offset, int len) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
@@ -136,6 +152,20 @@ public class TcpClient extends Thread{
             }
         }
     };
+
+    public void release () {
+        mSender.release();
+        mReceiver.release();
+        isInited = false;
+        try {
+            if (mSocket != null) {
+                mSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        interrupt();
+    }
 
     public interface TcpClientListener {
         void onSocketConnectFail (Exception e, String dstIp, int dstPort);

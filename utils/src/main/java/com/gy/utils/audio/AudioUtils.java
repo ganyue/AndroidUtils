@@ -66,7 +66,7 @@ public class AudioUtils {
         initPlayers();
     }
 
-    public void initPlayers () {
+    private void initPlayers () {
         Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
         LogUtils.d("yue.gan", "start media service");
         mApp.get().startService(intent);

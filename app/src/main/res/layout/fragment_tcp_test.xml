@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_send"
@@ -14,20 +15,23 @@
         android:id="@+id/btn_server"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Start Server"
-        android:layout_below="@id/btn_send"/>
+        android:text="Start Server"/>
+
+    <Button
+        android:id="@+id/btn_reconnect"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="Reconnect"/>
 
     <Button
         android:id="@+id/btn_clearLog"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Clear Log"
-        android:layout_below="@id/btn_server"/>
+        android:text="Clear Log"/>
 
     <TextView
         android:id="@+id/tv_log"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/btn_clearLog"
+        android:layout_height="fill_parent"
         android:layout_margin="40dp"/>
-</RelativeLayout>
+</LinearLayout>

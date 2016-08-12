@@ -28,6 +28,7 @@ import java.util.Map;
 
 /**
  * Created by lwk on 2016/2/23.
+ *
  */
 public class MpdManage {
 
@@ -90,7 +91,7 @@ public class MpdManage {
         }
 
         oMPDAsyncHelper = new MPDAsyncHelper();
-        oMPDAsyncHelper.addConnectionListener(listener);
+        if (listener != null) oMPDAsyncHelper.addConnectionListener(listener);
 
         settingsHelper = new SettingsHelper(mpdApplication, oMPDAsyncHelper);
 
@@ -117,36 +118,6 @@ public class MpdManage {
         oMPDAsyncHelper.stopMonitor();
         oMPDAsyncHelper.disconnect();
         Log.d("wl", "-----断开连接1111------");
-    }
-
-    public void setActivity(Object activity, String server) {
-        if (activity instanceof Activity)
-            currentActivity = (Activity) activity;
-
-        connectionLocks.add(activity);
-        checkConnectionNeeded(server);
-    }
-
-    public void unsetActivity(Object activity, String server) {
-        connectionLocks.remove(activity);
-        checkConnectionNeeded(server);
-
-        if (currentActivity == activity)
-            currentActivity = null;
-    }
-
-    private void checkConnectionNeeded(String server) {
-        if (connectionLocks.size() > 0) {
-            if (!oMPDAsyncHelper.isMonitorAlive()) {
-                oMPDAsyncHelper.startMonitor();
-            }
-            if (!oMPDAsyncHelper.oMPD.isConnected() && (currentActivity == null)) {
-                connect(server);
-                Log.d("wl", "-----重连1111----");
-            }
-        } else {
-            disconnect();
-        }
     }
 
     public void updateTrackInfo(final UpdateTrackInfoListener updateTrackInfoListener){
@@ -176,7 +147,7 @@ public class MpdManage {
     }
 
     public int changePlayMode(int mode){
-        mode = (mode + 1) % 3;
+        mode = (mode) % 3;
         switch (mode) {
             case 0:
                 try {
@@ -238,6 +209,17 @@ public class MpdManage {
         return  playlist.getMusicList();
     }
 
+    private final String[] PlaylistNames = new String[]{
+            "收藏列表",
+            "贝瓦童谣",
+            "贝瓦儿歌",
+            "贝瓦学堂",
+            "HappyEnglish",
+            "随便听听",
+            "睡前听听",
+            "路上听听",
+            "边听边动"};
+
     public void getBevabbPlayLists(final GetBevabbPlayListsListener listsListener){
         list = new ArrayList<>();
         new Thread(){
@@ -248,119 +230,32 @@ public class MpdManage {
                         Log.d("wl", "------获取宝宝歌单列表22--------"+items);
                         items = oMPDAsyncHelper.oMPD.getPlaylists(true);
                         Log.d("wl", "------获取宝宝歌单列表11--------"+items);
+
                         for (int i=0; i<items.size(); i++){
                             final Item item = items.get(i);
-                            final int index = i;
-                            new Thread(){
-                                @Override
-                                public void run() {
-                                    super.run();
-                                    try{
-                                        Map<String, Object> map = new HashMap<>();
-                                        Log.d("wl", "------获取宝宝歌单下单曲列表22--------"+songs);
-                                        if(item.getName().equals("0") || item.getName().equals("1") || item.getName().equals("2") || item.getName().equals("3") || item.getName().equals("4") || item.getName().equals("5") || item.getName().equals("6") || item.getName().equals("7") || item.getName().equals("8")){
-                                            songs = oMPDAsyncHelper.oMPD.getPlaylistSongs(item.getName());
-                                            Log.d("wl", "------获取宝宝歌单下单曲列表11--------"+songs);
-                                            if(songs != null && songs.size() > 0){
-                                                map.put("num", songs.size());
-                                            }else{
-                                                map.put("num", 0);
-                                            }
-                                            map.put("id", item.getName());
-
-                                            switch (Integer.parseInt(item.getName())){
-//                                                case 8:
-//                                                    map.put("name", "Happy English");
-//                                                    break;
-//
-//                                                case 0:
-//                                                    map.put("name", "收藏列表");
-//                                                    break;
-//
-//                                                case 1:
-//                                                    map.put("name", "贝瓦儿歌");
-//                                                    break;
-//
-//                                                case 2:
-//                                                    map.put("name", "贝瓦童谣");
-//                                                    break;
-//
-//                                                case 3:
-//                                                    map.put("name", "贝瓦故事");
-//                                                    break;
-//
-//                                                case 4:
-//                                                    map.put("name", "贝瓦学堂");
-//                                                    break;
-//
-//                                                case 5:
-//                                                    map.put("name", "睡前听听");
-//                                                    break;
-//
-//                                                case 6:
-//                                                    map.put("name", "路上听听");
-//                                                    break;
-//
-//                                                case 7:
-//                                                    map.put("name", "习惯养成");
-//                                                    break;
-
-                                                case 8:
-                                                    map.put("name", "边听边动");
-                                                    break;
-
-                                                case 0:
-                                                    map.put("name", "收藏列表");
-                                                    break;
-
-                                                case 1:
-                                                    map.put("name", "贝瓦童谣");
-                                                    break;
-
-                                                case 2:
-                                                    map.put("name", "贝瓦儿歌");
-                                                    break;
-
-                                                case 3:
-                                                    map.put("name", "贝瓦学堂");
-                                                    break;
-
-                                                case 4:
-                                                    map.put("name", "HappyEnglish");
-                                                    break;
-
-                                                case 5:
-                                                    map.put("name", "随便听听");
-                                                    break;
-
-                                                case 6:
-                                                    map.put("name", "睡前听听");
-                                                    break;
-
-                                                case 7:
-                                                    map.put("name", "路上听听");
-                                                    break;
-                                            }
-
-//                                            if (list != null) {
-//                                                for (Map m: list) {
-//                                                    if (map.get("name").equals(m.get("name"))) {
-//                                                        list.remove(m);
-//                                                        break;
-//                                                    }
-//                                                }
-//                                            }
-                                            list.add(map);
-                                            if(list != null && list.size() >= 9){
-                                                listsListener.onSuccess(list);
-                                            }
-                                        }
-                                    }catch (MPDServerException e){
-                                        Log.d("wl", "获取宝宝歌单下单曲列表失败"+e.toString());
+                            try{
+                                Map<String, Object> map = new HashMap<>();
+                                Log.d("wl", "------获取宝宝歌单下单曲列表22--------"+songs);
+                                int nameIndex = Integer.parseInt(item.getName());
+                                if(nameIndex >= 0 && nameIndex <= 8){
+                                    songs = oMPDAsyncHelper.oMPD.getPlaylistSongs(item.getName());
+                                    Log.d("wl", "------获取宝宝歌单下单曲列表11--------"+songs);
+                                    if(songs != null && songs.size() > 0){
+                                        map.put("num", songs.size());
+                                    }else{
+                                        map.put("num", 0);
                                     }
-                                }
-                            }.start();
+                                    map.put("id", item.getName());
+                                    map.put("name", PlaylistNames[nameIndex]);
+                                    list.add(map);
+                                }//end of if
+                            }catch (MPDServerException e){
+                                Log.d("wl", "获取宝宝歌单下单曲列表失败"+e.toString());
+                            }
+                        }//end of for
 
+                        if(list != null && list.size() >= 9){
+                            listsListener.onSuccess(list);
                         }
                     } catch (MPDServerException e) {
                         e.printStackTrace();
