@@ -76,6 +76,7 @@ public class TcpTestFrg extends BaseFragment {
                     client.release();
                     if (!TextUtils.isEmpty(client.getDstIp())) {
                         client = new TcpClient(client.getDstIp(), client.getDstPort());
+                        client.addTcpClientListener(tcpClientListener);
                         client.start();
                     }
                 }
