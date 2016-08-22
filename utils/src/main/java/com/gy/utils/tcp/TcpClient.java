@@ -72,11 +72,16 @@ public class TcpClient extends Thread{
             mSender.start();
             mReceiver.start();
             isInited = true;
+            if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
+                for (TcpClientListener tcpClientListener: tcpClientListeners) {
+                    tcpClientListener.onSocketConnectSuccess(dstIp, dstPort);
+                }
+            }
         }
     }
 
     public void send (String msg) {
-        mSender.send(msg);
+        if (mSender != null) mSender.send(msg);
     }
 
     @Override
@@ -169,6 +174,7 @@ public class TcpClient extends Thread{
 
     public interface TcpClientListener {
         void onSocketConnectFail (Exception e, String dstIp, int dstPort);
+        void onSocketConnectSuccess (String dstIp, int dstPort);
         void onSendBefore (String msg, String dstIp, int dstPort);
         void onSendSuccess (String msg, String dstIp, int dstPort);
         void onSendFailed (String msg, Exception e, String dstIp, int dstPort);

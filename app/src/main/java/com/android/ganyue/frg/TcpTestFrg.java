@@ -130,6 +130,11 @@ public class TcpTestFrg extends BaseFragment {
         }
 
         @Override
+        public void onSocketConnectSuccess(String dstIp, int dstPort) {
+
+        }
+
+        @Override
         public void onSendBefore(String msg, String dstIp, int dstPort) {
         }
 

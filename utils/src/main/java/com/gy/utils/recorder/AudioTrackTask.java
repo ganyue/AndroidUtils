@@ -2,7 +2,6 @@ package com.gy.utils.recorder;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.os.AsyncTask;
 
@@ -10,6 +9,7 @@ import com.gy.utils.log.LogUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by ganyu on 2016/8/6.
@@ -23,6 +23,7 @@ public class AudioTrackTask extends AsyncTask<Void, Void, Void> {
     private int audioConfig;
     private int audioFormat;
     private int minBuffSize;
+    private ArrayBlockingQueue<Byte[]> bufferQueue;
 
     public AudioTrackTask(String audioPath, int rate, int config, int format) {
         this.audioPath = audioPath;
@@ -30,11 +31,17 @@ public class AudioTrackTask extends AsyncTask<Void, Void, Void> {
         audioFormat = format;
         minBuffSize = AudioTrack.getMinBufferSize(rate, config, format);
 
-        if (config == AudioFormat.CHANNEL_IN_MONO) {
+        if (config == AudioFormat.CHANNEL_IN_MONO || config == AudioFormat.CHANNEL_OUT_MONO) {
             audioConfig = AudioFormat.CHANNEL_OUT_MONO;
         } else {
             audioConfig = AudioFormat.CHANNEL_OUT_STEREO;
         }
+
+        bufferQueue = new ArrayBlockingQueue<Byte[]>(32);
+    }
+
+    public void writeData (Byte[] buff) {
+        bufferQueue.offer(buff);
     }
 
     @Override
@@ -49,31 +56,29 @@ public class AudioTrackTask extends AsyncTask<Void, Void, Void> {
                 AudioTrack.MODE_STREAM);
 
         try {
-            FileInputStream fIn = new FileInputStream(new File(audioPath));
+            FileInputStream fIn = null;
+            if (audioPath != null) {
+               fIn = new FileInputStream(new File(audioPath));
+            }
             byte[] buff = new byte[minBuffSize];
             int len = 0;
             audioTrack.play();
             isPlaying = true;
 
-            byte[] tempbuff = new byte[2 * minBuffSize];
             while (isPlaying) {
-                len = fIn.read(buff, 0, minBuffSize);
-                if (len <= 0) {
-                    LogUtils.d("yue.gan", "end of pcm file");
-                    break;
+                if (fIn != null) {
+                    len = fIn.read(buff, 0, minBuffSize);
+                    if (len <= 0) {
+                        LogUtils.d("yue.gan", "end of pcm file");
+                        break;
+                    }
+                    audioTrack.write(buff, 0, len);
+                } else {
+                    Byte[] tempBuffer = bufferQueue.take();
+                    byte[] buffer = new byte[tempBuffer.length];
+                    System.arraycopy(tempBuffer, 0, buffer, 0, tempBuffer.length);
+                    audioTrack.write(buffer, 0, buffer.length);
                 }
-//                int index = 0;
-//                for (int i = 0; i < len; i++) {
-//                    if (i % 2 == 0 && i != 0) {
-//                        tempbuff[index] = tempbuff[index - 2];
-//                        index++;
-//                        tempbuff[index] = tempbuff[index - 2];
-//                        index ++;
-//                    }
-//                    tempbuff[index] = buff[i];
-//                    index++;
-//                }
-                audioTrack.write(buff, 0, len);
             }
 
             LogUtils.d("yue.gan", "stop play");

@@ -18,6 +18,7 @@ public class StringUtils {
         for (int i = 0; i < b.length; i++) {
             sb.append(HEX_DIGITS[(b[i] & 0xf0) >>> 4]);
             sb.append(HEX_DIGITS[b[i] & 0x0f]);
+            sb.append(" ");
         }
         return sb.toString();
     }

@@ -27,6 +27,13 @@ public class AudioRecordInfo {
     public int audioRecordConfig;
     public int audioRecordMinBuffSize;
 
+    public void changeInfo (int rate, int config, int format) {
+        audioRate = rate;
+        audioRecordConfig = config;
+        audioFormat = format;
+        audioRecordMinBuffSize = AudioRecord.getMinBufferSize(rate, config, format);
+    }
+
     public AudioRecordInfo () {
         int[] rates = new int[]{44100, 22050, 11025, 8000};
         for (int rate : rates) {

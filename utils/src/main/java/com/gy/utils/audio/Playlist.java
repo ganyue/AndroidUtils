@@ -15,6 +15,7 @@ import java.util.Random;
 public class Playlist implements Parcelable{
     private int mode;
     private int currentPos;
+    private String name;
     private Album album;
     private List<Track> tracks;
 
@@ -24,6 +25,10 @@ public class Playlist implements Parcelable{
     public Playlist (List<Track> tracks) {
         setTracks(tracks);
     }
+
+    public String getName () {return name;}
+
+    public void setName (String name) {this.name = name;}
 
     public int getMode() {
         return mode;
@@ -143,6 +148,7 @@ public class Playlist implements Parcelable{
     protected Playlist(Parcel in) {
         mode = in.readInt();
         currentPos = in.readInt();
+        name = in.readString();
         album = in.readParcelable(Album.class.getClassLoader());
         tracks = in.createTypedArrayList(Track.CREATOR);
     }
@@ -168,6 +174,7 @@ public class Playlist implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(mode);
         dest.writeInt(currentPos);
+        dest.writeString(name);
         dest.writeParcelable(album, flags);
         dest.writeTypedList(tracks);
     }

@@ -1,1 +1,1 @@
-include ':app', ':weidget', ':utils', ':appbase', ':map', ':libgdx', ':xunfei'
+include ':app', ':weidget', ':utils', ':appbase', ':map', ':libgdx', ':xunfei', ':audio2d'

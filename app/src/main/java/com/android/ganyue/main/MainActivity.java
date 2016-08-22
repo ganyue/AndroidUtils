@@ -13,6 +13,7 @@ import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.GameTestFrg;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
+import com.android.ganyue.frg.MpdTestFrg;
 import com.android.ganyue.frg.TcpTestFrg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
@@ -49,6 +50,7 @@ public class MainActivity extends Activity{
             MapTestFrg.class,
             GameTestFrg.class,
             XunFeiTestFrg.class,
+            MpdTestFrg.class,
     };
 
     @Override

@@ -96,7 +96,7 @@ public class GracenoteCover extends AbstractWebCover {
     }
 
     public String register(String clientID) {
-        String request = "<QUERIES><QUERY CMD=\"REGISTER\"><CLIENT>" + clientID + "</CLIENT></QUERY></QUERIES>";
+        String request = "<QUERIES><QUERY Cmd=\"REGISTER\"><CLIENT>" + clientID + "</CLIENT></QUERY></QUERIES>";
         String response = this.executePostRequest(API_URL, request);
         return extractUserID(response);
     }
@@ -110,7 +110,7 @@ public class GracenoteCover extends AbstractWebCover {
                 "    <CLIENT>" + CLIENT_ID + "</CLIENT>\n" +
                 "    <USER>" + userId + "</USER>\n" +
                 "  </AUTH>\n" +
-                "  <QUERY CMD=\"ALBUM_SEARCH\">\n" +
+                "  <QUERY Cmd=\"ALBUM_SEARCH\">\n" +
                 "    <MODE>SINGLE_BEST_COVER</MODE>\n" +
                 "    <TEXT TYPE=\"ARTIST\">" + artist + "</TEXT>\n" +
                 "    <TEXT TYPE=\"ALBUM_TITLE\">" + album + "</TEXT>\n" +

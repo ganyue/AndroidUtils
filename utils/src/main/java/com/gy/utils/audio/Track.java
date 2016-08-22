@@ -19,6 +19,7 @@ public class Track implements Parcelable{
     public String mp3Url = "";
     public String picUrl = "";
     public String singer = "";
+    public String file = "";
 
     public Track (){};
 
@@ -32,6 +33,7 @@ public class Track implements Parcelable{
         mp3Url = in.readString();
         picUrl = in.readString();
         singer = in.readString();
+        file = in.readString();
     }
 
     public static final Creator<Track> CREATOR = new Creator<Track>() {
@@ -63,5 +65,6 @@ public class Track implements Parcelable{
         dest.writeString(mp3Url);
         dest.writeString(picUrl);
         dest.writeString(singer);
+        dest.writeString(file);
     }
 }

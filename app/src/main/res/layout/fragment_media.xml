@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_pre"
@@ -14,32 +15,38 @@
         android:id="@+id/btn_play"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="Play"
-        android:layout_below="@id/btn_pre"/>
+        android:text="Play"/>
 
     <Button
         android:id="@+id/btn_next"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="next"
-        android:layout_below="@id/btn_play"/>
+        android:text="next"/>
     <Button
         android:id="@+id/btn_init"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="init"
-        android:layout_below="@id/btn_next"/>
+        android:text="init"/>
     <Button
         android:id="@+id/btn_seek"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="seek"
-        android:layout_below="@id/btn_init"/>
+        android:text="seek"/>
 
-    <TextView
-        android:id="@+id/tv_log"
+    <Button
+        android:id="@+id/btn_clearLog"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/btn_seek"
-        android:layout_margin="40dp"/>
-</RelativeLayout>
+        android:layout_height="40dp"
+        android:text="Clear Log"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+        <TextView
+            android:id="@+id/tv_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="40dp"/>
+    </ScrollView>
+</LinearLayout>
