@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Represents a playlist in the database
+ * Represents a playlistVersion in the database
  *
  */
 public class PlaylistFile extends Item implements FilesystemTreeEntry {

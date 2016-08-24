@@ -96,8 +96,8 @@ public class MPDStatus {
 					this.volume = Integer.parseInt(line.substring("volume: ".length()));
 				} else if (line.startsWith("bitrate:")) {
 					this.bitrate = Long.parseLong(line.substring("bitrate: ".length()));
-				} else if (line.startsWith("playlist:")) {
-					this.playlistVersion = Integer.parseInt(line.substring("playlist: ".length()));
+				} else if (line.startsWith("playlistVersion:")) {
+					this.playlistVersion = Integer.parseInt(line.substring("playlistVersion: ".length()));
 				} else if (line.startsWith("playlistlength:")) {
 					this.playlistLength = Integer.parseInt(line.substring("playlistlength: ".length()));
 				} else if (line.startsWith("song:")) {
@@ -186,18 +186,18 @@ public class MPDStatus {
 	}
 
 	/**
-	 * Retrieves playlist version.
+	 * Retrieves playlistVersion version.
 	 * 
-	 * @return playlist version.
+	 * @return playlistVersion version.
 	 */
 	public int getPlaylistVersion() {
 		return playlistVersion;
 	}
 
 	/**
-	 * Retrieves the length of the playlist.
+	 * Retrieves the length of the playlistVersion.
 	 * 
-	 * @return the length of the playlist.
+	 * @return the length of the playlistVersion.
 	 */
 	public int getPlaylistLength() {
 		return playlistLength;
@@ -239,18 +239,18 @@ public class MPDStatus {
 	}
 	
 	/**
-	 * Retrieves current song playlist number.
+	 * Retrieves current song playlistVersion number.
 	 * 
-	 * @return current song playlist number.
+	 * @return current song playlistVersion number.
 	 */
 	public int getSongPos() {
 		return song;
 	}
 
 	/**
-	 * Retrieves current song playlist id.
+	 * Retrieves current song playlistVersion id.
 	 * 
-	 * @return current song playlist id.
+	 * @return current song playlistVersion id.
 	 */
 	public int getSongId() {
 		return songId;
@@ -334,7 +334,7 @@ public class MPDStatus {
 	 * @see Object#toString()
 	 */
 	public String toString() {
-		return "volume: " + volume + ", bitrate: " + bitrate + ", playlist: " + playlistVersion + ", playlistLength: " + playlistLength
+		return "volume: " + volume + ", bitrate: " + bitrate + ", playlistVersion: " + playlistVersion + ", playlistLength: " + playlistLength
 				+ ", song: " + song + ", songid: " + songId + ", repeat: " + repeat + ", random: " + random + ", state: " + state + ", error: "
 				+ error + ", elapsedTime: " + elapsedTime + ", totalTime: " + totalTime;
 	}

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Class representing a file/music entry in playlist.
+ * Class representing a file/music entry in playlistVersion.
  *
  * @author Felipe Gustavo de Almeida
  * @version $Id: Music.java 2940 2005-02-09 02:31:48Z galmeida $
@@ -282,18 +282,18 @@ public class Music extends Item implements FilesystemTreeEntry {
     }
 
     /**
-     * Retrieves current song playlist id.
+     * Retrieves current song playlistVersion id.
      *
-     * @return current song playlist id.
+     * @return current song playlistVersion id.
      */
     public int getSongId() {
         return songId;
     }
 
     /**
-     * Retrieves current song stopped on or playing, playlist song number.
+     * Retrieves current song stopped on or playing, playlistVersion song number.
      *
-     * @return current song stopped on or playing, playlist song number.
+     * @return current song stopped on or playing, playlistVersion song number.
      */
     public int getPos() {
         return pos;

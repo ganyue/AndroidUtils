@@ -60,7 +60,7 @@ public class Playlist implements Parcelable{
     }
 
     public void setCurrentPos (int pos) {
-        currentPos = pos;
+        currentPos = pos % tracks.size();
     }
 
     public int getCurrentPos () {

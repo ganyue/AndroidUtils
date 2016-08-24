@@ -413,12 +413,12 @@ public abstract class MPDConnection {
                         result.setResult(innerSyncedWriteAsyncRead(this));
                     }
                     // Do not fail when the IDLE response has not been read (to improve connection failure robustness)
-                    // Just send the "changed playlist" result to force the MPD status to be refreshed.
+                    // Just send the "changed playlistVersion" result to force the MPD status to be refreshed.
                 } catch (MPDNoResponseException ex0) {
                     this.setSentToServer(false);
                     handleConnectionFailure(result, ex0);
                     if (command.equals(MPD_CMD_IDLE)) {
-                        result.setResult(Arrays.asList("changed: playlist"));
+                        result.setResult(Arrays.asList("changed: playlistVersion"));
                     }
                 } catch (MPDServerException ex1) {
                     handleConnectionFailure(result, ex1);

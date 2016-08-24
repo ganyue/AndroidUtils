@@ -135,8 +135,16 @@ public class MainActivity extends BaseFragmentActivity implements View.OnClickLi
                 canvas.drawRect(wStep * (i - startIndex), height - val/20000 - 90, wStep * (i - startIndex + 1) - 6, height - 70, rectPaint);
 //                canvas.drawText(""+(int)(complex[i].getIntValue()/hStep), wStep * i + 8, complex[i].getIntValue()/hStep - 50, linePaint);
             }
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    tvLog.setText(""+count++);
+                }
+            });
             svSurface.getHolder().unlockCanvasAndPost(canvas);
         }
+
+        private int count = 0;
 
         @Override
         public void onDecodeFinished(List<Byte> result) {

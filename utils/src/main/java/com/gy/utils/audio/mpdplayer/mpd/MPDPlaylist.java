@@ -39,7 +39,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
     private static final boolean DEBUG = false;
 
 	/**
-	 * Creates a new playlist.
+	 * Creates a new playlistVersion.
 	 */
 	MPDPlaylist(MPD mpd) {
 		this.mpd = mpd;
@@ -48,10 +48,10 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Adds a <code>Collection</code> of <code>Music</code> to playlist.
+	 * Adds a <code>Collection</code> of <code>Music</code> to playlistVersion.
 	 *
 	 * @param c
-	 *           <code>Collection</code> of <code>Music</code> to be added to playlist.
+	 *           <code>Collection</code> of <code>Music</code> to be added to playlistVersion.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 * @see Music
@@ -65,10 +65,10 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Adds a music to playlist.
+	 * Adds a music to playlistVersion.
 	 *
 	 * @param entry
-	 *           music/directory/playlist to be added.
+	 *           music/directory/playlistVersion to be added.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 */
@@ -78,7 +78,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Adds a stream to playlist.
+	 * Adds a stream to playlistVersion.
 	 *
 	 * @param url streams's URL
 	 * @throws MPDServerException
@@ -90,7 +90,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Clears playlist content.
+	 * Clears playlistVersion content.
 	 *
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
@@ -111,7 +111,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Retrieves music at position index in playlist. Operates on local copy of playlist, may not reflect server's current playlist.
+	 * Retrieves music at position index in playlistVersion. Operates on local copy of playlistVersion, may not reflect server's current playlistVersion.
 	 *
 	 * @param index
 	 *           position.
@@ -122,10 +122,10 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Load playlist file.
+	 * Load playlistVersion file.
 	 *
 	 * @param file
-	 *           playlist filename without .m3u extension.
+	 *           playlistVersion filename without .m3u extension.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 */
@@ -166,7 +166,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/*
-	 * React to playlist change on server and refresh ourself
+	 * React to playlistVersion change on server and refresh ourself
 	 * @see org.a0z.mpd.event.AbstractStatusChangeListener#playlistChanged(org.a0z.mpd.MPDStatus, int)
 	 */
 	@Override
@@ -179,12 +179,12 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Reload playlist content. <code>refresh</code> has better performance and is more server friendly, use it whenever possible.
+	 * Reload playlistVersion content. <code>refresh</code> has better performance and is more server friendly, use it whenever possible.
 	 *
 	 * @see #refresh(int)
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
-	 * @return current playlist version.
+	 * @return current playlistVersion version.
 	 */
 	private int refresh() throws MPDServerException {
 		if (firstRefreash) {
@@ -205,13 +205,13 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Do incremental update of playlist contents.
+	 * Do incremental update of playlistVersion contents.
 	 *
 	 * @param playlistVersion
-	 *           last read playlist version
+	 *           last read playlistVersion version
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
-	 * @return current playlist version.
+	 * @return current playlistVersion version.
 	 */
 	private int refresh(int playlistVersion) throws MPDServerException {
 		// TODO should be atomic
@@ -241,7 +241,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Remove playlist entry at position index.
+	 * Remove playlistVersion entry at position index.
 	 *
 	 * @param position
 	 *           position of the entry to be removed.
@@ -255,7 +255,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Removes entries from playlist.
+	 * Removes entries from playlistVersion.
 	 *
 	 * @param songs
 	 *           entries positions.
@@ -275,7 +275,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Remove playlist entry with ID songId
+	 * Remove playlistVersion entry with ID songId
 	 *
 	 * @param songId
 	 *           id of the entry to be removed.
@@ -288,7 +288,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Removes entries from playlist.
+	 * Removes entries from playlistVersion.
 	 *
 	 * @param songIds
 	 *           entries IDs.
@@ -305,7 +305,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Removes album of given ID from playlist.
+	 * Removes album of given ID from playlistVersion.
 	 *
 	 * @param songs
 	 *           entries positions.
@@ -357,10 +357,10 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Removes playlist file.
+	 * Removes playlistVersion file.
 	 *
 	 * @param file
-	 *           playlist filename without .m3u extension.
+	 *           playlistVersion filename without .m3u extension.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 */
@@ -369,15 +369,15 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Save playlist file.
+	 * Save playlistVersion file.
 	 *
 	 * @param file
-	 *           playlist filename without .m3u extension.
+	 *           playlistVersion filename without .m3u extension.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 */
 	public void savePlaylist(String file) throws MPDServerException {
-		// If the playlist already exists, save will fail. So, just remove it first!
+		// If the playlistVersion already exists, save will fail. So, just remove it first!
 		try {
 			this.mpd.getMpdConnection().sendCommand(MPD_CMD_PLAYLIST_DELETE, file);
 		} catch (MPDServerException e) {
@@ -387,7 +387,7 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Shuffles playlist content.
+	 * Shuffles playlistVersion content.
 	 *
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
@@ -397,10 +397,10 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	}
 
 	/**
-	 * Retrieves playlist size. Operates on local copy of playlist, may not reflect server's current playlist. You may call refresh() before
+	 * Retrieves playlistVersion size. Operates on local copy of playlistVersion, may not reflect server's current playlistVersion. You may call refresh() before
 	 * calling size().
 	 *
-	 * @return playlist size.
+	 * @return playlistVersion size.
 	 */
 	public int size() {
 		return list.size();
@@ -410,9 +410,9 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	 * Swap positions of song1 and song2.
 	 *
 	 * @param song1
-	 *           position of song1 in playlist.
+	 *           position of song1 in playlistVersion.
 	 * @param song2
-	 *           position of song2 in playlist
+	 *           position of song2 in playlistVersion
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 * @see #swap(int, int)
@@ -426,9 +426,9 @@ public class MPDPlaylist extends AbstractStatusChangeListener {
 	 * Swap positions of song1 and song2.
 	 *
 	 * @param song1Id
-	 *           id of song1 in playlist.
+	 *           id of song1 in playlistVersion.
 	 * @param song2Id
-	 *           id of song2 in playlist.
+	 *           id of song2 in playlistVersion.
 	 * @throws MPDServerException
 	 *            if an error occur while contacting server.
 	 */

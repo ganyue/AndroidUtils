@@ -20,13 +20,13 @@ public interface StatusChangeListener {
 	void volumeChanged(MPDStatus mpdStatus, int oldVolume);
 
 	/**
-	 * Called when playlist changes on MPD server.
+	 * Called when playlistVersion changes on MPD server.
 	 * 
 	 * @param mpdStatus
-	 *           MPDStatus after playlist change.
+	 *           MPDStatus after playlistVersion change.
 	 * 
 	 * @param oldPlaylistVersion
-	 *           old playlist version.
+	 *           old playlistVersion version.
 	 * @throws MPDServerException 
 	 */
 	void playlistChanged(MPDStatus mpdStatus, int oldPlaylistVersion);

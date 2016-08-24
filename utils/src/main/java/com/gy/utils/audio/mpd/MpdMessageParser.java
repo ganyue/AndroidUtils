@@ -22,8 +22,8 @@ public class MpdMessageParser {
                     status.volume = Integer.parseInt(line.substring("volume: ".length()));
                 } else if (line.startsWith("bitrate:")) {
                     status.bitrate = Long.parseLong(line.substring("bitrate: ".length()));
-                } else if (line.startsWith("playlist:")) {
-                    status.playlist = Integer.parseInt(line.substring("playlist: ".length()));
+                } else if (line.startsWith("playlistVersion:")) {
+                    status.playlistVersion = Integer.parseInt(line.substring("playlistVersion: ".length()));
                 } else if (line.startsWith("playlistlength:")) {
                     status.playlistLength = Integer.parseInt(line.substring("playlistlength: ".length()));
                 } else if (line.startsWith("song:")) {

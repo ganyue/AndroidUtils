@@ -6,6 +6,7 @@ package com.gy.utils.audio;
  */
 public interface IAudioPlayer {
     boolean initPlaylist(Playlist playlist);
+    boolean skipToPosition (int pos);
     boolean stop ();
     boolean playOrPause ();
     boolean prev ();

@@ -79,7 +79,7 @@ public class MPDStatusMonitor extends Thread {
 			}
 
 			if (connectionState == Boolean.TRUE) {
-				// playlist
+				// playlistVersion
 				try {
 					boolean dbChanged=false;
 					boolean statusChanged=false;
@@ -100,7 +100,7 @@ public class MPDStatusMonitor extends Thread {
 								break;
 							} else if (change.startsWith("changed: update")) {
 								dbChanged=true;
-							} else if (change.startsWith("changed: playlist") || change.startsWith("changed: player") ||
+							} else if (change.startsWith("changed: playlistVersion") || change.startsWith("changed: player") ||
 									change.startsWith("changed: mixer") || change.startsWith("changed: output")  || change.startsWith("changed: options")) {
 								statusChanged=true;
 							}
@@ -116,7 +116,7 @@ public class MPDStatusMonitor extends Thread {
 					if (statusChanged) {
 						MPDStatus status = mpd.getStatus(true);
 
-						// playlist
+						// playlistVersion
 						if (connectionStateChanged || (oldPlaylistVersion != status.getPlaylistVersion() && status.getPlaylistVersion() != -1)) {
 							// Lets update our own copy
 							for (StatusChangeListener listener : statusChangedListeners)

@@ -44,12 +44,12 @@ public class MusicList {
 	}
 
 	/**
-	 * Adds all Musics from <code>playlist</code> to this <code>MusicList</code>.
+	 * Adds all Musics from <code>playlistVersion</code> to this <code>MusicList</code>.
 	 * 
 	 * @param playlist
 	 *           <code>Collection</code> of <code>Music</code> to be added to this <code>MusicList</code>.
 	 * @throws ClassCastException
-	 *            when <code>playlist</code> contains elements not asignable to <code>Music</code>.
+	 *            when <code>playlistVersion</code> contains elements not asignable to <code>Music</code>.
 	 */
 	public void addAll(List<Music> playlist) throws ClassCastException {
 		list.addAll(playlist);
@@ -92,7 +92,7 @@ public class MusicList {
 	}
 
 	/**
-	 * Retrieves a music by its position on playlist.
+	 * Retrieves a music by its position on playlistVersion.
 	 * 
 	 * @param index
 	 *           position of the music to be retrieved.

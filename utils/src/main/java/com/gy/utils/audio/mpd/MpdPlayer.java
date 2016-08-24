@@ -26,7 +26,7 @@ public class MpdPlayer implements IAudioPlayer{
     private MpdStatus status;
     private Map<String, Playlist> playlists;
     private List<String> playlistNames;
-    private List<List<String>> receiveStrs;
+    private List<String> receiveStrs;
 
     private Activity activity;
     private TextView tvLog;
@@ -54,10 +54,7 @@ public class MpdPlayer implements IAudioPlayer{
     }
 
     public void testCmd () {
-//        setMode(AudioPlayerConst.Mode.REPEAT_ONE);
-//        sendCmd(MpdConsts.Cmd.MPD_CMD_PLAYLIST_INFO, "8");
-//        sendCmd(MpdConsts.Cmd.MPD_CMD_LISTALLINFO);
-        getPlaylistTracks("0");
+        sendCmd(MpdConsts.Cmd.MPD_CMD_LIST);
     }
 
     public void release () {
@@ -69,64 +66,53 @@ public class MpdPlayer implements IAudioPlayer{
         playlistNames = null;
     }
 
-    private int indexTemp = 0;
-    private boolean isInitPlaylist = false;
-    private void getPlaylistTracks (String playlistName) {
-        sendCmd(MpdConsts.Cmd.MPD_CMD_PLAYLIST_INFO, playlistName);
-    }
+    private String latestCmdSended = "";
+    private final Object sendLock = new Object();
 
+    /** 处理收到的消息 */
     private void parseMessage (List<String> msg) {
-        int len = msg.size() > 20? 20: msg.size();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            stringBuilder.append(msg.get(i));
-        }
-        String temp = stringBuilder.toString();
 
-        /**状态信息*/
-        if (temp.contains("state")) {
+        latestCmdSended = latestCmdSended.trim();
+        if (latestCmdSended.contains(MpdConsts.Cmd.MPD_CMD_STATUS)) {
+            /** 状态  status */
             if (status == null) status = new MpdStatus();
             MpdMessageParser.parseStatus(status, msg);
-        }
-
-        /**歌单名字列表*/
-        if (temp.contains(MpdConsts.MpdKeys.PLAYLIST)
-                && temp.contains(MpdConsts.MpdKeys.LAST_MODIFIED)) {
+        } else if (latestCmdSended.contains(MpdConsts.Cmd.MPD_CMD_LISTPLAYLISTS)) {
+            /** 歌单名字列表 */
             if (playlistNames == null) playlistNames = new ArrayList<>();
             playlistNames = MpdMessageParser.parsePlaylistNames(playlistNames, msg);
-            if (playlists == null || playlists.size() <= 0) {
-                indexTemp = 0;
-                isInitPlaylist = true;
-                getPlaylistTracks(playlistNames.get(indexTemp));//获取歌单歌曲列表
-            }
-        }
-
-        /**解析歌单歌曲列表，并获取其他歌单歌曲列表*/
-        if (temp.contains(MpdConsts.MpdKeys.FILE)
-                && temp.contains(MpdConsts.MpdKeys.ALBUM)) {
-            Playlist playlist = MpdMessageParser.parsePlaylist(msg);
-            String playlistName = playlistNames.get(indexTemp);
-            playlist.setName(playlistName);
-            if (playlistName.equals(status.playlist)) {
-                playlist.setCurrentPos(status.song);
-            }
-            playlists.put(playlistNames.get(indexTemp), playlist);
-            if (isInitPlaylist) {
-                if (indexTemp < playlistNames.size() - 1) {
-                    indexTemp++;
-                    getPlaylistTracks(playlistNames.get(indexTemp));
-                } else {
-                    isInitPlaylist = false;
+            /** 获取所有歌单歌曲列表 */
+            if (playlistNames.size() > 0) {
+                for (String pName: playlistNames) {
+                    sendCmd(MpdConsts.Cmd.MPD_CMD_PLAYLIST_INFO, pName);
                 }
             }
-        } else if (isInitPlaylist && msg.size() == 1 && msg.get(0).equals("OK")) {
-            //歌单中没有单曲，直接返回OK，这时候没法判断，只好这么搞了
-            if (indexTemp >= 0 && indexTemp < playlistNames.size() - 1) {
-                indexTemp++;
-                getPlaylistTracks(playlistNames.get(indexTemp));
-            } else {
-                isInitPlaylist = false;
-            }
+        } else if (latestCmdSended.contains(MpdConsts.Cmd.MPD_CMD_PLAYLIST_INFO)) {
+            /** 歌单歌曲列表 */
+            String pName = latestCmdSended.substring(
+                    latestCmdSended.indexOf("\"") + 1,
+                    latestCmdSended.lastIndexOf("\""));
+            Playlist playlist = MpdMessageParser.parsePlaylist(msg);
+            playlist.setName(pName);
+            playlists.put(pName, playlist);
+        } else if (latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_PLAY)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_PAUSE)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_NEXT)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_PREV)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_STOP)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_REPEAT)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_SINGLE)
+                || latestCmdSended.equals(MpdConsts.Cmd.MPD_CMD_RANDOM)
+                || latestCmdSended.contains(MpdConsts.Cmd.MPD_CMD_SEEK)
+                || latestCmdSended.contains(MpdConsts.Cmd.MPD_CMD_PLAY + "\"")) {
+            /** 播放、暂停、停止、上一首、下一首 、播放模式 需要更新状态*/
+            sendCmd(MpdConsts.Cmd.MPD_CMD_STATUS);
+        }
+
+        synchronized (sendLock) {
+            receiveStrs.clear();
+            latestCmdSended = "";
+            sendLock.notify();
         }
     }
 
@@ -134,6 +120,7 @@ public class MpdPlayer implements IAudioPlayer{
         @Override
         public void onSocketConnectFail(Exception e, String dstIp, int dstPort) {
             LogUtils.d("yue.gan", "connect fail : " + dstIp + ":"+dstPort);
+            /** TODO tcp client 连接失败，应该重连 */
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -151,8 +138,21 @@ public class MpdPlayer implements IAudioPlayer{
         }
 
         @Override
-        public void onSendBefore(String msg, String dstIp, int dstPort) {
+        public boolean onSendBefore(String msg, String dstIp, int dstPort) {
             LogUtils.d("yue.gan", "send before : " + msg);
+            /** 如果上次命令发送后没有数据返回则等待3s， 3s后仍未返回当上次命令同步失败 */
+            if (!TextUtils.isEmpty(latestCmdSended)) {
+                synchronized (sendLock) {
+                    try {
+                        sendLock.wait(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            latestCmdSended = msg;
+            return false;
         }
 
         @Override
@@ -168,7 +168,7 @@ public class MpdPlayer implements IAudioPlayer{
 
         @Override
         public void onSendFailed(final String msg, Exception e, String dstIp, int dstPort) {
-            //断线重连
+            /** TODO tcp client 连接断开，应该重连 */
             LogUtils.d("yue.gan", "send fail : " + msg);
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -196,18 +196,19 @@ public class MpdPlayer implements IAudioPlayer{
                 }
             });
 
-            if (TextUtils.isEmpty(msg)) return;
+            if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(latestCmdSended)) {
+                receiveStrs.clear();
+                return;
+            }
+
             String[] lines = msg.split("\n");
 
             /**有可能一次收到多个命令的回复 e.g: XXX OK XXX OK... */
             for (String line: lines) {
-                if (line.startsWith("ACK")) continue;
-                if (receiveStrs.size() <= 0) receiveStrs.add(new ArrayList<String>());
-                receiveStrs.get(receiveStrs.size() - 1).add(line);
+//                if (line.startsWith("ACK")) continue;
+                receiveStrs.add(line);
                 if (line.startsWith("OK")) {
-                    receiveStrs.add(new ArrayList<String>());
-                    List<String> list = receiveStrs.remove(0);
-                    parseMessage(list);
+                    parseMessage(receiveStrs);
                 }
             }
         }
@@ -231,33 +232,61 @@ public class MpdPlayer implements IAudioPlayer{
     }
 
     @Override
+    public boolean skipToPosition(int pos) {
+        if (status == null) {
+            return false;
+        }
+        sendCmd(MpdConsts.Cmd.MPD_CMD_PLAY, ""+pos);
+        return true;
+    }
+
+    @Override
     public boolean stop() {
-        //TODO
-        return false;
+        if (status == null) {
+            return false;
+        }
+        sendCmd(MpdConsts.Cmd.MPD_CMD_STOP);
+        return true;
     }
 
     @Override
     public boolean playOrPause() {
-        //TODO
-        return false;
+        if (status == null) {
+            return false;
+        }
+        if (status != null && status.state == AudioPlayerConst.PlayerState.PLAYING) {
+            sendCmd(MpdConsts.Cmd.MPD_CMD_PAUSE);
+        } else {
+            sendCmd(MpdConsts.Cmd.MPD_CMD_PLAY);
+        }
+        return true;
     }
 
     @Override
     public boolean prev() {
-        //TODO
-        return false;
+        if (status == null) {
+            return false;
+        }
+        sendCmd(MpdConsts.Cmd.MPD_CMD_PREV);
+        return true;
     }
 
     @Override
     public boolean next() {
-        //TODO
-        return false;
+        if (status == null) {
+            return false;
+        }
+        sendCmd(MpdConsts.Cmd.MPD_CMD_NEXT);
+        return true;
     }
 
     @Override
     public boolean seek(int pos) {
-        //TODO
-        return false;
+        if (status == null) {
+            return false;
+        }
+        sendCmd(MpdConsts.Cmd.MPD_CMD_SEEK, ""+status.songId, ""+pos);
+        return true;
     }
 
     @Override
@@ -274,6 +303,10 @@ public class MpdPlayer implements IAudioPlayer{
 
     @Override
     public void setMode(int mode) {
+        /** mpd 播放模式由三个变量确定，所以要发送三种命令 */
+        if (status == null) {
+            return;
+        }
         switch (mode) {
             case AudioPlayerConst.Mode.NORMAL:
             case AudioPlayerConst.Mode.REPEAT_ALL:
@@ -317,19 +350,11 @@ public class MpdPlayer implements IAudioPlayer{
 
     @Override
     public Playlist getPlaylist() {
-        return playlists.get(status.playlist);
+        return playlists.get(status.playlistVersion);
     }
 
     public Playlist getPlaylist(String playlistName) {
-        if (playlists.containsKey(playlistName)) {
-            Playlist playlist = playlists.get(playlistName);
-            if (playlist.getTracks() == null || playlist.getTracks().size() <= 0) {
-                getPlaylistTracks(playlistName);
-            }
-            return playlists.get(playlists);
-        } else {
-            getPlaylistTracks(playlistName);
-            return null;
-        }
+        //TODO 返回当前播放歌单
+        return null;
     }
 }

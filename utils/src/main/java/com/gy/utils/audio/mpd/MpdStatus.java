@@ -16,7 +16,7 @@ public class MpdStatus {
     public boolean single;
     public int mode;
     public boolean consume;
-    public int playlist;
+    public int playlistVersion;
     public int playlistLength;
     public AudioPlayerConst.PlayerState state;
     public int song;

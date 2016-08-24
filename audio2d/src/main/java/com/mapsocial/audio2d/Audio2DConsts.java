@@ -16,7 +16,7 @@ public class Audio2DConsts {
         public static final int Max_Vol = 32767;                //音量最大值
         public static final int Min_Vol = -32768;                //音量最小值
         public static final int Max_Multy_Vol = 32768 / 9;      //混音音量最大值
-        public static final int Sample_Count = 4410;            //取样点数
+        public static final int Sample_Count = 4096;            //取样点数
         public static final int Sample_Analytic_Count = 512;    //每次傅里叶分析点数
     }
 
@@ -42,25 +42,25 @@ public class Audio2DConsts {
 //        public static final int BEnd = 20500;//239
 
 
-        public static final int B0 = 1500; //134
-        public static final int B1 = 2000; //140
-        public static final int B2 = 2500; //146
-        public static final int B3 = 3000; //151
-        public static final int B4 = 3500; //157
-        public static final int B5 = 4000; //163
-        public static final int B6 = 4500; //169
-        public static final int B7 = 5000; //175
-        public static final int B8 = 5500; //180
-        public static final int B9 = 6000; //186
-        public static final int Ba = 6500; //192
-        public static final int Bb = 7000; //198
-        public static final int Bc = 7500; //204
-        public static final int Bd = 8000; //209
-        public static final int Be = 8500; //215
-        public static final int Bf = 9000; //221
-        public static final int BStart = 9500; //227
-        public static final int BDivide = 10000;//233
-        public static final int BEnd = 10500;//239
+        public static final int B0 = 1507; //18
+        public static final int B1 = 2024; //24
+        public static final int B2 = 2541; //30
+        public static final int B3 = 2972; //35
+        public static final int B4 = 3488; //41
+        public static final int B5 = 4005; //47
+        public static final int B6 = 4521; //53
+        public static final int B7 = 5039; //59
+        public static final int B8 = 5469; //64
+        public static final int B9 = 5986; //70
+        public static final int Ba = 6503; //76
+        public static final int Bb = 7020; //82
+        public static final int Bc = 7537; //88
+        public static final int Bd = 7967; //93
+        public static final int Be = 8484; //99
+        public static final int Bf = 9001; //105
+        public static final int BStart = 9518; //111
+        public static final int BDivide = 10034;//117
+        public static final int BEnd = 10465;//122
 
         //每种频率对应的每次取样的角度差
         public static final double DB0 = 2 * Math.PI * B0 / AudioInfo.Audio_Rate;
@@ -123,4 +123,26 @@ public class Audio2DConsts {
             Coodbook.IBStart,
             Coodbook.IBDivide,
             Coodbook.IBEnd};
+
+    private double[] test2 = {
+            1f* (Coodbook.IB0 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB1 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB2 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB3 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB4 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB5 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB6 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB7 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB8 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IB9 * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBa * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBb * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBc * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBd * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBe * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBf * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBStart * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBDivide * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+            1f* (Coodbook.IBEnd * 1f - 0.5f) * AudioInfo.Audio_Rate / 512,
+    };
 }

@@ -348,13 +348,13 @@ public class MPD {
             // file-elements are the only ones using fileCache,
             // therefore if something new begins and the cache
             // contains data, its music
-            if ((line.startsWith("file: ") || line.startsWith("directory: ") || line.startsWith("playlist: ")) && lineCache.size() > 0) {
+            if ((line.startsWith("file: ") || line.startsWith("directory: ") || line.startsWith("playlistVersion: ")) && lineCache.size() > 0) {
                 result.add(new Music(lineCache));
                 lineCache.clear();
             }
 
-            if (line.startsWith("playlist: ")) {
-                line = line.substring("playlist: ".length());
+            if (line.startsWith("playlistVersion: ")) {
+                line = line.substring("playlistVersion: ".length());
                 result.add(new PlaylistFile(line));
             } else if (line.startsWith("directory: ")) {
                 line = line.substring("directory: ".length());
@@ -392,9 +392,9 @@ public class MPD {
     }
 
     /**
-     * Retrieves <code>playlist</code>.
+     * Retrieves <code>playlistVersion</code>.
      *
-     * @return playlist.
+     * @return playlistVersion.
      */
     public MPDPlaylist getPlaylist() {
         return this.playlist;
@@ -867,7 +867,7 @@ public class MPD {
     }
 
     /**
-     * Jumps to next playlist track.
+     * Jumps to next playlistVersion track.
      *
      * @throws MPDServerException if an error occur while contacting server.
      */
@@ -905,7 +905,7 @@ public class MPD {
     }
 
     /**
-     * Plays previous playlist music.
+     * Plays previous playlistVersion music.
      *
      * @throws MPDServerException
      *            if an error occur while contacting server..
@@ -955,7 +955,7 @@ public class MPD {
      * Seeks music to the position.
      *
      * @param songId
-     *           music id in playlist.
+     *           music id in playlistVersion.
      * @param position
      *           song position in seconds.
      * @throws MPDServerException
@@ -972,7 +972,7 @@ public class MPD {
      * Seeks music to the position.
      *
      * @param index
-     *           music position in playlist.
+     *           music position in playlistVersion.
      * @param position
      *           song position in seconds.
      * @throws MPDServerException
@@ -1087,7 +1087,7 @@ public class MPD {
     }
 
     /**
-     * Jumps to track <code>position</code> from playlist.
+     * Jumps to track <code>position</code> from playlistVersion.
      *
      * @param position
      *           track number.
@@ -1203,8 +1203,8 @@ public class MPD {
         List<Item> result = new ArrayList<Item>();
         List<String> response = mpdConnection.sendCommand(MPDCommand.MPD_CMD_LISTPLAYLISTS);
         for(String line : response) {
-            if(line.startsWith("playlist"))
-                result.add(new Playlist(line.substring("playlist: ".length())));
+            if(line.startsWith("playlistVersion"))
+                result.add(new Playlist(line.substring("playlistVersion: ".length())));
         }
         if (sort)
             Collections.sort(result);

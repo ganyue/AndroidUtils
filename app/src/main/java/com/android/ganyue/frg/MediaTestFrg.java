@@ -77,7 +77,7 @@ public class MediaTestFrg extends BaseFragment {
 
         @Override
         public void onComplete(String sender, Playlist playlist) {
-            LogUtils.d("yue.gan", "sender : " + sender + " playlist : " + playlist);
+            LogUtils.d("yue.gan", "sender : " + sender + " playlistVersion : " + playlist);
         }
 
         @Override

@@ -60,6 +60,22 @@ public class MpdConsts {
         public static final String MPD_CMD_PLAYLIST_MOVE = "playlistmove";
         public static final String MPD_CMD_PLAYLIST_DEL = "playlistdelete";
 
+
+        public static final String MPD_CMD_ADD = "add";
+        public static final String MPD_CMD_CLEAR = "clear";
+        public static final String MPD_CMD_DELETE = "rm";
+        public static final String MPD_CMD_LIST = "playlistid";
+        public static final String MPD_CMD_CHANGES = "plchanges";
+        public static final String MPD_CMD_LOAD = "load";
+        public static final String MPD_CMD_MOVE = "move";
+        public static final String MPD_CMD_MOVE_ID = "moveid";
+        public static final String MPD_CMD_REMOVE = "delete";
+        public static final String MPD_CMD_REMOVE_ID = "deleteid";
+        public static final String MPD_CMD_SAVE = "save";
+        public static final String MPD_CMD_SHUFFLE = "shuffle";
+        public static final String MPD_CMD_SWAP = "swap";
+        public static final String MPD_CMD_SWAP_ID = "swapid";
+
         // deprecated commands
         public static final String MPD_CMD_VOLUME = "volume";
         public static final String MPD_FIND_ALBUM = "album";
@@ -85,7 +101,7 @@ public class MpdConsts {
     }
 
     public static class MpdKeys {
-        public static final String PLAYLIST = "playlist";
+        public static final String PLAYLIST = "playlistVersion";
         public static final String LAST_MODIFIED = "Last-Modified";
         public static final String FILE = "file";
         public static final String ARTIST = "Artist";

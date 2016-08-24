@@ -108,6 +108,14 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         return preparePlayer();
     }
 
+    @Override
+    public boolean skipToPosition(int pos) {
+        if (playlist == null) return false;
+        playlist.setCurrentPos(pos);
+        startAfterPrepare = true;
+        return preparePlayer();
+    }
+
     public boolean preparePlayer () {
         if (playlist == null) {
             state = AudioPlayerConst.PlayerState.UNINITED;

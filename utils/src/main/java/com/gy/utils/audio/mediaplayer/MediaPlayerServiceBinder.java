@@ -28,6 +28,11 @@ public class MediaPlayerServiceBinder extends Binder implements IAudioPlayer{
     }
 
     @Override
+    public boolean skipToPosition(int pos) {
+        return service.skipToPosition(pos);
+    }
+
+    @Override
     public boolean stop() {
         return service.stop();
     }

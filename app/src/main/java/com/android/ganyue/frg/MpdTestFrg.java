@@ -45,8 +45,8 @@ public class MpdTestFrg extends BaseFragment {
         view.findViewById(R.id.btn_pre).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayer = new MpdPlayer("192.168.1.142", mActivity, tvLog);
-//                mpdPlayer = new MpdPlayer("192.168.1.102", mActivity, tvLog);
+//                mpdPlayer = new MpdPlayer("192.168.1.142", mActivity, tvLog);
+                mpdPlayer = new MpdPlayer("192.168.0.156", mActivity, tvLog);
             }
         });
         view.findViewById(R.id.btn_play).setOnClickListener(new View.OnClickListener() {
@@ -93,7 +93,7 @@ public class MpdTestFrg extends BaseFragment {
 
         @Override
         public void onComplete(String sender, Playlist playlist) {
-            LogUtils.d("yue.gan", "sender : " + sender + " playlist : " + playlist);
+            LogUtils.d("yue.gan", "sender : " + sender + " playlistVersion : " + playlist);
         }
 
         @Override

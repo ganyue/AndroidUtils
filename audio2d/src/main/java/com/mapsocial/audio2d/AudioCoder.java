@@ -14,7 +14,7 @@ import java.util.List;
 public class AudioCoder {
 
     public byte[] encode (int freq) {
-//        freq = Audio2DConsts.Coodbook.B6;
+//        freq = Audio2DConsts.Coodbook.B1;
         double dr = 2 * Math.PI * freq / Audio2DConsts.AudioInfo.Audio_Rate;
         double r = 0;
         byte[] buff = new byte[Audio2DConsts.AudioInfo.Sample_Count * 2];
@@ -284,5 +284,9 @@ public class AudioCoder {
         }
 
         return results;
+    }
+
+    public void isValidIndex () {
+
     }
 }

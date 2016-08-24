@@ -36,6 +36,9 @@ public class TcpSender extends Thread {
     }
 
     public void send(String msg) {
+        if (mMessage.contains(msg)) {
+            return;
+        }
         mMessage.offer(new TcpMessage("", 0, msg));
     }
 
