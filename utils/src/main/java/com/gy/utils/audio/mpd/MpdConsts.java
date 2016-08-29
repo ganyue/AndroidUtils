@@ -101,13 +101,14 @@ public class MpdConsts {
     }
 
     public static class MpdKeys {
-        public static final String PLAYLIST = "playlistVersion";
+        public static final String PLAYLIST = "playlist";
         public static final String LAST_MODIFIED = "Last-Modified";
         public static final String FILE = "file";
         public static final String ARTIST = "Artist";
         public static final String ALBUM = "Album";
         public static final String GENRE = "Genre";
         public static final String TIME = "Time";
+        public static final String ID = "Id";
     }
 
 }

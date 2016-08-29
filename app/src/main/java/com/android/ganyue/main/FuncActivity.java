@@ -42,7 +42,7 @@ public class FuncActivity extends BaseFragmentActivity{
         try {
             Class clazz = Class.forName(HorizontalIndicatorFrg.class.getPackage().getName() + "." + type);
             this.controller = new FuncCtrl(this);
-            controller.showFragment(true, null, R.id.flyt_content, clazz, null, null);
+            controller.showFragment(getSupportFragmentManager(), true, null, R.id.flyt_content, clazz, null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

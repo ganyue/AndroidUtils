@@ -27,12 +27,11 @@ public class BaseFragmentActivityController {
     }
 
     protected FragmentActivity mActivity;
-    protected FragmentManager mFragmentManager;
     private final String Tag = BaseFragmentActivityController.class.getSimpleName();
 
     public BaseFragmentActivityController(FragmentActivity activity) {
         mActivity = activity;
-        mFragmentManager = mActivity.getSupportFragmentManager();
+        FragmentManager mFragmentManager = mActivity.getSupportFragmentManager();
 
         setController(mActivity);
         List<Fragment> fragments = mFragmentManager.getFragments();
@@ -52,7 +51,7 @@ public class BaseFragmentActivityController {
         return null;
     }
 
-    protected Fragment createFragment (Class fragClazz, Class[] paramTypes, Object[] params) {
+    public Fragment createFragment (Class fragClazz, Class[] paramTypes, Object[] params) {
         try {
             Constructor constructor = fragClazz.getConstructor(paramTypes);
             return (Fragment) constructor.newInstance(params);
@@ -63,7 +62,7 @@ public class BaseFragmentActivityController {
         return null;
     }
 
-    protected void setController (Object object) {
+    public void setController (Object object) {
         Method method = getMethod(object.getClass(), MethodNames.M_SET_CONTROLLER,
                 new Class[]{BaseFragmentActivityController.class});
         if (method != null) {
@@ -79,18 +78,18 @@ public class BaseFragmentActivityController {
         return clazz.getSimpleName();
     }
 
-    public Fragment replaceFragment (int holderId, Class fragClazz, Class[] paramTypes, Object[] params) {
-        if (mFragmentManager == null) {
+    public Fragment replaceFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Class[] paramTypes, Object[] params) {
+        if (fragmentManager == null) {
             return null;
         }
 
-        Fragment fragment = mFragmentManager.findFragmentByTag(getTag(fragClazz));
+        Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
         if (fragment != null) {
             return fragment;
         }
 
         if ((fragment = createFragment(fragClazz, paramTypes, params)) != null) {
-            mFragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz)).commit();
+            fragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz)).commit();
         }
 
         if (fragment != null) {
@@ -100,15 +99,15 @@ public class BaseFragmentActivityController {
         return fragment;
     }
 
-    public Fragment addFragment (int holderId, Class fragClazz, Class[] paramTypes, Object[] params) {
-        if (mFragmentManager == null) {
+    public Fragment addFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Class[] paramTypes, Object[] params) {
+        if (fragmentManager == null) {
             return null;
         }
 
-        Fragment fragment = mFragmentManager.findFragmentByTag(getTag(fragClazz));
+        Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
         if (fragment == null) {
             if ((fragment = createFragment(fragClazz, paramTypes, params)) != null) {
-                mFragmentManager.beginTransaction().add(holderId, fragment, getTag(fragClazz)).commit();
+                fragmentManager.beginTransaction().add(holderId, fragment, getTag(fragClazz)).commit();
             }
         }
 
@@ -119,22 +118,31 @@ public class BaseFragmentActivityController {
         return fragment;
     }
 
-    public Fragment showFragment (boolean hideOthers,
+    public Fragment hideFragment (FragmentManager fragmentManager, Class fragClazz) {
+        Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
+        if (fragment != null) {
+            fragmentManager.beginTransaction().hide(fragment).commit();
+        }
+        return fragment;
+    }
+
+    public Fragment showFragment (FragmentManager fragmentManager,
+                                  boolean hideOthers,
                                   List<String> whiteTagList,
                                   int holderId,
                                   Class fragClazz,
                                   Class[] paramTypes,
                                   Object[] params) {
 
-        Fragment fragment = addFragment(holderId, fragClazz, paramTypes, params);
+        Fragment fragment = addFragment(fragmentManager, holderId, fragClazz, paramTypes, params);
         if (fragment == null) {
             return null;
         }
 
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         if (hideOthers) {
-            List<Fragment> fragments = mFragmentManager.getFragments();
+            List<Fragment> fragments = fragmentManager.getFragments();
             if (fragments != null) {
                 for (Fragment frag : fragments) {
                     String tag = frag.getTag();
@@ -153,6 +161,5 @@ public class BaseFragmentActivityController {
 
     public void destroy () {
         mActivity = null;
-        mFragmentManager = null;
     }
 }

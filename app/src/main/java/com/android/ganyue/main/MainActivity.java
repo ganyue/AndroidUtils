@@ -11,6 +11,7 @@ import com.android.ganyue.application.MApplication;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.GameTestFrg;
+import com.android.ganyue.frg.HTabFragTestFrag;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.MpdTestFrg;
@@ -20,7 +21,6 @@ import com.android.ganyue.frg.WifiConnectTestFrg;
 import com.android.ganyue.frg.XunFeiTestFrg;
 import com.gy.utils.constants.WindowConstants;
 import com.android.ganyue.R;
-import com.android.ganyue.frg.BevaTtAlbumDetailFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.android.ganyue.frg.ARecordTestFrg;
 import com.gy.utils.log.LogUtils;
@@ -40,7 +40,6 @@ public class MainActivity extends Activity{
     private final Class[] types = {
             ARecordTestFrg.class,
             HorizontalIndicatorFrg.class,
-            BevaTtAlbumDetailFrg.class,
             WifiConnectTestFrg.class,
             TcpTestFrg.class,
             UdpTestFrg.class,
@@ -51,6 +50,7 @@ public class MainActivity extends Activity{
             GameTestFrg.class,
             XunFeiTestFrg.class,
             MpdTestFrg.class,
+            HTabFragTestFrag.class
     };
 
     @Override

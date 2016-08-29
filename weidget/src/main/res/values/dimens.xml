@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- tab fragment -->
+    <dimen name="tab_height">41dp</dimen>
+    <dimen name="tab_unselectedSize">14sp</dimen>
+    <dimen name="tab_selectedSize">16sp</dimen>
+
+    <dimen name="tab_leftPadding">15dp</dimen>
+    <dimen name="tab_rightPadding">22dp</dimen>
+
+</resources>

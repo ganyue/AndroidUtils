@@ -78,7 +78,7 @@ public class MpdMessageParser {
                 }
             } catch (RuntimeException e) {
                 // Do nothing, these should be harmless
-                e.printStackTrace();
+//                e.printStackTrace();
             }
         }//end of for
 
@@ -98,8 +98,13 @@ public class MpdMessageParser {
     public static List<String> parsePlaylistNames (List<String> playlistNames, List<String> recieveStr) {
         /**解析所有歌单名字*/
         for (String line: recieveStr) {
-            if (line.startsWith(MpdConsts.MpdKeys.PLAYLIST)) {
-                playlistNames.add(line.substring(MpdConsts.MpdKeys.PLAYLIST.length() + 1).trim());
+            try {
+                if (line.startsWith(MpdConsts.MpdKeys.PLAYLIST)) {
+                    playlistNames.add(line.substring(MpdConsts.MpdKeys.PLAYLIST.length() + 1).trim());
+                }
+            } catch (Exception e) {
+                //如果返回的字符串非法，直接忽略
+//                e.printStackTrace();
             }
         }
         return playlistNames;
@@ -110,17 +115,30 @@ public class MpdMessageParser {
         Album album = new Album();
         List<Track> tracks = new ArrayList<>();
         ;
+        /**
+         * track :
+         * file -> file
+         * Artist -> singer
+         * Time -> duration
+         * */
         for (String line: receiveStr) {
-            if (line.startsWith(MpdConsts.MpdKeys.FILE)) {
-                tracks.add(new Track());
-                tracks.get(tracks.size() - 1).file = line.substring(MpdConsts.MpdKeys.FILE.length() + 1).trim();
-            } else if (line.startsWith(MpdConsts.MpdKeys.ARTIST)) {
-                tracks.get(tracks.size() - 1).singer = line.substring(MpdConsts.MpdKeys.ARTIST.length() + 1).trim();
-            } else if (line.startsWith(MpdConsts.MpdKeys.TIME)) {
-                tracks.get(tracks.size() - 1).duration = Integer.parseInt(line.substring(MpdConsts.MpdKeys.TIME.length() + 1).trim());
-            }else if (line.startsWith(MpdConsts.MpdKeys.ALBUM)) {
-                album.name = line.substring(MpdConsts.MpdKeys.ALBUM.length() + 1).trim();
-            }//TODO 还有其他字段，目前用不到，用到再加吧
+            try {
+                if (line.startsWith(MpdConsts.MpdKeys.FILE)) {
+                    tracks.add(new Track());
+                    tracks.get(tracks.size() - 1).file = line.substring(MpdConsts.MpdKeys.FILE.length() + 1).trim();
+                } else if (line.startsWith(MpdConsts.MpdKeys.ARTIST)) {
+                    tracks.get(tracks.size() - 1).singer = line.substring(MpdConsts.MpdKeys.ARTIST.length() + 1).trim();
+                } else if (line.startsWith(MpdConsts.MpdKeys.TIME)) {
+                    tracks.get(tracks.size() - 1).duration = Integer.parseInt(line.substring(MpdConsts.MpdKeys.TIME.length() + 1).trim());
+                } else if (line.startsWith(MpdConsts.MpdKeys.ID)) {
+                    tracks.get(tracks.size() - 1).id = Integer.parseInt(line.substring(MpdConsts.MpdKeys.ID.length() + 1).trim());
+                }else if (line.startsWith(MpdConsts.MpdKeys.ALBUM)) {
+                    album.name = line.substring(MpdConsts.MpdKeys.ALBUM.length() + 1).trim();
+                }//TODO 还有其他字段，目前用不到，用到再加吧
+            } catch (Exception  e) {
+                //可能会遇到返回非法字符串的情况，直接忽略掉继续后面操作
+//                e.printStackTrace();
+            }
         }
 
         playlist.setAlbum(album);

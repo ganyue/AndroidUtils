@@ -1,5 +1,7 @@
 package com.gy.utils.tcp;
 
+import com.gy.utils.log.LogUtils;
+
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
@@ -47,6 +49,8 @@ public class TcpMessageProcessor extends Thread{
 
             } catch (Exception e) {
                 //nothing to do
+                e.printStackTrace();
+                LogUtils.e("yue.gan", "########## error to parse recieve msg!");
             }
         }
     }
