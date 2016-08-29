@@ -42,7 +42,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/tv_log"
             android:layout_width="match_parent"

@@ -135,7 +135,8 @@ public class TcpTestFrg extends BaseFragment {
         }
 
         @Override
-        public void onSendBefore(String msg, String dstIp, int dstPort) {
+        public boolean onSendBefore(String msg, String dstIp, int dstPort) {
+            return false;
         }
 
         @Override

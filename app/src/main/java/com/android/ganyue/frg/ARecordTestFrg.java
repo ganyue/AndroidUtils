@@ -1,5 +1,6 @@
 package com.android.ganyue.frg;
 
+import android.media.AudioFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,6 +52,8 @@ public class ARecordTestFrg extends BaseFragment {
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
         audioRecordInfo = AudioRecordInfo.getInstance();
+        audioRecordInfo.audioRate = 8000;
+        audioRecordInfo.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         playFreq = audioRecordInfo.audioRate;
 
         btnRecord.setOnClickListener(new View.OnClickListener() {
