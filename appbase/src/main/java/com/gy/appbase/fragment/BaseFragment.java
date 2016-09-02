@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 public abstract class BaseFragment extends Fragment {
     protected BaseFragmentActivityController mController;
     protected FragmentActivity mActivity;
+
+    @CallSuper
     public void setController (BaseFragmentActivityController controller) {
         this.mController = controller;
     }
@@ -30,7 +32,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (mController == null) {
-            instanceController();
+            mController = instanceController();
         }
         return createView(inflater, container, savedInstanceState);
     }
@@ -52,7 +54,7 @@ public abstract class BaseFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (mController == null) {
-            instanceController();
+            mController = instanceController();
         }
     }
 
@@ -60,7 +62,7 @@ public abstract class BaseFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (mController == null) {
-            instanceController();
+            mController = instanceController();
         }
     }
 

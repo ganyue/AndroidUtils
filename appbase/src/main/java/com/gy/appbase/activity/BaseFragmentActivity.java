@@ -21,6 +21,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         this.transluentStatusAndNavigation = transluentStatusAndNavigation;
     }
 
+    @CallSuper
     public void setController (BaseFragmentActivityController controller) {
         mController = controller;
     }

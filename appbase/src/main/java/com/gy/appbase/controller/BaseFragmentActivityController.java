@@ -1,5 +1,6 @@
 package com.gy.appbase.controller;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -51,6 +52,18 @@ public class BaseFragmentActivityController {
         return null;
     }
 
+    public Fragment createFragment (Class fragClazz) {
+        return createFragment(fragClazz, null, null);
+    }
+
+    public Fragment createFragment (Class fragClazz, Bundle arguments) {
+        Fragment fragment = createFragment(fragClazz, null, null);
+        if (fragment != null) {
+            fragment.setArguments(arguments);
+        }
+        return fragment;
+    }
+
     public Fragment createFragment (Class fragClazz, Class[] paramTypes, Object[] params) {
         try {
             Constructor constructor = fragClazz.getConstructor(paramTypes);
@@ -78,24 +91,43 @@ public class BaseFragmentActivityController {
         return clazz.getSimpleName();
     }
 
+    public Fragment replaceFragment (FragmentManager fragmentManager, int holderId, Class fragClazz) {
+        return replaceFragment(fragmentManager, holderId, fragClazz, null, null);
+    }
+
+    public Fragment replaceFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Bundle arguments) {
+        Fragment fragment = replaceFragment(fragmentManager, holderId, fragClazz, null, null);
+        if (fragment != null) {
+            fragment.setArguments(arguments);
+        }
+        return fragment;
+    }
+
     public Fragment replaceFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Class[] paramTypes, Object[] params) {
         if (fragmentManager == null) {
             return null;
         }
 
         Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
+
+        if (fragment == null && (fragment = createFragment(fragClazz, paramTypes, params)) == null) {
+            return null;
+        }
+        setController(fragment);
+        fragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz)).commit();
+
+        return fragment;
+    }
+
+    public Fragment addFragment (FragmentManager fragmentManager, int holderId, Class fragClazz) {
+        return addFragment(fragmentManager, holderId, fragClazz, null, null);
+    }
+
+    public Fragment addFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Bundle arguments) {
+        Fragment fragment = addFragment(fragmentManager, holderId, fragClazz, null, null);
         if (fragment != null) {
-            return fragment;
+            fragment.setArguments(arguments);
         }
-
-        if ((fragment = createFragment(fragClazz, paramTypes, params)) != null) {
-            fragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz)).commit();
-        }
-
-        if (fragment != null) {
-            setController(fragment);
-        }
-
         return fragment;
     }
 
@@ -122,6 +154,27 @@ public class BaseFragmentActivityController {
         Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
         if (fragment != null) {
             fragmentManager.beginTransaction().hide(fragment).commit();
+        }
+        return fragment;
+    }
+
+    public Fragment showFragment (FragmentManager fragmentManager,
+                                  boolean hideOthers,
+                                  List<String> whiteTagList,
+                                  int holderId,
+                                  Class fragClazz) {
+        return showFragment(fragmentManager, hideOthers, whiteTagList, holderId, fragClazz, null, null);
+    }
+
+    public Fragment showFragment (FragmentManager fragmentManager,
+                                  boolean hideOthers,
+                                  List<String> whiteTagList,
+                                  int holderId,
+                                  Class fragClazz,
+                                  Bundle arguments) {
+        Fragment fragment = showFragment(fragmentManager, hideOthers, whiteTagList, holderId, fragClazz, null, null);
+        if (fragment != null) {
+            fragment.setArguments(arguments);
         }
         return fragment;
     }

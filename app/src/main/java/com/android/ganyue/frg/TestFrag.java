@@ -6,23 +6,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.ganyue.R;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 
 /**
  * Created by ganyu on 2016/8/29.
+ *
  */
 public class TestFrag extends BaseFragment {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return new TextView(mActivity);
+        return inflater.inflate(R.layout.fragment_testfrag, container, false);
     }
 
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
-        TextView textView = (TextView) view;
-        textView.setText("test" + getArguments().getString("name"));
     }
 
     @Override
