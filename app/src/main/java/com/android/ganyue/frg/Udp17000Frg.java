@@ -3,7 +3,6 @@ package com.android.ganyue.frg;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +16,11 @@ import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.udp.UdpSpeaker;
 import com.gy.utils.udp.UdpSpeakerCallback;
 
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * Created by ganyu on 2016/4/30.
  * Nsd test
  */
-public class UdpTestFrg extends BaseFragment {
+public class Udp17000Frg extends BaseFragment {
 
 
     @Override
@@ -43,7 +37,7 @@ public class UdpTestFrg extends BaseFragment {
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
 
-        udpSpeaker17000 = UdpSpeaker.get(18000);
+        udpSpeaker17000 = UdpSpeaker.get(17000);
         udpSpeaker17000.addCallback(udpSpeakerCallback);
 
         view.findViewById(R.id.btn_keepAlive).setOnClickListener(new View.OnClickListener() {

@@ -20,6 +20,7 @@ public class TcpSender extends Thread {
     private TcpSenderListener mTcpSenderListener;
     private WeakReference<Socket> mSocket;
     private boolean isRun;
+    private boolean enableHart = true;
 
     public TcpSender(Socket socket) {
         mMessage = new ArrayBlockingQueue<TcpMessage>(64);
@@ -29,6 +30,10 @@ public class TcpSender extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void enableHart (boolean enableHart) {
+        this.enableHart = enableHart;
     }
 
     public void setTcpSenderListener (TcpSenderListener listener) {
@@ -55,7 +60,9 @@ public class TcpSender extends Thread {
                 //3秒后如果没有消息发送则发送一个简单消息来确认tcp连接是否活着
                 message = mMessage.poll(3000, TimeUnit.MILLISECONDS);
                 if (message == null || TextUtils.isEmpty(message.message)) {
-                    mSocket.get().sendUrgentData(0xFF);
+                    if (enableHart) {
+                        mSocket.get().sendUrgentData(0xFF);
+                    }
                     continue;
                 }
                 boolean handled = false;

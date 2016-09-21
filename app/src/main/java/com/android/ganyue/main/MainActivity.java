@@ -16,6 +16,8 @@ import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.MpdTestFrg;
 import com.android.ganyue.frg.TcpTestFrg;
+import com.android.ganyue.frg.Udp17000Frg;
+import com.android.ganyue.frg.Udp18000Frg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
 import com.android.ganyue.frg.XunFeiTestFrg;
@@ -43,6 +45,8 @@ public class MainActivity extends Activity{
             WifiConnectTestFrg.class,
             TcpTestFrg.class,
             UdpTestFrg.class,
+            Udp17000Frg.class,
+            Udp18000Frg.class,
             DaoTestFrg.class,
             FileUtilTestFrg.class,
             MediaTestFrg.class,

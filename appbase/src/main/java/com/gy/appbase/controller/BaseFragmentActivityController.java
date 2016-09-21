@@ -27,14 +27,12 @@ public class BaseFragmentActivityController {
         public static final String M_SET_CONTROLLER = "setController";
     }
 
-    protected FragmentActivity mActivity;
     private final String Tag = BaseFragmentActivityController.class.getSimpleName();
 
     public BaseFragmentActivityController(FragmentActivity activity) {
-        mActivity = activity;
-        FragmentManager mFragmentManager = mActivity.getSupportFragmentManager();
+        FragmentManager mFragmentManager = activity.getSupportFragmentManager();
 
-        setController(mActivity);
+        setController(activity);
         List<Fragment> fragments = mFragmentManager.getFragments();
         if (fragments != null && fragments.size() > 0) {
             for (Fragment fragment : fragments) {
@@ -212,7 +210,4 @@ public class BaseFragmentActivityController {
         return fragment;
     }
 
-    public void destroy () {
-        mActivity = null;
-    }
 }

@@ -9,44 +9,44 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal">
-        <Button
-            android:id="@+id/btn_start_server"
+        <EditText
+            android:id="@+id/edt_ip"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:text="start server on port --> "/>
+            android:gravity="center"
+            android:hint="输入ip"/>
         <EditText
             android:id="@+id/edt_port"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:hint="port"/>
+            android:gravity="center"
+            android:hint="输入port"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal">
-        <EditText
-            android:id="@+id/edt_ip_dst"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:hint="ip"
-            android:gravity="center"/>
-        <EditText
-            android:id="@+id/edt_port_dst"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:hint="port"
-            android:gravity="center"/>
         <Button
             android:id="@+id/btn_connect"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:text="connect"/>
+        <EditText
+            android:id="@+id/edt_msg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="message"/>
+        <Button
+            android:id="@+id/btn_sendMsg"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Send"/>
     </LinearLayout>
 
     <LinearLayout
@@ -54,18 +54,17 @@
         android:layout_height="48dp"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/btn_send"
+            android:id="@+id/btn_enableHart"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="send msg"/>
-        <EditText
-            android:id="@+id/edt_msg"
+            android:text="Enable Hart"/>
+        <Button
+            android:id="@+id/btn_enableReconnect"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:hint="message"
-            android:gravity="center"/>
+            android:layout_weight="1"
+            android:text="Enable Reconnect"/>
     </LinearLayout>
 
     <Button
@@ -76,11 +75,13 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/tv_log"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:layout_margin="15dp"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="40dp"/>
     </ScrollView>
 </LinearLayout>

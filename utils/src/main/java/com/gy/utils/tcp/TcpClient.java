@@ -22,6 +22,8 @@ public class TcpClient extends Thread{
     private List<TcpClientListener> tcpClientListeners;
     private boolean isConnected = false;
 
+    private boolean enableHart = true;
+
     public void addTcpClientListener (TcpClientListener tcpClientListener) {
         if (tcpClientListeners == null) {
             tcpClientListeners = Collections.synchronizedList(new ArrayList<TcpClientListener>());
@@ -51,6 +53,15 @@ public class TcpClient extends Thread{
         isInited = false;
     }
 
+    public void enableHart (boolean enableHart) {
+        this.enableHart = enableHart;
+        if (mSender != null) mSender.enableHart(enableHart);
+    }
+
+    public boolean isHartEnabled () {
+        return enableHart;
+    }
+
     public String getDstIp () {
         return dstIp;
     }
@@ -67,6 +78,7 @@ public class TcpClient extends Thread{
         if (!isInited) {
             mSender = new TcpSender(mSocket);
             mReceiver = new TcpReceiver(mSocket);
+            mSender.enableHart(enableHart);
             mSender.setTcpSenderListener(tcpSenderListener);
             mReceiver.setTcpReceiverListener(tcpReceiverListener);
             mSender.start();
