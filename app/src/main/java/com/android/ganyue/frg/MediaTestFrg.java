@@ -54,7 +54,9 @@ public class MediaTestFrg extends BaseFragment {
             @Override
             public void onClick(View v) {
                 List<Track> tracks = new ArrayList<Track>();
-                Track track1 = new Track(); track1.mp3Url = "http://zzya.beva.cn/dq/lm9-E1JJDs5RrAKIclfIyJFZ9fQ0.mp3";
+                Track track1 = new Track();
+//                track1.mp3Url = "http://zzya.beva.cn/dq/lm9-E1JJDs5RrAKIclfIyJFZ9fQ0.mp3";
+                track1.mp3Url = "http://live.beva.cn/app/stream.mp3";
                 tracks.add(track1);
                 MApplication.getAudioUtils().getPlayer(AudioUtils.AudioType.MEDIA).initPlaylist(new Playlist(tracks));
             }

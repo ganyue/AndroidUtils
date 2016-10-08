@@ -48,7 +48,7 @@ public class Circle extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (paint == null) {
-            paint = new Paint();;
+            paint = new Paint();
             paint.setColor(color);
             if (fillContent) {
                 paint.setStyle(Paint.Style.FILL);

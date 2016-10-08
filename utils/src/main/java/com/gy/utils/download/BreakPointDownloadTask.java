@@ -71,16 +71,16 @@ public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{
                 InputStream in = connection.getInputStream();
                 byte[] buff = new byte[1024];   //buffer不宜过大，过大可能会导致阻塞
                 int len;
-                byte count = 0;
+                long lastestUpdateTime = 0;
 
                 if (listener != null) listener.onDownloadStart(bean);
                 while ((len = in.read(buff)) > 0) {
                     fOut.write(buff, 0, len);
                     bean.storedLen += len;
-                    count ++;
-                    if (count > 10) {
-                        //每10k更新一次进度，防止更新过于频繁拖慢下载速度
-                        count = 0;
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastestUpdateTime > 1000) {
+                        //每1秒更新一次进度，防止更新过于频繁拖慢下载速度
+                        lastestUpdateTime = currentTime;
                         publishProgress(bean.storedLen);
                     }
                 }

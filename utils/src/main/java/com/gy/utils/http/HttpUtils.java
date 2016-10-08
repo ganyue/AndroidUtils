@@ -34,4 +34,9 @@ public class HttpUtils implements IHttpRequest{
     public void getString(String url, OnRequestListener listener) {
         volleyHttpUtils.getString(url, listener);
     }
+
+    @Override
+    public void getObject(String url, Class clazz, OnRequestListener listener) {
+        volleyHttpUtils.getObject(url, clazz, listener);
+    }
 }

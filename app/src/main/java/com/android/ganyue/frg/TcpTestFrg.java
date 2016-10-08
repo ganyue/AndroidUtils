@@ -122,7 +122,9 @@ public class TcpTestFrg extends BaseFragment implements View.OnClickListener{
             case R.id.btn_start_server:
                 if (tcpServer!=null) tcpServer.release();
                 tcpServer = new TcpServer(Integer.parseInt(""+edtPort.getText()));
+                tcpServer.setTcpServerListener(tcpServerListener);
                 tcpServer.start();
+                writeLog("server start");
                 break;
             case R.id.btn_connect:
                 if (tcpClient != null) tcpClient.release();
@@ -130,8 +132,9 @@ public class TcpTestFrg extends BaseFragment implements View.OnClickListener{
                 tcpClient.enableHart(false);
                 tcpClient.addTcpClientListener(tcpClientListener);
                 tcpClient.start();
+                writeLog("client connecting");
                 break;
-            case R.id.btn_sendMsg:
+            case R.id.btn_send:
                 if (tcpClient != null) {
                     tcpClient.send(""+edtMsg.getText());
                 }

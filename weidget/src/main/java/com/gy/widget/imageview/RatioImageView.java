@@ -10,6 +10,7 @@ import com.gy.widget.R;
 /**
  * Created by ganyu on 2016/9/2.
  *
+ * <p>用宽除以高做ratio，作为属性传入后可以按比例自适应高度</p>
  */
 public class RatioImageView extends ImageView {
     public RatioImageView(Context context) {

@@ -3,6 +3,7 @@ package com.gy.utils.audio.mediaplayer;
 import android.os.Binder;
 
 import com.gy.utils.audio.IAudioPlayer;
+import com.gy.utils.audio.OnAudioListener;
 import com.gy.utils.audio.Playlist;
 
 /**
@@ -95,5 +96,10 @@ public class MediaPlayerServiceBinder extends Binder implements IAudioPlayer{
     @Override
     public Playlist getPlaylist() {
         return service.getPlaylist();
+    }
+
+    @Override
+    public void setOnAudioListener(OnAudioListener audioListener) {
+        service.setOnAudioListener(audioListener);
     }
 }

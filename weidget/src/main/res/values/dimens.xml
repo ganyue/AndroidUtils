@@ -3,8 +3,13 @@
     
     <!-- tab fragment -->
     <dimen name="tab_height">41dp</dimen>
-    <dimen name="tab_unselectedSize">14sp</dimen>
-    <dimen name="tab_selectedSize">16sp</dimen>
+    <dimen name="tab_unselectedSize">14dp</dimen>
+    <dimen name="tab_selectedSize">16dp</dimen>
+
+    <!-- push refresh list view-->
+    <dimen name="footer_height">45dp</dimen>
+    <dimen name="footer_icon_size">20dp</dimen>
+    <dimen name="footer_tip_text_size">14dp</dimen>
 
     <dimen name="tab_leftPadding">15dp</dimen>
     <dimen name="tab_rightPadding">22dp</dimen>

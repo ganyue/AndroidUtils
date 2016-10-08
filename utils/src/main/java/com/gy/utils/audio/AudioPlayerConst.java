@@ -7,6 +7,11 @@ package com.gy.utils.audio;
 
 public class AudioPlayerConst {
 
+    public enum PlayerType {
+        MEDIA_PLAYER,
+        MPD_PLAYER,
+    }
+
     public enum  PlayerState {
         UNINITED,
         PREPARING,
@@ -26,7 +31,7 @@ public class AudioPlayerConst {
     public static final class PlayerConsts {
         public static final class Keys {
             public static final String KEY_CMD_I = "cmd";
-            public static final String KEY_PLAYLIST_O = "playlistVersion";
+            public static final String KEY_PLAYLIST_O = "playlist";
             public static final String KEY_SEEK_I = "seek";
             public static final String KEY_MODE_I = "mode";
 

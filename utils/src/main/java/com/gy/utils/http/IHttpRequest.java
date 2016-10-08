@@ -7,4 +7,5 @@ package com.gy.utils.http;
 public interface IHttpRequest {
     void getJson (String url, OnRequestListener listener);
     void getString (String url, OnRequestListener listener);
+    void getObject (String url, Class clazz, OnRequestListener listener);
 }

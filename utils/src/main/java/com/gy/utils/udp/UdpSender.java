@@ -16,7 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class UdpSender extends Thread {
 
-    private final int MAX_MESSAGE_QUEUE_SIZE = 64;
+    private final int MAX_MESSAGE_QUEUE_SIZE = 256;
 
     private DatagramSocket mSocket;
     private boolean isRun;

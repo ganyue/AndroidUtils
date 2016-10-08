@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -66,6 +68,23 @@ public class WifiUtils {
             return connectivityManager.getActiveNetworkInfo().getType();
         }
         return -1;
+    }
+
+    public String getIp () {
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+            WifiManager wifiManager = (WifiManager) mApp.get().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo info = wifiManager.getConnectionInfo();
+            int ipAddr = info.getIpAddress();
+            return int2IpAddr(ipAddr);
+        }
+        return "";
+    }
+
+    public String int2IpAddr (int ipAddr) {
+        String ip = ((ipAddr & 0xff) + "." + (ipAddr >> 8 & 0xff) + "."
+                + (ipAddr >> 16 & 0xff) + "." + (ipAddr >> 24 & 0xff));
+        return ip;
     }
 
     /**

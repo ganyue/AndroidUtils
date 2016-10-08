@@ -2,4 +2,6 @@
 <resources>
     <color name="tab_selected">#fed102</color>
     <color name="tab_unselected">#464646</color>
+
+    <color name="text_color_black">#474747</color>
 </resources>

@@ -51,7 +51,7 @@ public class Playlist implements Parcelable{
         this.tracks.addAll(tracks);
     }
 
-    public Album getAlbum() {
+    public Album geztAlbum() {
         return album;
     }
 

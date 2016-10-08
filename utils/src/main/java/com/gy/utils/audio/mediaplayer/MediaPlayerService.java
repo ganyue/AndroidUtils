@@ -6,11 +6,13 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import com.gy.utils.audio.AudioPlayerConst;
 import com.gy.utils.audio.AudioUtils;
 import com.gy.utils.audio.IAudioPlayer;
+import com.gy.utils.audio.OnAudioListener;
 import com.gy.utils.audio.Playlist;
 import com.gy.utils.audio.Track;
 
@@ -22,6 +24,7 @@ import java.io.IOException;
  */
 public class MediaPlayerService extends Service implements IAudioPlayer {
 
+    private OnAudioListener onAudioListener;
     private Playlist playlist;
     private MediaPlayer mediaPlayer;
     private MediaPlayerServiceBinder binder;
@@ -272,6 +275,11 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         return playlist;
     }
 
+    @Override
+    public void setOnAudioListener(OnAudioListener audioListener) {
+        this.onAudioListener = audioListener;
+    }
+
     private AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
@@ -309,11 +317,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     private MediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Intent intent = new Intent(AudioUtils.ACTION_AUDIO_PLAYER_CALLBACK_RECEIVER);
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_TYPE_I, AudioPlayerConst.PlayerConsts.BCastType.COMPLETE);
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_SENDER_S, MediaPlayerService.class.getSimpleName());
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O, playlist);
-            sendBroadcast(intent);
+            onAudioListener.onComplete(AudioPlayerConst.PlayerType.MEDIA_PLAYER, playlist);
 
             state = AudioPlayerConst.PlayerState.PAUSE;
             playlist.next();
@@ -327,11 +331,7 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     private MediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            Intent intent = new Intent(AudioUtils.ACTION_AUDIO_PLAYER_CALLBACK_RECEIVER);
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_TYPE_I, AudioPlayerConst.PlayerConsts.BCastType.ERROR);
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_SENDER_S, MediaPlayerService.class.getSimpleName());
-            intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_EXTRA_I, extra);
-            sendBroadcast(intent);
+            onAudioListener.onError(AudioPlayerConst.PlayerType.MEDIA_PLAYER, playlist, extra);
 
             state = AudioPlayerConst.PlayerState.PAUSE;
             long currentErrorTime = SystemClock.currentThreadTimeMillis();

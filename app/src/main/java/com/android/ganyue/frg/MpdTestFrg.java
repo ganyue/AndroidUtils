@@ -123,8 +123,13 @@ public class MpdTestFrg extends BaseFragment implements View.OnClickListener{
                 break;
             case R.id.btn_sendMsg:
                 if (tcpClient != null) {
-                    String mpdCmd = MpdConsts.getCommandStr(""+edtMsg.getText());
-                    tcpClient.send(mpdCmd);
+                    String cmdStr = ""+edtMsg.getText();
+                    if (cmdStr.contains("volume")) {
+                        cmdStr = MpdConsts.getCommandStr(cmdStr, "0");
+                    } else {
+                        cmdStr = MpdConsts.getCommandStr(cmdStr);
+                    }
+                    tcpClient.send(cmdStr);
                 }
                 break;
             case R.id.btn_enableHart:

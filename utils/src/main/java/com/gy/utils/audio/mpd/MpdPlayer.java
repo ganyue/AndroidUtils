@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.gy.utils.audio.AudioPlayerConst;
 import com.gy.utils.audio.IAudioPlayer;
+import com.gy.utils.audio.OnAudioListener;
 import com.gy.utils.audio.Playlist;
 import com.gy.utils.audio.Track;
 import com.gy.utils.log.LogUtils;
@@ -466,6 +467,11 @@ public class MpdPlayer implements IAudioPlayer{
     @Override
     public Playlist getPlaylist() {
         return currentPlaylist;
+    }
+
+    @Override
+    public void setOnAudioListener(OnAudioListener audioListener) {
+
     }
 
     public Map<String, Playlist> getPlaylists() {

@@ -20,4 +20,5 @@ public interface IAudioPlayer {
     int getVolume ();
     boolean isAlive ();
     Playlist getPlaylist();
+    void setOnAudioListener(OnAudioListener audioListener);
 }

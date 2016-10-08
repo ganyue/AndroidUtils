@@ -15,6 +15,7 @@ import com.android.ganyue.frg.HTabFragTestFrag;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.MpdTestFrg;
+import com.android.ganyue.frg.ScrollObservListFrag;
 import com.android.ganyue.frg.TcpTestFrg;
 import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
@@ -54,7 +55,8 @@ public class MainActivity extends Activity{
             GameTestFrg.class,
             XunFeiTestFrg.class,
             MpdTestFrg.class,
-            HTabFragTestFrag.class
+            HTabFragTestFrag.class,
+            ScrollObservListFrag.class,
     };
 
     @Override

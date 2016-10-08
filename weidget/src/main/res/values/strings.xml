@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">weidget</string>
+    <string name="loading">正在加载更多内容</string>
 </resources>

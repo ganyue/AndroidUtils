@@ -2,6 +2,7 @@ package com.gy.widget.listview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
@@ -43,62 +44,69 @@ public class ScrollObservedListView extends android.widget.ListView implements A
     }
 
     public void removeOnScrollObservedListener (OnScrollObservedListener listener) {
-        if (onScrollObservedListeners == null || !onScrollObservedListeners.contains(listener)) {
+        if (onScrollObservedListeners == null || !onScrollObservedListeners.contains(listener)){
             return;
         }
         onScrollObservedListeners.remove(listener);
     }
 
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
+    private int observedItem;
 
+    public void setObservedItem (int pos) {
+        observedItem = pos;
     }
 
-    private int preLastChildPos = 0;
-    private int preLastChildY = 0;
-    private int listItemHeight = 0;
-    private int listDeviderHeight = 0;
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+    }
 
-        if (view.getChildCount() <= 0 || onScrollObservedListeners == null || onScrollObservedListeners.size() <= 0) {
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem,
+                         int visibleItemCount, int totalItemCount) {
+
+        if (view.getChildCount() <= 0
+                || onScrollObservedListeners == null
+                || onScrollObservedListeners.size() <= 0) {
             return;
         }
 
-        View lastChild = view.getChildAt(view.getChildCount() - 1);
-        int[] lastChildLoc = new int[2];
-        lastChild.getLocationOnScreen(lastChildLoc);
-        if (preLastChildPos == 0) {
-            //init
-            preLastChildPos = view.getLastVisiblePosition();
-            preLastChildY = lastChildLoc[1];
-            listItemHeight = lastChild.getHeight();
-            listDeviderHeight = ((ListView)view).getDividerHeight();
-        } else {
-            //calculate dy
-            int lastVisibleChildPos = view.getLastVisiblePosition();
-            int dPos = lastVisibleChildPos - preLastChildPos;
-            int preLastChildCurrentY = lastChildLoc[1] - dPos * listItemHeight - listDeviderHeight * dPos;
-            int dy = preLastChildY - preLastChildCurrentY;
-            preLastChildPos = lastVisibleChildPos;
-            preLastChildY = lastChildLoc[1];
 
-            if (dy > 0) {
-                //scroll up
-                for (OnScrollObservedListener listener : onScrollObservedListeners) {
-                    listener.onScrollUp(this, dy);
-                }
-            } else if (dy < 0) {
-                //scroll down
-                for (OnScrollObservedListener listener : onScrollObservedListeners) {
-                    listener.onScrollDown(this, dy);
-                }
+        if (firstVisibleItem > observedItem) {
+            //BeyondScreen
+            for (OnScrollObservedListener listener: onScrollObservedListeners) {
+                listener.onObservedItemPosChanged(ItemState.BeyondScreen, null, null);
+            }
+        } else if (firstVisibleItem + visibleItemCount <= observedItem) {
+            //BelowScreen
+            for (OnScrollObservedListener listener: onScrollObservedListeners) {
+                listener.onObservedItemPosChanged(ItemState.BelowScreen, null, null);
+            }
+        } else {
+            //OnScreen
+            View childV = view.getChildAt(observedItem - firstVisibleItem);
+            if (childV == null) return;
+            int[] location = new int[2];
+            int[] size = new int[2];
+            size[0] = childV.getWidth();
+            size[1] = childV.getHeight();
+            childV.getLocationOnScreen(location);
+            for (OnScrollObservedListener listener: onScrollObservedListeners) {
+                listener.onObservedItemPosChanged(ItemState.OnScreen, location, size);
             }
         }
+
+    }
+
+    public enum ItemState {
+        BelowScreen, OnScreen, BeyondScreen,
     }
 
     public interface OnScrollObservedListener {
-        void onScrollUp (ListView view, int dy);
-        void onScrollDown (ListView view, int dy);
+        /**
+         * @param state     enum visible state
+         * @param location  int[2] item at 0 is x, item at 1 is height
+         * @param size      int[2] item at 0 is width, item at 1 is height
+         */
+        void onObservedItemPosChanged (ItemState state, int[] location, int[] size);
     }
 }
