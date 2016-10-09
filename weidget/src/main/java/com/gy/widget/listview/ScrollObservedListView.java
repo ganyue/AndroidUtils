@@ -30,7 +30,7 @@ public class ScrollObservedListView extends android.widget.ListView implements A
         init();
     }
 
-    private void init () {
+    protected void init () {
         setOnScrollListener(this);
     }
 

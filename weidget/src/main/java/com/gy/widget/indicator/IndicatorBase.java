@@ -44,9 +44,9 @@ public abstract class IndicatorBase extends ViewGroup implements IIndicator {
     public void setCurrentIndicatorIndex (int currentIndicatorIndex) {
         mCurrentIndicatorIndex = currentIndicatorIndex;
         if (mVIndicator != null) {
-            currentIndicatorIndex -= 1;
+//            currentIndicatorIndex -= 1;
             currentIndicatorIndex = currentIndicatorIndex < 0? 0: currentIndicatorIndex;
-            scrollToPosition(currentIndicatorIndex, 1);
+            scrollToPosition(currentIndicatorIndex, 0.01f);
         }
     }
 

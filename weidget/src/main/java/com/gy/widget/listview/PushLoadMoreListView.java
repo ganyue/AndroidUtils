@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListAdapter;
 
 import com.gy.widget.R;
 
@@ -26,6 +27,18 @@ public class PushLoadMoreListView extends ScrollObservedListView {
         super(context, attrs, defStyleAttr);
     }
 
+    @Override
+    protected void init() {
+        super.init();
+        showLoadMoreFooter();
+    }
+
+    @Override
+    public void setAdapter(ListAdapter adapter) {
+        super.setAdapter(adapter);
+        hideLoadMoreFooter();
+    }
+
     private OnLoadMoreListener onLoadMoreListener;
     public void setOnLoadMoreListener (OnLoadMoreListener listener) {
         onLoadMoreListener = listener;
@@ -45,26 +58,32 @@ public class PushLoadMoreListView extends ScrollObservedListView {
                 /**一页显示完全，不需要加载更多*/
                 return;
             }
-            if (lastVisibleItem == totalItemCount - 1) {
+            if (lastVisibleItem == totalItemCount - 1 && onLoadMoreListener.canLoadMore()) {
+                showLoadMoreFooter();
                 onLoadMoreListener.onLoadMore();
+            } else {
+                hideLoadMoreFooter();
             }
         }
     }
 
-    private boolean isLoadMoreFooterShown = false;
+    private boolean isLoadMoreFooterShown () {
+        if (getFooterViewsCount() > 0 && getFooterView() == footerV) {
+            return true;
+        }
+        return false;
+    }
+
     public void showLoadMoreFooter () {
-        if (!isLoadMoreFooterShown) {
-            //TODO
-            addFooterView(initFooterView());
+        if (!isLoadMoreFooterShown()) {
+            addFooterView(getFooterView());
             smoothScrollToPosition(getCount());
-            isLoadMoreFooterShown = true;
         }
     }
 
     public void hideLoadMoreFooter () {
-        if (isLoadMoreFooterShown) {
-            removeFooterView(initFooterView());
-            isLoadMoreFooterShown = false;
+        if (isLoadMoreFooterShown()) {
+            removeFooterView(getFooterView());
         }
     }
 
@@ -74,17 +93,17 @@ public class PushLoadMoreListView extends ScrollObservedListView {
         refreshViewStyle = style;
     }
 
-    private View initFooterView () {
+    private View getFooterView() {
         if (footerV == null) {
 
             switch (refreshViewStyle) {
                 //TODO add other style
                 default:
                     footerV = LayoutInflater.from(getContext()).inflate(R.layout.item_normal_load_more_footer, this, false);
-                    AbsListView.LayoutParams defaultParams = new AbsListView.LayoutParams(
-                            LayoutParams.MATCH_PARENT,
-                            getResources().getDisplayMetrics().widthPixels/6);
-                    footerV.setLayoutParams(defaultParams);
+//                    AbsListView.LayoutParams defaultParams = new AbsListView.LayoutParams(
+//                            LayoutParams.MATCH_PARENT,
+//                            getResources().getDisplayMetrics().widthPixels/6);
+//                    footerV.setLayoutParams(defaultParams);
                     break;
             }
         }
@@ -93,5 +112,6 @@ public class PushLoadMoreListView extends ScrollObservedListView {
 
     public interface OnLoadMoreListener {
         void onLoadMore();
+        boolean canLoadMore();
     }
 }

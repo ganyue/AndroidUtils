@@ -8,10 +8,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.android.ganyue.application.MApplication;
+import com.android.ganyue.frg.BannerFrag;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.GameTestFrg;
-import com.android.ganyue.frg.HTabFragTestFrag;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.MpdTestFrg;
@@ -55,8 +55,8 @@ public class MainActivity extends Activity{
             GameTestFrg.class,
             XunFeiTestFrg.class,
             MpdTestFrg.class,
-            HTabFragTestFrag.class,
             ScrollObservListFrag.class,
+            BannerFrag.class,
     };
 
     @Override

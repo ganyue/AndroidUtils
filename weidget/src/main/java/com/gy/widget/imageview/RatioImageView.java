@@ -37,6 +37,10 @@ public class RatioImageView extends ImageView {
         typedArray.recycle();
     }
 
+    public void setRatio (float ratio) {
+        this.ratio = ratio;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (ratio <= 0) {

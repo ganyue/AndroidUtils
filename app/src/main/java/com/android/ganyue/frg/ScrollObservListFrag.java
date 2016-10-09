@@ -61,7 +61,12 @@ public class ScrollObservListFrag extends BaseFragment {
             = new PushLoadMoreListView.OnLoadMoreListener() {
         @Override
         public void onLoadMore() {
-            mLvContent.showLoadMoreFooter();
+            //TODO
+        }
+
+        @Override
+        public boolean canLoadMore() {
+            return true;
         }
     };
 

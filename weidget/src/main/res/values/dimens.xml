@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+    <!-- text size -->
+    <dimen name="textSize_large">20dp</dimen>
+    <dimen name="textSize_normal">18dp</dimen>
+    <dimen name="textSize_small">16dp</dimen>
+    <dimen name="textSize_smaller">14dp</dimen>
+    <dimen name="textSize_smallest">12dp</dimen>
+
+    <!-- padding -->
+    <dimen name="normal_padding">15dp</dimen>
+
+
     <!-- tab fragment -->
     <dimen name="tab_height">41dp</dimen>
     <dimen name="tab_unselectedSize">14dp</dimen>
