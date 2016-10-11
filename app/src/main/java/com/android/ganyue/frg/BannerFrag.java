@@ -11,7 +11,9 @@ import com.android.ganyue.R;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
-import com.gy.widget.view.BannerView;
+import com.gy.widget.viewpager.banner.BannerCallback;
+import com.gy.widget.viewpager.banner.BannerView;
+import com.gy.widget.viewpager.banner.FirstStartGuideView;
 
 /**
  * Created by ganyu on 2016/10/8.
@@ -20,6 +22,7 @@ import com.gy.widget.view.BannerView;
 public class BannerFrag extends BaseFragment {
 
     @ViewInject(R.id.banner)    private BannerView mBanner;
+    @ViewInject(R.id.guide)     private FirstStartGuideView mGuide;
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,6 +34,9 @@ public class BannerFrag extends BaseFragment {
         mBanner.setBannerCallback(bannerCallback);
         mBanner.setCount(3);
         mBanner.setAutoStart(true, 3000);
+
+        mGuide.setBannerCallback(bannerCallback);
+        mGuide.setCount(3);
     }
 
     @Override
@@ -38,7 +44,7 @@ public class BannerFrag extends BaseFragment {
         return null;
     }
 
-    private BannerView.BannerCallback bannerCallback = new BannerView.BannerCallback() {
+    private BannerCallback bannerCallback = new BannerCallback() {
         @Override
         public void displayImage(ImageView imageView, int pos) {
             imageView.setScaleType(ImageView.ScaleType.FIT_XY);

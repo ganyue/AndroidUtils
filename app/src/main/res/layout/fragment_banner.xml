@@ -6,10 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.gy.widget.view.BannerView
+    <com.gy.widget.viewpager.banner.BannerView
         android:id="@+id/banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:ratio="2"/>
+
+    <com.gy.widget.viewpager.banner.FirstStartGuideView
+        android:id="@+id/guide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ratio="1"/>
 
 </LinearLayout>

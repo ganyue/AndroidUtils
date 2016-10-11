@@ -2,20 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/footer_height"
+    android:layout_height="@dimen/widget_footer_height"
     android:gravity="center"
     android:background="@android:color/white">
 
     <ProgressBar
-        android:layout_width="@dimen/footer_icon_size"
-        android:layout_height="@dimen/footer_icon_size" />
+        android:layout_width="@dimen/widget_footer_icon_size"
+        android:layout_height="@dimen/widget_footer_icon_size" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/loading"
-        android:textColor="@color/text_color_black"
-        android:textSize="@dimen/footer_tip_text_size"
+        android:textColor="@color/widget_text_color_black"
+        android:textSize="@dimen/widget_footer_tip_text_size"
         android:layout_marginLeft="20dp"/>
 
 </LinearLayout>

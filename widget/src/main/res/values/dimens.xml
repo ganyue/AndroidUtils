@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- text size -->
+    <dimen name="widget_textSize_large">20dp</dimen>
+    <dimen name="widget_textSize_normal">18dp</dimen>
+    <dimen name="widget_textSize_small">16dp</dimen>
+    <dimen name="widget_textSize_smaller">14dp</dimen>
+    <dimen name="widget_textSize_smallest">12dp</dimen>
+
+    <!-- padding -->
+    <dimen name="widget_normal_padding">15dp</dimen>
+
+
+    <!-- tab fragment -->
+    <dimen name="widget_tab_height">41dp</dimen>
+    <dimen name="widget_tab_unselectedSize">14dp</dimen>
+    <dimen name="widget_tab_selectedSize">16dp</dimen>
+
+    <!-- push refresh list view-->
+    <dimen name="widget_footer_height">45dp</dimen>
+    <dimen name="widget_footer_icon_size">20dp</dimen>
+    <dimen name="widget_footer_tip_text_size">14dp</dimen>
+
+    <dimen name="widget_tab_leftPadding">15dp</dimen>
+    <dimen name="widget_tab_rightPadding">22dp</dimen>
+
+</resources>

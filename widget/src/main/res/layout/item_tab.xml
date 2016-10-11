@@ -2,7 +2,7 @@
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/tab_height"
-    android:paddingLeft="@dimen/tab_leftPadding"
-    android:paddingRight="@dimen/tab_rightPadding"
+    android:layout_height="@dimen/widget_tab_height"
+    android:paddingLeft="@dimen/widget_tab_leftPadding"
+    android:paddingRight="@dimen/widget_tab_rightPadding"
     android:gravity="center_vertical"/>
