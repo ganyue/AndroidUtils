@@ -6,15 +6,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.text.TextUtils;
-
-import com.gy.utils.audio.AudioPlayerConst;
-import com.gy.utils.audio.AudioUtils;
-import com.gy.utils.audio.IAudioPlayer;
-import com.gy.utils.audio.OnAudioListener;
-import com.gy.utils.audio.Playlist;
-import com.gy.utils.audio.Track;
 
 import java.io.IOException;
 
@@ -22,65 +14,80 @@ import java.io.IOException;
  * Created by ganyu on 2016/7/19.
  *
  */
-public class MediaPlayerService extends Service implements IAudioPlayer {
+public class MediaPlayerService extends Service implements IMediaPlayer {
 
-    private OnAudioListener onAudioListener;
-    private Playlist playlist;
+    public static final String ACTION_PLAYER_STATUS_CHANGED = MediaPlayerService.class.getName();
+
+    enum  PlayerState {
+        UNINITED,
+        PREPARING,
+        PREPARED,
+        PLAYING,
+        PAUSE,
+        STOP,
+    }
+    
     private MediaPlayer mediaPlayer;
-    private MediaPlayerServiceBinder binder;
     private AudioManager audioManager;
-    private AudioPlayerConst.PlayerState state;
-    private int operation;
+    private PlayerState state;
     private boolean startAfterPrepare;
-
+    private String sourcePath = "";
+    
+    
     @Override
     public void onCreate() {
         super.onCreate();
+        if (mediaPlayer == null) {
+            initMediaPlayer();
+        }
+    }
+
+    private void initMediaPlayer () {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(onPreparedListener);
         mediaPlayer.setOnCompletionListener(onCompletionListener);
         mediaPlayer.setOnErrorListener(onErrorListener);
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        state = AudioPlayerConst.PlayerState.UNINITED;
+        state = PlayerState.UNINITED;
         startAfterPrepare = false;
-        operation = AudioPlayerConst.PlayerConsts.Operation.NONE;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        if (binder == null) {
-            binder = new MediaPlayerServiceBinder(this);
-        }
-        return binder;
+        return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_STICKY;
-        int cmd = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_CMD_I, AudioPlayerConst.PlayerConsts.Cmds.CMD_UNKNOWN);
+
+        if (mediaPlayer == null) {
+            initMediaPlayer();
+        }
+
+        int cmd = intent.getIntExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_UNKNOWN);
 
         switch (cmd) {
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_PLAY:
-                playlist = intent.getParcelableExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O);
-                startAfterPrepare = true;
-                initPlaylist(playlist);
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY:
+                String path = intent.getStringExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH);
+                play(path);
                 break;
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_STOP:
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_STOP:
                 stop();
                 break;
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE:
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE:
                 playOrPause();
                 break;
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_SEEK:
-                int seek = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_SEEK_I, 0);
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_SEEK:
+                int seek = intent.getIntExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SEEK_I, 0);
                 seek(seek);
                 break;
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_GET_STATE:
-                onStateChanged();
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_SET_VOL:
+                int vol = intent.getIntExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_VOLUME_I, 0);
+                setVolume(vol);
                 break;
-            case AudioPlayerConst.PlayerConsts.Cmds.CMD_MODE:
-                int mode = intent.getIntExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_MODE_I, 0);
-                playlist.setMode(mode);
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_UPDATE_STATUS:
+                updateStatus();
                 break;
             default:
                 break;
@@ -89,56 +96,23 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
         return START_STICKY;
     }
 
-    private void onStateChanged () {
-        Intent intent = new Intent(AudioUtils.ACTION_AUDIO_PLAYER_CALLBACK_RECEIVER);
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_TYPE_I, AudioPlayerConst.PlayerConsts.BCastType.STATE);
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_SENDER_S, MediaPlayerService.class.getSimpleName());
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_PLAYLIST_O, playlist);
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_IS_PLAYING_B, isPlaying());
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_POSITION_I, getPosition());
-        intent.putExtra(AudioPlayerConst.PlayerConsts.Keys.KEY_OPERATION_I, operation);
-        operation = AudioPlayerConst.PlayerConsts.Operation.NONE;
-        sendBroadcast(intent);
-    }
-
-    @Override
-    public boolean initPlaylist(Playlist playlist) {
-        if (playlist.equals(this.playlist) && state != AudioPlayerConst.PlayerState.UNINITED) {
-            return true;
-        }
-        this.playlist = playlist;
-        startAfterPrepare = false;
-        return preparePlayer();
-    }
-
-    @Override
-    public boolean skipToPosition(int pos) {
-        if (playlist == null) return false;
-        playlist.setCurrentPos(pos);
-        startAfterPrepare = true;
-        return preparePlayer();
-    }
-
     public boolean preparePlayer () {
-        if (playlist == null) {
-            state = AudioPlayerConst.PlayerState.UNINITED;
+        if (sourcePath == null) {
+            state = PlayerState.UNINITED;
             return false;
         }
-        Track track = playlist.getCurrentTrack();
-        String dataSource = (track == null)? "" : (TextUtils.isEmpty(track.localPath) ?
-                (TextUtils.isEmpty(track.mp3Url) ? "" : track.mp3Url) : track.localPath);
 
-        if (TextUtils.isEmpty(dataSource)) {
-            state = AudioPlayerConst.PlayerState.UNINITED;
+        if (TextUtils.isEmpty(sourcePath)) {
+            state = PlayerState.UNINITED;
             return false;
         }
 
         mediaPlayer.reset();
 
         try {
-            mediaPlayer.setDataSource(dataSource);
+            mediaPlayer.setDataSource(sourcePath);
             mediaPlayer.prepareAsync();
-            state = AudioPlayerConst.PlayerState.PREPARING;
+            state = PlayerState.PREPARING;
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -148,107 +122,74 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     }
 
     @Override
-    public boolean stop() {
-        if (getPosition() > 0) {
+    public void stop() {
+        if (state != PlayerState.UNINITED) {
             mediaPlayer.stop();
+
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.STOP);
+
         }
-        state = AudioPlayerConst.PlayerState.STOP;
-        operation = AudioPlayerConst.PlayerConsts.Operation.STOP;
-        onStateChanged();
-        return true;
+        state = PlayerState.STOP;
     }
 
     @Override
-    public boolean playOrPause() {
-        if (state == AudioPlayerConst.PlayerState.PLAYING) {
+    public void seek(int pos) {
+        if (state != PlayerState.UNINITED) {
+            mediaPlayer.seekTo(pos);
+            mediaPlayer.start();
+            state = PlayerState.PLAYING;
+
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.SEEK);
+
+        }
+    }
+
+    @Override
+    public void play(String path) {
+        if (TextUtils.isEmpty(path)) {
+            onStateError("error : data source is empty");
+            return;
+        }
+        if (isPlaying() && path.equals(sourcePath)) {
+            seek(0);
+            return;
+        }
+        sourcePath = path;
+        startAfterPrepare = true;
+        preparePlayer();
+    }
+
+    @Override
+    public void playOrPause() {
+        if (state == PlayerState.PLAYING) {
             //暂停
             mediaPlayer.pause();
-            state = AudioPlayerConst.PlayerState.PAUSE;
-            operation = AudioPlayerConst.PlayerConsts.Operation.PAUSE;
-            onStateChanged();
-        } else if (state == AudioPlayerConst.PlayerState.PAUSE
-                || state == AudioPlayerConst.PlayerState.STOP) {
+            state = PlayerState.PAUSE;
+
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
+
+        } else if (state == PlayerState.PAUSE
+                || state == PlayerState.STOP
+                || state == PlayerState.PREPARED) {
             //播放
             audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mediaPlayer.start();
-            state = AudioPlayerConst.PlayerState.PLAYING;
-            operation = AudioPlayerConst.PlayerConsts.Operation.PLAY;
-            onStateChanged();
-        } else if (state == AudioPlayerConst.PlayerState.PREPARED) {
-            //开始
-            audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-            mediaPlayer.start();
-            state = AudioPlayerConst.PlayerState.PLAYING;
-            operation = AudioPlayerConst.PlayerConsts.Operation.START;
-            onStateChanged();
-        } else if (state == AudioPlayerConst.PlayerState.PREPARING){
+            state = PlayerState.PLAYING;
+
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
+
+        } else if (state == PlayerState.PREPARING){
             //正在prepare
             startAfterPrepare = true;
-        } else if (state == AudioPlayerConst.PlayerState.UNINITED) {
+        } else if (state == PlayerState.UNINITED) {
             //初始化
-            operation = AudioPlayerConst.PlayerConsts.Operation.START;
             startAfterPrepare = true;
             preparePlayer();
         }
-        return true;
     }
 
-    @Override
-    public boolean prev() {
-        if (playlist == null) return false;
-        operation = AudioPlayerConst.PlayerConsts.Operation.PREV;
-        playlist.prev();
-        startAfterPrepare = true;
-        return preparePlayer();
-    }
-
-    @Override
-    public boolean next() {
-        if (playlist == null) return false;
-        operation = AudioPlayerConst.PlayerConsts.Operation.NEXT;
-        playlist.next();
-        startAfterPrepare = true;
-        return preparePlayer();
-    }
-
-    @Override
-    public boolean seek(int pos) {
-        if (state == AudioPlayerConst.PlayerState.UNINITED) {
-            return false;
-        }
-        mediaPlayer.seekTo(pos);
-        mediaPlayer.start();
-        state = AudioPlayerConst.PlayerState.PLAYING;
-        operation = AudioPlayerConst.PlayerConsts.Operation.SEEK;
-        onStateChanged();
-        return true;
-    }
-
-    @Override
-    public int getPosition() {
-        if (state == AudioPlayerConst.PlayerState.UNINITED) {
-            return -1;
-        }
-        return mediaPlayer.getCurrentPosition();
-    }
-
-    @Override
     public boolean isPlaying() {
-        return state == AudioPlayerConst.PlayerState.PLAYING;
-    }
-
-    @Override
-    public void setMode(int mode) {
-        if (playlist == null) return;
-        playlist.setMode(mode);
-        operation = AudioPlayerConst.PlayerConsts.Operation.MODE_CHANGED;
-        onStateChanged();
-    }
-
-    @Override
-    public int getMode() {
-        if (playlist == null) return 0;
-        return playlist.getMode();
+        return state == PlayerState.PLAYING;
     }
 
     @Override
@@ -259,28 +200,18 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     }
 
     @Override
+    public void updateStatus() {
+
+    }
+
     public int getVolume() {
         float maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         float vol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         return (int) (vol / maxVol * 100);
     }
 
-    @Override
-    public boolean isAlive() {
-        return mediaPlayer != null;
-    }
-
-    @Override
-    public Playlist getPlaylist() {
-        return playlist;
-    }
-
-    @Override
-    public void setOnAudioListener(OnAudioListener audioListener) {
-        this.onAudioListener = audioListener;
-    }
-
-    private AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+    private AudioManager.OnAudioFocusChangeListener onAudioFocusChangeListener
+            = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
             switch (focusChange) {
@@ -288,6 +219,9 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     if (isPlaying()) {
                         mediaPlayer.pause();
+
+                        onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
+
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -303,27 +237,23 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     private MediaPlayer.OnPreparedListener onPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
-            state = AudioPlayerConst.PlayerState.PREPARED;
+            state = PlayerState.PREPARED;
             if (startAfterPrepare) {
                 audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
                 mediaPlayer.start();
-                state = AudioPlayerConst.PlayerState.PLAYING;
+                state = PlayerState.PLAYING;
                 startAfterPrepare = false;
             }
-            onStateChanged();
         }
     };
 
     private MediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            onAudioListener.onComplete(AudioPlayerConst.PlayerType.MEDIA_PLAYER, playlist);
+            state = PlayerState.PAUSE;
 
-            state = AudioPlayerConst.PlayerState.PAUSE;
-            playlist.next();
-            startAfterPrepare = true;
-            preparePlayer();
-            operation = AudioPlayerConst.PlayerConsts.Operation.COMPLETE_AUTO_NEXT;
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.COMPLETE);
+
         }
     };
 
@@ -331,29 +261,51 @@ public class MediaPlayerService extends Service implements IAudioPlayer {
     private MediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-            onAudioListener.onError(AudioPlayerConst.PlayerType.MEDIA_PLAYER, playlist, extra);
 
-            state = AudioPlayerConst.PlayerState.PAUSE;
+            state = PlayerState.PAUSE;
             long currentErrorTime = SystemClock.currentThreadTimeMillis();
             long timeInterval = currentErrorTime - lastErrorTime;
             lastErrorTime = currentErrorTime;
-            if (timeInterval < 5000) {
-                onStateChanged();
-                return true;
+
+            /** 此处设置error回调时间，为了防止一直下一首无限死循环 */
+            if (timeInterval > 2000) {
+                onStateError("play " + sourcePath + "occor error --- what:" + what + " extra:" + extra);
             }
-            playlist.next();
-            operation = AudioPlayerConst.PlayerConsts.Operation.ERROR_AUTO_NEXT;
-            startAfterPrepare = true;
-            return preparePlayer();
+
+            return true;
         }
     };
+
+    private MediaStatus getStatus () {
+        MediaStatus status = new MediaStatus();
+        status.sourcePath = sourcePath;
+        status.duration = mediaPlayer.getDuration();
+        status.currentTime = mediaPlayer.getCurrentPosition();
+        status.isPlaying = isPlaying()?1:0;
+        status.volume = getVolume();
+        return status;
+    }
+
+    private void onStatusChanged (int state) {
+        Intent intent = new Intent(ACTION_PLAYER_STATUS_CHANGED);
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_STATE_I, state);
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O, getStatus());
+        sendBroadcast(intent);
+    }
+
+    private void onStateError (String errorMsg) {
+        Intent intent = new Intent(ACTION_PLAYER_STATUS_CHANGED);
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_STATE_I,
+                MediaPlayerConst.BroadCastConsts.States.ERROR);
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O, getStatus());
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_ERROR_MSG, errorMsg);
+        sendBroadcast(intent);
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mediaPlayer.release();
         mediaPlayer = null;
-        binder = null;
-        playlist = null;
     }
 }

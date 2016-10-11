@@ -16,17 +16,17 @@ import java.util.concurrent.TimeUnit;
 public class TcpSender extends Thread {
 
     private OutputStream mSockOutStream;
-    private ArrayBlockingQueue<TcpMessage> mMessage;
+    private ArrayBlockingQueue<String> mMessage;
     private TcpSenderListener mTcpSenderListener;
     private WeakReference<Socket> mSocket;
     private boolean isRun;
     private boolean enableHart = true;
 
     public TcpSender(Socket socket) {
-        mMessage = new ArrayBlockingQueue<TcpMessage>(64);
+        mMessage = new ArrayBlockingQueue<>(64);
         try {
             mSockOutStream = socket.getOutputStream();
-            mSocket = new WeakReference<Socket>(socket);
+            mSocket = new WeakReference<>(socket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class TcpSender extends Thread {
         if (mMessage.contains(msg)) {
             return;
         }
-        mMessage.offer(new TcpMessage("", 0, msg));
+        mMessage.offer(msg);
     }
 
     @Override
@@ -54,12 +54,12 @@ public class TcpSender extends Thread {
         }
         isRun = true;
 
-        TcpMessage message = null;
+        String message = null;
         while (isRun) {
             try {
                 //3秒后如果没有消息发送则发送一个简单消息来确认tcp连接是否活着
                 message = mMessage.poll(3000, TimeUnit.MILLISECONDS);
-                if (message == null || TextUtils.isEmpty(message.message)) {
+                if (message == null || TextUtils.isEmpty(message)) {
                     if (enableHart) {
                         mSocket.get().sendUrgentData(0xFF);
                     }
@@ -67,25 +67,25 @@ public class TcpSender extends Thread {
                 }
                 boolean handled = false;
                 if (mTcpSenderListener != null) {
-                    handled = mTcpSenderListener.onSendBefore(message.message);
+                    handled = mTcpSenderListener.onSendBefore(message);
                 }
 
                 if (handled) {
                     continue;
                 }
 
-                byte[] data = message.message.getBytes();
+                byte[] data = message.getBytes();
                 mSockOutStream.write(data, 0, data.length);
                 mSockOutStream.flush();
 
                 if (mTcpSenderListener != null) {
-                    mTcpSenderListener.onSendSuccess(message.message);
+                    mTcpSenderListener.onSendSuccess(message);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
 
                 if (mTcpSenderListener != null) {
-                    mTcpSenderListener.onSendFailed(message == null ? null : message.message, e);
+                    mTcpSenderListener.onSendFailed(message == null ? null : message, e);
                 }
             }
         }

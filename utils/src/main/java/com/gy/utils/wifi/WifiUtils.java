@@ -107,8 +107,6 @@ public class WifiUtils {
 
     public void release () {
         mApp.get().unregisterReceiver(netStateReceiver);
-        mApp.clear();
-        mApp = null;
     }
 
     class NetStateReceiver extends BroadcastReceiver {

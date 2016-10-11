@@ -16,8 +16,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  */
 public class BaseApplication extends Application{
 
-    private static Application application;
-    private static boolean isDebug;
+    protected static Application application;
+    protected static boolean isDebug;
 
     @CallSuper
     @Override

@@ -1,10 +1,10 @@
 package com.android.ganyue.application;
 
-import android.content.Intent;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.gy.appbase.application.BaseApplication;
-import com.gy.utils.audio.AudioUtils;
+import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
+import com.gy.utils.audio.mpd.MpdPlayerUtils;
 import com.gy.utils.log.LogUtils;
 import com.gy.xunfei.XunfeiUtils;
 
@@ -18,13 +18,17 @@ public class MApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
 
-        LogUtils.d("yue.gan", "start init media service");
-        AudioUtils.getInstance(this);       //初始化audio播放器
         XunfeiUtils.getInstance(this);      //初始化讯飞sdk
         SDKInitializer.initialize(this);    //初始化百度地图api
+
+        getMediaPlayerUtils();              //启动MediaPlayerService
     }
 
-    public static AudioUtils getAudioUtils () {
-        return AudioUtils.getInstance(getApplication());
+    public static MediaPlayerUtils getMediaPlayerUtils () {
+        return MediaPlayerUtils.getInstance(application);
+    }
+
+    public static MpdPlayerUtils getMpdPlayerUtils () {
+        return MpdPlayerUtils.getInstance();
     }
 }

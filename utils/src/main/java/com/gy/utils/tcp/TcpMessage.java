@@ -1,9 +1,8 @@
 package com.gy.utils.tcp;
 
-import android.os.Message;
-
 /**
  * Created by sam_gan on 2016/6/3.
+ *
  */
 public class TcpMessage {
     public String ip;

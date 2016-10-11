@@ -17,6 +17,7 @@ import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.MpdTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
 import com.android.ganyue.frg.TcpTestFrg;
+import com.android.ganyue.frg.TestFrag;
 import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
 import com.android.ganyue.frg.UdpTestFrg;
@@ -57,6 +58,7 @@ public class MainActivity extends Activity{
             MpdTestFrg.class,
             ScrollObservListFrag.class,
             BannerFrag.class,
+            TestFrag.class,
     };
 
     @Override

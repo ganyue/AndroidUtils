@@ -10,14 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.ganyue.R;
+import com.android.ganyue.application.MApplication;
 import com.android.ganyue.controller.FuncCtrl;
 import com.android.ganyue.utils.nsd.NsdTest;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.wifi.WiFi;
 import com.gy.utils.wifi.WiFiConnecter;
+import com.gy.utils.wifi.WifiUtils;
 
 import java.util.List;
 
@@ -61,6 +64,13 @@ public class WifiConnectTestFrg extends BaseFragment {
                     }
                 }
                 wifiManager.saveConfiguration();
+            }
+        });
+
+        MApplication.getWifiUtils().addOnNetworkChangedListener(new WifiUtils.OnNetworkChangedListener() {
+            @Override
+            public void onNetworkChanged(boolean isConnected, int type) {
+                Toast.makeText(mActivity, "wifi connected : " + isConnected + " type: " + type, Toast.LENGTH_SHORT).show();
             }
         });
     }
