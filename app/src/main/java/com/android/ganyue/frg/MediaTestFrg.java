@@ -15,12 +15,12 @@ import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
 import com.gy.utils.audio.mediaplayer.MediaStatus;
 import com.gy.utils.audio.mediaplayer.OnMediaListener;
-import com.gy.utils.audio.mpd.MpdConsts;
 import com.gy.utils.audio.mpd.MpdPlayerUtils;
 import com.gy.utils.audio.mpd.OnMpdListener;
 import com.gy.utils.log.LogUtils;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -42,6 +42,8 @@ public class MediaTestFrg extends BaseFragment {
     private MediaPlayerUtils mediaPlayerUtils;
     private MpdPlayerUtils mpdPlayerUtils;
 
+
+    private List<String> musicUrls = new ArrayList<>();
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
         clearLog.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +54,11 @@ public class MediaTestFrg extends BaseFragment {
         });
 //        testMediaPlayer(view);
         testMpdPlayer(view);
+
+        musicUrls.add("http://zzya.beva.cn/dq/lhMwW0mGEa20NST8HCWPGMl9HS3r.mp3");
+        musicUrls.add("http://zzya.beva.cn/dq/lkQpVHJtFpZIQOP87xj85c-EW-76.mp3");
+        musicUrls.add("http://zzya.beva.cn/dq/lu6QCotRNQvAdoPeNV3FUb1MVa8Z.mp3");
+        musicUrls.add("http://zzya.beva.cn/dq/lo0gttnKbiObx39gquvOk3ES-BiI.mp3");
     }
 
     public void testMpdPlayer (View view) {
@@ -61,31 +68,42 @@ public class MediaTestFrg extends BaseFragment {
         view.findViewById(R.id.btn_pre).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayerUtils.send(MpdConsts.Cmd.MPD_CMD_LIST);
+                mpdPlayerUtils.removeFromCurrentPlaylistById(1);
+                mpdPlayerUtils.removeFromCurrentPlaylistByPos(0);
             }
         });
         view.findViewById(R.id.btn_play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayerUtils.send(MpdConsts.Cmd.MPD_CMD_LISTALL);
+                List<String> songs = new ArrayList<String>();
+                songs.add("A2280.mp3");
+                songs.add("A2369.mp3");
+                songs.add("1607.mp3");
+                songs.add("A1607.mp3");
+                mpdPlayerUtils.addToPlaylist(songs, "0");
             }
         });
         view.findViewById(R.id.btn_next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayerUtils.send(MpdConsts.Cmd.MPD_CMD_LISTALLINFO);
+                List<Integer> indexes = new ArrayList<Integer>();
+                indexes.add(3);
+                indexes.add(1);
+                indexes.add(2);
+                indexes.add(0);
+                mpdPlayerUtils.removeFromPlaylist("0", indexes);
             }
         });
         view.findViewById(R.id.btn_init).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayerUtils.send(MpdConsts.Cmd.MPD_CMD_LISTPLAYLISTS);
+                mpdPlayerUtils.getPlaylist("0");
             }
         });
         view.findViewById(R.id.btn_seek).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mpdPlayerUtils.send(MpdConsts.Cmd.MPD_CMD_STATUS);
+                mpdPlayerUtils.getAllFiles();
             }
         });
     }

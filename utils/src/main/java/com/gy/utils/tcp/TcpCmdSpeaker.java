@@ -2,6 +2,8 @@ package com.gy.utils.tcp;
 
 import android.text.TextUtils;
 
+import com.gy.utils.log.LogUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,11 +32,13 @@ public class TcpCmdSpeaker extends Thread{
 
     protected boolean isRun;
     protected OutputStream mSockOutStream;
-    protected BufferedReader mSockReader;
+    protected InputStream mSockInStream;
     protected ArrayBlockingQueue<String> mMessage;
 
-    protected boolean enableHart = true;
+    protected boolean enableHart = false;
     protected String hearCmd = "0xff";
+    protected int soTimeOut = 0;
+    protected int interval = 3000;
 
     public void addTcpClientListener (TcpCmdSpeakerListener listener) {
         if (listeners == null) {
@@ -60,15 +64,17 @@ public class TcpCmdSpeaker extends Thread{
         mMessage = new ArrayBlockingQueue<>(64);
     }
 
-    public TcpCmdSpeaker(String ip, int port) {
+    public TcpCmdSpeaker(String ip, int port, int soTimeOut) {
         dstIp = ip;
         dstPort = port;
         mMessage = new ArrayBlockingQueue<>(64);
+        this.soTimeOut = soTimeOut;
     }
 
-    public void enableHart (boolean enableHart, String cmd) {
+    public void enableHart (boolean enableHart, String cmd, int interval) {
         this.enableHart = enableHart;
         this.hearCmd = cmd;
+        this.interval = interval;
     }
 
     public boolean isHartEnabled () {
@@ -99,9 +105,9 @@ public class TcpCmdSpeaker extends Thread{
         if (mSocket == null) {
             try {
                 mSocket = new Socket(dstIp, dstPort);
-                mSocket.setSoTimeout(3000);
+                mSocket.setSoTimeout(soTimeOut);
                 mSockOutStream = mSocket.getOutputStream();
-                mSockReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+                mSockInStream = mSocket.getInputStream();
                 isConnected = true;
 
                 if (listeners != null && listeners.size() > 0) {
@@ -127,14 +133,13 @@ public class TcpCmdSpeaker extends Thread{
         while (isRun) {
             /**3秒后如果没有消息发送则发送一个简单消息来确认tcp连接是否活着*/
             try {
-                cmd = mMessage.poll(3000, TimeUnit.MILLISECONDS);
+                cmd = mMessage.poll(interval, TimeUnit.MILLISECONDS);
                 if (cmd == null || TextUtils.isEmpty(cmd)) {
-//                    if (enableHart) {
-//                        cmd = hearCmd;
-//                    } else {
-//                        continue;
-//                    }
-                    continue;
+                    if (enableHart) {
+                        cmd = hearCmd;
+                    } else {
+                        continue;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -144,11 +149,25 @@ public class TcpCmdSpeaker extends Thread{
             if (!sendCmd(cmd)) continue;
             receiveCmdResponse(cmd);
         }//end of while
+        isConnected = false;
 
     }//end of run
 
     protected boolean sendCmd (String cmd) {
         try {
+
+            /** 发送命令前需要先清空buff, skip方法有问题，所以直接采用读取的方式清空了 */
+            int available = mSockInStream.available();
+            while (available > 0) {
+                if (available > 1024) {
+                    mSockInStream.read(new byte[1024], 0, 1024);
+                    available = mSockInStream.available();
+                } else {
+                    mSockInStream.read(new byte[available], 0, available);
+                    available = mSockInStream.available();
+                }
+            }
+
             boolean handled = false;
             if (listeners != null && listeners.size() > 0) {
                 for (TcpCmdSpeakerListener listener: listeners) {
@@ -187,7 +206,8 @@ public class TcpCmdSpeaker extends Thread{
             String line;
             boolean responsed = false;
             List<String> results = new ArrayList<>();
-            while ((line = mSockReader.readLine()) != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(mSockInStream));
+            while ((line = reader.readLine()) != null) {
                 responsed = true;
                 if (line.contains("OK") || line.contains("ACK")) break;
                 results.add(line);
@@ -222,6 +242,7 @@ public class TcpCmdSpeaker extends Thread{
 
     public void release () {
         isRun = false;
+        isConnected = false;
         listeners.clear();
         mMessage.clear();
 
@@ -230,8 +251,8 @@ public class TcpCmdSpeaker extends Thread{
                 mSockOutStream.close();
             }
 
-            if (mSockReader != null) {
-                mSockReader.close();
+            if (mSockInStream != null) {
+                mSockInStream.close();
             }
 
             if (mSocket != null) {

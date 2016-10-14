@@ -5,7 +5,6 @@ import com.baidu.mapapi.SDKInitializer;
 import com.gy.appbase.application.BaseApplication;
 import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
 import com.gy.utils.audio.mpd.MpdPlayerUtils;
-import com.gy.utils.log.LogUtils;
 import com.gy.xunfei.XunfeiUtils;
 
 /**

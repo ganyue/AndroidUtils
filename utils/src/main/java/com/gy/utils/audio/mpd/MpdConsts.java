@@ -1,5 +1,7 @@
 package com.gy.utils.audio.mpd;
 
+import java.util.List;
+
 /**
  * Created by ganyu on 2016/8/12.
  *
@@ -22,7 +24,26 @@ public class MpdConsts {
         return outString;
     }
 
+    public static String getQueuedCommand (List<String> cmdStrs, boolean withSweparator) {
+        String cmdStr = (withSweparator? "command_list_ok_begin": "command_list_begin") + "\n";
+        for (String str : cmdStrs) cmdStr += str;
+        cmdStr += "command_list_end" + "\n";
+        return cmdStr;
+    }
+
+    public static String[] getArgsFromCommand (String cmd) {
+        cmd = cmd.trim();
+        int firstIndex = cmd.indexOf('\"');
+        int lastIndex = cmd.lastIndexOf('\"');
+        if (lastIndex <= 0 || firstIndex == lastIndex) return null;
+        cmd = cmd.substring(firstIndex + 1, cmd.length() - 1);
+        String[] result = cmd.split("\"");
+        return result;
+    }
+
     public static class Cmd {
+        public static final String MPD_CMD_IDLE = "idle";
+
         public static final String MPD_CMD_CLEARERROR = "clearerror";
         public static final String MPD_CMD_CLOSE = "close";
         public static final String MPD_CMD_COUNT = "count";
