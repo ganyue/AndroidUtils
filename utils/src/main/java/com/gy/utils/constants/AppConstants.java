@@ -1,8 +1,10 @@
 package com.gy.utils.constants;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 
 /**
  * Created by ganyu on 2016/10/10.
@@ -40,5 +42,18 @@ public class AppConstants {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String getMetaData (Context context, String key, String defaultVal) {
+        try {
+            ApplicationInfo applicationInfo = context.getPackageManager().
+                    getApplicationInfo(getPackageName(context), PackageManager.GET_META_DATA);
+            String data = applicationInfo.metaData.getString(key);
+            if (TextUtils.isEmpty(data)) return defaultVal;
+            return data;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
