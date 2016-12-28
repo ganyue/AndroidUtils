@@ -46,13 +46,6 @@ public class BannerView extends RelativeLayout {
         ratio = typedArray.getFloat(R.styleable.RatioImageView_ratio, 0);
         typedArray.recycle();
 
-//        LayoutInflater inflater = LayoutInflater.from(context);
-//        View rootV = inflater.inflate(R.layout.view_banner, this, false);
-//        mViewPager = (ScrollSpeedAvailablePager) rootV.findViewById(R.id.vp_pager);
-//        indicator = (HCircleIndicator) rootV.findViewById(R.id.hi_indicator);
-//        mViewPager.setAdapter(new MPagerAdapter());
-//        mViewPager.setScrollSpeed(160);
-//        addView(rootV);
         mViewPager = new ScrollSpeedAvailablePager(context);
         indicator = new HCircleIndicator(context);
 
@@ -129,7 +122,7 @@ public class BannerView extends RelativeLayout {
         @Override
         public void onClick(View v) {
             if (bannerCallback != null) {
-                bannerCallback.onItemClick((ImageView) v, mViewPager.getCurrentItem());
+                bannerCallback.onItemClick((ImageView) v, mViewPager.getCurrentItem() - 1);
             }
         }
     };

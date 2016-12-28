@@ -15,7 +15,7 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
     private WeakReference<Context> mContext;
 
     public DefaultCrashHandler (Context context) {
-        mContext = new WeakReference<Context>(context);
+        mContext = new WeakReference<>(context);
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
     }

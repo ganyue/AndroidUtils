@@ -2,6 +2,7 @@ package com.gy.utils.constants;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -38,8 +39,11 @@ public class WindowConstants {
 
             View view = activity.getWindow().getDecorView();
             View contentV = view.findViewById(android.R.id.content);
-            notificationBarHeight = contentV.getTop();
             contentHeight = contentV.getHeight();
+
+            Rect rect = new Rect();
+            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+            notificationBarHeight = rect.top;
 
             density = activity.getResources().getDisplayMetrics().density;
 

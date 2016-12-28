@@ -2,8 +2,6 @@ package com.gy.utils.tcp;
 
 import android.text.TextUtils;
 
-import com.gy.utils.log.LogUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

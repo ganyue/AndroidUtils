@@ -6,4 +6,25 @@
         <attr name="ratio" format="float"/>
     </declare-styleable>
 
+    <declare-styleable name="SegSeeker">
+        <attr name="segs" format="string"/>
+    </declare-styleable>
+
+    <declare-styleable name="TimerSeekBar">
+        <attr name="split" format="integer" />
+        <attr name="line_width" format="dimension" />
+        <attr name="line_height" format="dimension" />
+        <attr name="line_color" format="color" />
+        <attr name="normal_point_r" format="dimension"/>
+        <attr name="normal_point_color" format="color" />
+        <attr name="move_point_r" format="dimension"/>
+        <attr name="move_point_color" format="color" />
+        <attr name="point_num" format="integer"/>
+        <attr name="text_marginTop" format="dimension"/>
+        <attr name="text_splitDes" format="string"/>
+        <attr name="text_size_normal" format="dimension"/>
+        <attr name="text_size_selected" format="dimension"/>
+        <attr name="text_color_normal" format="color" />
+        <attr name="text_color_selected" format="color" />
+    </declare-styleable>
 </resources>

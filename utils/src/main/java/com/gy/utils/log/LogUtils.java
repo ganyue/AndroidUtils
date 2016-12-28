@@ -10,7 +10,8 @@ public class LogUtils {
     private static boolean isDebug = true;
 
     public static void enable (boolean enable) {
-        isDebug = enable;
+//        isDebug = enable;
+        isDebug = true;
     }
 
     public static void d (String tag, String log) {

@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="widget_popup_bottom_in_out">
+        <item name="android:windowEnterAnimation">@anim/widget_anim_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/widget_anim_bottom_out</item>
+    </style>
+
+</resources>

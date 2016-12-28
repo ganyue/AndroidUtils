@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import java.io.IOException;
@@ -75,8 +76,18 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_STOP:
                 stop();
                 break;
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_ONLY:
+                playOnly();
+                break;
+            case MediaPlayerConst.PlayerConsts.Cmds.CMD_PAUSE_ONLY:
+                pauseOnly();
+                break;
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE:
-                playOrPause();
+                if (TextUtils.isEmpty(sourcePath)) {
+                    play(intent.getStringExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH));
+                } else {
+                    playOrPause();
+                }
                 break;
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_SEEK:
                 int seek = intent.getIntExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SEEK_I, 0);
@@ -97,13 +108,9 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
     }
 
     public boolean preparePlayer () {
-        if (sourcePath == null) {
-            state = PlayerState.UNINITED;
-            return false;
-        }
-
         if (TextUtils.isEmpty(sourcePath)) {
             state = PlayerState.UNINITED;
+            onStateError("************ source path can not be null **************");
             return false;
         }
 
@@ -115,6 +122,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             state = PlayerState.PREPARING;
             return true;
         } catch (IOException e) {
+            onStateError("************ exception while setDataSource or prepareAsync **************");
             e.printStackTrace();
         }
 
@@ -188,20 +196,47 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
         }
     }
 
+    @Override
+    public void playOnly() {
+        if (state == PlayerState.UNINITED) return;
+        if (state == PlayerState.PREPARING) {
+            startAfterPrepare = true;
+            return;
+        }
+        if (mediaPlayer != null && !isPlaying()) {
+            mediaPlayer.start();
+            state = PlayerState.PLAYING;
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
+        }
+    }
+
+    public void pauseOnly () {
+        if (state == PlayerState.UNINITED) return;
+        if (state == PlayerState.PREPARING) {
+            startAfterPrepare = false;
+            return;
+        }
+        if (mediaPlayer != null && isPlaying()) {
+            mediaPlayer.pause();
+            state = PlayerState.PAUSE;
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
+        }
+    }
+
     public boolean isPlaying() {
-        return state == PlayerState.PLAYING;
+        return mediaPlayer != null && mediaPlayer.isPlaying() && state == PlayerState.PLAYING;
     }
 
     @Override
     public void setVolume(int volume) {
         float maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int vol = (int) (volume * maxVol / 100f);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 1);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, vol, 0);
     }
 
     @Override
     public void updateStatus() {
-
+        onStatusChanged(MediaPlayerConst.BroadCastConsts.States.SEEK);
     }
 
     public int getVolume() {
@@ -218,10 +253,8 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
                 case AudioManager.AUDIOFOCUS_LOSS:
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     if (isPlaying()) {
-                        mediaPlayer.pause();
-
+                        pauseOnly();
                         onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
-
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -243,6 +276,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
                 mediaPlayer.start();
                 state = PlayerState.PLAYING;
                 startAfterPrepare = false;
+                onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
             }
         }
     };
@@ -261,8 +295,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
     private MediaPlayer.OnErrorListener onErrorListener = new MediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
-
-            state = PlayerState.PAUSE;
+            state = PlayerState.UNINITED;
             long currentErrorTime = SystemClock.currentThreadTimeMillis();
             long timeInterval = currentErrorTime - lastErrorTime;
             lastErrorTime = currentErrorTime;
@@ -279,8 +312,13 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
     private MediaStatus getStatus () {
         MediaStatus status = new MediaStatus();
         status.sourcePath = sourcePath;
-        status.duration = mediaPlayer.getDuration();
-        status.currentTime = mediaPlayer.getCurrentPosition();
+        if (state == PlayerState.UNINITED || state == PlayerState.PREPARING)  {
+            status.duration = 0;
+            status.currentTime = 0;
+        } else {
+            status.duration = mediaPlayer.getDuration();
+            status.currentTime = mediaPlayer.getCurrentPosition();
+        }
         status.isPlaying = isPlaying()?1:0;
         status.volume = getVolume();
         return status;
@@ -288,8 +326,13 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
 
     private void onStatusChanged (int state) {
         Intent intent = new Intent(ACTION_PLAYER_STATUS_CHANGED);
+        MediaStatus status = getStatus();
+
+        //android 5.x 系统中，complete事件中获取到的current position有误
+        if (state == MediaPlayerConst.BroadCastConsts.States.COMPLETE) status.currentTime = status.duration;
         intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_STATE_I, state);
-        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O, getStatus());
+        intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O, status);
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         sendBroadcast(intent);
     }
 
@@ -299,6 +342,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
                 MediaPlayerConst.BroadCastConsts.States.ERROR);
         intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O, getStatus());
         intent.putExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_ERROR_MSG, errorMsg);
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         sendBroadcast(intent);
     }
 

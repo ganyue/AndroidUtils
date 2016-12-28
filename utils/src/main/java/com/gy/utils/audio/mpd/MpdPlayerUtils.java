@@ -44,6 +44,13 @@ public class MpdPlayerUtils {
         onMpdListeners.remove(listener);
     }
 
+    public String getDstIp () {
+        if (isConnected()) {
+            return cmdSpeaker.getDstIp();
+        }
+        return "";
+    }
+
     /** 5s读取超时，30s发送一次status命令 */
     public void connect (String ip) {
         if (ip == null || TextUtils.isEmpty(ip)) return;
@@ -61,7 +68,7 @@ public class MpdPlayerUtils {
     }
 
     /** 监听状态 */
-    public void connectIdle (String ip) {
+    private void connectIdle (String ip) {
         if (idleSpeaker != null) {
             idleSpeaker.release();
             idleSpeaker = null;
@@ -153,8 +160,8 @@ public class MpdPlayerUtils {
         send(MpdConsts.Cmd.MPD_CMD_PLAY_ID, ""+id);
     }
 
-    public void seek(int songId, int pos) {
-        send(MpdConsts.Cmd.MPD_CMD_SEEK, ""+songId, ""+pos);
+    public void seek(int songIndex, int pos) {
+        send(MpdConsts.Cmd.MPD_CMD_SEEK, ""+songIndex, ""+pos);
     }
 
     public void play () {

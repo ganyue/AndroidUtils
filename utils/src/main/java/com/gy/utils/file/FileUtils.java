@@ -1,6 +1,7 @@
 package com.gy.utils.file;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import java.nio.channels.FileChannel;
 public class FileUtils {
 
     public static long getFileSize (String path) {
+        if (TextUtils.isEmpty(path)) return 0;
         return getFileSize(new File(path));
     }
 
@@ -79,16 +81,30 @@ public class FileUtils {
         return count;
     }
 
-
     public static void copyFiles (String sourcePath, String dstDir, OnCopyCallback callback) {
         FileTask task = new FileTask(new File[] {new File(sourcePath), new File(dstDir)}, TaskType.COPY, callback);
         task.execute();
+    }
+    public static void copyFiles (String sourcePath, String dstDir, int copyType, OnCopyCallback callback) {
+        if (TextUtils.isEmpty(sourcePath) || TextUtils.isEmpty(dstDir)) {
+            callback.onCopyFinished();
+            return;
+        }
+        FileTask task = new FileTask(new File[] {new File(sourcePath), new File(dstDir)}, TaskType.COPY, callback);
+        task.setCopyType(copyType);
+        task.execute();
+    }
+
+    private static void copy (String sourcePath, String dstDir, OnCopyCallback callback) {
+        copy (sourcePath, dstDir, callback, true);
     }
 
     /**
      * 拷贝，会拷贝所有文件，可拷贝這个目录到另一个目录下
      */
-    private static void copy (String sourcePath, String dstDir, OnCopyCallback callback) {
+    private static void copy (String sourcePath, String dstDir, OnCopyCallback callback, boolean useSamePath) {
+        if (TextUtils.isEmpty(sourcePath) || TextUtils.isEmpty(dstDir)) return;
+
         File sFile = new File(sourcePath);
         File dFile = new File(dstDir);
 
@@ -107,9 +123,9 @@ public class FileUtils {
             if (files == null) {
                 return;
             }
-            String dir = dstDir + File.separator + sFile.getName();
+            String dir = dstDir + (useSamePath?File.separator + sFile.getName():"");
             for (File file : files) {
-                copy(file.getPath(), dir, callback);
+                copy(file.getPath(), dir, callback, useSamePath);
             }
         } else {
             File file = new File(dstDir, sFile.getName());
@@ -143,15 +159,22 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 同步
+     * 删除所有文件，包括文件夹下的其他文件，包括自己,
+     */
     public static void deleteFiles(String filePath, OnDeleteCallback callback) {
+        if (TextUtils.isEmpty(filePath)) return;
         FileTask fileTask = new FileTask(new File[]{new File(filePath)}, TaskType.DELETE, callback);
         fileTask.execute();
     }
 
     /**
+     * 异步
      * 删除所有文件，包括文件夹下的其他文件，包括自己
      */
-    private static void delete(File file, OnDeleteCallback callback) {
+    @Deprecated
+    public static void delete(File file, OnDeleteCallback callback) {
 
         if (!file.exists()) {
             return;
@@ -163,6 +186,7 @@ public class FileUtils {
 
         if (!file.isDirectory()) {
             safeDelete(file);
+            return;
         }
 
         File[] files = file.listFiles();
@@ -182,7 +206,7 @@ public class FileUtils {
     /**
      * 只能删除单个文件，一旦传入的参数是一个directory而且里面有其他文件，那么这个方法将无法完成删除
      */
-    private static void safeDelete (File file) {
+    public static void safeDelete (File file) {
         final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
         //重命名是为了防止文件名字超过系统限制导致的无法删除的情形
         file.renameTo(to);
@@ -193,17 +217,25 @@ public class FileUtils {
         COPY, DELETE;
     }
 
+    public static final int COPY_TYPE_SAME_PATH = 0;
+    public static final int COPY_TYPE_ALL_IN_SOURCE_ROOT_DIR = 2;
     //task to do file jobs
     static class FileTask extends AsyncTask<Integer, Integer, Boolean> {
         private File[] files;
         private TaskType taskType;
         private Object callback;
+        private int copyType;
+
 
         public FileTask(File[] files, TaskType taskType, Object callback) {
             super();
             this.files = files;
             this.taskType = taskType;
             this.callback = callback;
+        }
+
+        public void setCopyType (int type) {
+            copyType = type;
         }
 
         @Override
@@ -214,7 +246,11 @@ public class FileUtils {
                     if (callback != null) ((OnDeleteCallback)callback).onDeleteFinished();
                     break;
                 case COPY:
-                    copy(files[0].getPath(), files[1].getPath(), (OnCopyCallback) callback);
+                    if (copyType == COPY_TYPE_ALL_IN_SOURCE_ROOT_DIR) {
+                        copy(files[0].getPath(), files[1].getPath(), (OnCopyCallback) callback, false);
+                    } else {
+                        copy(files[0].getPath(), files[1].getPath(), (OnCopyCallback) callback);
+                    }
                     if (callback != null) ((OnCopyCallback)callback).onCopyFinished();
                     break;
             }

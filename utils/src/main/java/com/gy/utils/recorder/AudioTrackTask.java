@@ -5,8 +5,6 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.AsyncTask;
 
-import com.gy.utils.log.LogUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -69,7 +67,6 @@ public class AudioTrackTask extends AsyncTask<Void, Void, Void> {
                 if (fIn != null) {
                     len = fIn.read(buff, 0, minBuffSize);
                     if (len <= 0) {
-                        LogUtils.d("yue.gan", "end of pcm file");
                         break;
                     }
                     audioTrack.write(buff, 0, len);
@@ -81,7 +78,6 @@ public class AudioTrackTask extends AsyncTask<Void, Void, Void> {
                 }
             }
 
-            LogUtils.d("yue.gan", "stop play");
             fIn.close();
             audioTrack.stop();
             audioTrack.release();

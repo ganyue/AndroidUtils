@@ -47,8 +47,8 @@ public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{
 
             URL url = new URL(bean.url);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
             File outFile = new File(outDir, bean.fileName);
             if (outFile.exists() && !outFile.isDirectory()) {
                 //file already exists
@@ -71,16 +71,20 @@ public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{
                 InputStream in = connection.getInputStream();
                 byte[] buff = new byte[1024];   //buffer不宜过大，过大可能会导致阻塞
                 int len;
-                long lastestUpdateTime = 0;
+                long lastUpdateTime = 0;
+                int lastUpdateLen = bean.storedLen;
 
                 if (listener != null) listener.onDownloadStart(bean);
                 while ((len = in.read(buff)) > 0) {
                     fOut.write(buff, 0, len);
                     bean.storedLen += len;
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastestUpdateTime > 1000) {
+                    if (currentTime - lastUpdateTime > 1000) {
                         //每1秒更新一次进度，防止更新过于频繁拖慢下载速度
-                        lastestUpdateTime = currentTime;
+                        bean.downSpeed = (int) ((bean.storedLen - lastUpdateLen)
+                                /((currentTime - lastUpdateTime)*1f/1000));
+                        lastUpdateLen = bean.storedLen;
+                        lastUpdateTime = currentTime;
                         publishProgress(bean.storedLen);
                     }
                 }
@@ -90,7 +94,7 @@ public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{
                 connection.disconnect();
 
                 //校验文件是否正确
-                if (!TextUtils.isEmpty(bean.md5)) {
+                if (!TextUtils.isEmpty(bean.md5) && !"null".equals(bean.md5)) {
                     String md5Str = MD5Utils.getFileMD5(outFile);
                     if (!bean.md5.equals(md5Str)) {
                         bean.extraMsg = DownloadErrorType.MD5_NOT_MATCH;

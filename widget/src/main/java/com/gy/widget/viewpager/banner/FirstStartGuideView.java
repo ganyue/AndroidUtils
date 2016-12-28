@@ -49,6 +49,7 @@ public class FirstStartGuideView extends RelativeLayout {
 
         mViewPager.setAdapter(new MPagerAdapter());
         mViewPager.setScrollSpeed(180);
+        mViewPager.setOffscreenPageLimit(1);
 
         LayoutParams pagerParams = new LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

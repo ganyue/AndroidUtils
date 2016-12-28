@@ -4,11 +4,17 @@ import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.support.annotation.CallSuper;
 
+import com.gy.utils.bluetooth.BluetoothUtils;
+import com.gy.utils.download.DownloadManager;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
 import com.gy.utils.log.LogUtils;
+import com.gy.utils.preference.SharedPreferenceUtils;
 import com.gy.utils.wifi.WifiUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by ganyu on 2016/7/19.
@@ -25,8 +31,8 @@ public class BaseApplication extends Application{
         super.onCreate();
 
         application = this;
-        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
-
+//        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
+        isDebug = false;
         LogUtils.enable(isDebug);   //debug 版本打印日志, release版本不打印
         initCrashHandler();         //设置全局异常处理器
         getImageLoader();           //初始化 image loader
@@ -39,15 +45,15 @@ public class BaseApplication extends Application{
     }
 
     public void initCrashHandler () {
-        new DefaultCrashHandler(application);
+//        new DefaultCrashHandler(application);
     }
 
     public static Application getApplication () {
         return application;
     }
 
-    public static ImageLoader getImageLoader () {
-        return ImageLoaderUtils.getImageLoader(application);
+    public static ImageLoaderUtils getImageLoader () {
+        return ImageLoaderUtils.getInstance(application);
     }
 
     public static HttpUtils getHttpUtils () {
@@ -58,4 +64,22 @@ public class BaseApplication extends Application{
         return WifiUtils.getInstance(application);
     }
 
+    public static BluetoothUtils getBluetoothUtils () {
+        return BluetoothUtils.getInstance(application);
+    }
+
+    public static SharedPreferenceUtils getPreferenceUtils () {
+        return SharedPreferenceUtils.getInstance(application);
+    }
+
+    /**
+     * 一些数据库操作是很耗时的，
+     * 但同时多个线程一起存取数据库容易出问题，
+     * 所以这里提供一个单线程的线程池来做这些操作
+     */
+    private static ExecutorService executorService;
+    public static ExecutorService getExecutorService () {
+        if (executorService == null) executorService = Executors.newSingleThreadExecutor();
+        return executorService;
+    }
 }

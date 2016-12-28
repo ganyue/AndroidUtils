@@ -42,10 +42,15 @@ public class SharedPreferenceUtils {
         editor.putString(key, value);
         editor.apply();
     }
-    
+
     public String getStr (String key) {
         SharedPreferences preferences = getPref();
         return preferences.getString(key, "");
+    }
+
+    public String getStr (String key, String defVal) {
+        SharedPreferences preferences = getPref();
+        return preferences.getString(key, defVal);
     }
 
     //integer
@@ -61,6 +66,11 @@ public class SharedPreferenceUtils {
         return preferences.getInt(key, 0);
     }
 
+    public int getInt (String key, int defVal) {
+        SharedPreferences preferences = getPref();
+        return preferences.getInt(key, defVal);
+    }
+
     //boolean
     public void saveBoolean (String key, boolean value) {
         SharedPreferences preferences = getPref();
@@ -72,6 +82,11 @@ public class SharedPreferenceUtils {
     public boolean getBoolean (String key) {
         SharedPreferences preferences = getPref();
         return preferences.getBoolean(key, false);
+    }
+
+    public boolean getBoolean (String key, boolean defVal) {
+        SharedPreferences preferences = getPref();
+        return preferences.getBoolean(key, defVal);
     }
 
     //long
@@ -87,6 +102,11 @@ public class SharedPreferenceUtils {
         return preferences.getLong(key, 0);
     }
 
+    public long getLong (String key, long defVal) {
+        SharedPreferences preferences = getPref();
+        return preferences.getLong(key, defVal);
+    }
+
     //float
     public void saveFloat (String key, float value) {
         SharedPreferences preferences = getPref();
@@ -98,6 +118,11 @@ public class SharedPreferenceUtils {
     public float getFloat (String key) {
         SharedPreferences preferences = getPref();
         return preferences.getFloat(key, 0);
+    }
+
+    public float getFloat (String key, float defVal) {
+        SharedPreferences preferences = getPref();
+        return preferences.getFloat(key, defVal);
     }
 
     /**

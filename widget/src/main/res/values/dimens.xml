@@ -20,7 +20,6 @@
     <dimen name="widget_footer_height">45dp</dimen>
     <dimen name="widget_footer_icon_size">20dp</dimen>
     <dimen name="widget_footer_tip_text_size">14dp</dimen>
-
     <dimen name="widget_tab_leftPadding">15dp</dimen>
     <dimen name="widget_tab_rightPadding">22dp</dimen>
 

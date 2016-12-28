@@ -2,6 +2,10 @@ package com.gy.utils.file;
 
 import android.content.Context;
 import android.os.Environment;
+import android.os.StatFs;
+
+import com.gy.utils.constants.AppConstants;
+import com.gy.utils.log.LogUtils;
 
 import java.io.File;
 
@@ -97,5 +101,62 @@ public class SdcardUtils {
         }
 
         return file;
+    }
+
+    public static long getUsableCacheStorage () {
+        if (!isExternalStorageUsable()) {
+            return getSystemUsableStorage();
+        }
+        return getExternalUsableStorage();
+    }
+
+    public static long getExternalUsableStorage () {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            File sdcardDir = Environment.getExternalStorageDirectory();
+            StatFs statFs = new StatFs(sdcardDir.getPath());
+            long bolckSize = statFs.getBlockSize();
+            long avaiBlocks = statFs.getAvailableBlocks();
+            return avaiBlocks * bolckSize;
+        }
+        return 0;
+    }
+
+    public static long getSystemUsableStorage () {
+        File root = Environment.getRootDirectory();
+        StatFs statFs = new StatFs(root.getPath());
+        long bolckSize = statFs.getBlockSize();
+        long avaiBlocks = statFs.getAvailableBlocks();
+        return avaiBlocks * bolckSize;
+    }
+
+    public static String getUsableDownloadDir(Context context) {
+        File root = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        if (root == null) {
+            if (isExternalStorageUsable() && getExternalRootDir() != null) {
+                String externalRoot = getExternalRootDir().getAbsolutePath();
+                return externalRoot + File.separator + "beva" + File.separator + "tingting";
+            }
+            return getFileDir(context).getAbsolutePath()+File.separator+"Download";
+        }
+        return root.getAbsolutePath();
+    }
+
+    public static String getUsableDownloadMp3Dir (Context context) {
+        File root = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        if (root == null) {
+            if (isExternalStorageUsable() && getExternalRootDir() != null) {
+                String externalRoot = getExternalRootDir().getAbsolutePath();
+                String appExternalPath = externalRoot + File.separator + "Android" + File.separator + "data"
+                        + File.separator + AppConstants.getPackageName(context) + File.separator + "files"
+                        + File.separator + "Music";
+                File file = new File(appExternalPath);
+                if (file.mkdirs()) return appExternalPath;
+                return externalRoot + File.separator + "beva" + File.separator + "tingting" + File.separator + "Music";
+            }
+            return getFileDir(context).getAbsolutePath()+File.separator+"Music";
+        }
+        LogUtils.d("yue.gan", "mp3 download path : " + root.getAbsolutePath());
+        return root.getAbsolutePath();
     }
 }

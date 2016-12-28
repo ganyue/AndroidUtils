@@ -2,9 +2,6 @@ package com.gy.utils.recorder;
 
 import android.media.AudioRecord;
 import android.os.AsyncTask;
-import android.os.SystemClock;
-
-import com.gy.utils.log.LogUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

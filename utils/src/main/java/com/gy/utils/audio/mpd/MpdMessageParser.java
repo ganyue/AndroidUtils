@@ -21,16 +21,16 @@ public class MpdMessageParser {
             return parseFiles(response);
         } else if (cmd.trim().equals(MpdConsts.Cmd.MPD_CMD_LIST)) {
             /** 正在播放列表 */
-            return Music.getMusicFromList(response, false);
+            return Music.getMusicFromList(response);
         } else if (cmd.trim().contains(MpdConsts.Cmd.MPD_CMD_PLAYLIST_INFO)) {
             /** 指定歌单列表 */
-            return Music.getMusicFromList(response, false);
+            return Music.getMusicFromList(response);
         } else if (cmd.trim().equals(MpdConsts.Cmd.MPD_CMD_LISTPLAYLISTS)) {
             /** 解析所有歌单的名字，时间目前用不到，暂时不做解析 */
             return parsePlaylistInfos(response);
         }
         /**  */
-        return null;
+        return response;
     }
 
     private List<String> parseFiles (List<String> response){

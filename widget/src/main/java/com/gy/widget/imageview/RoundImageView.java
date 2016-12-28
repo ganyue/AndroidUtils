@@ -1,8 +1,7 @@
-package com.beva.bevatingting.view;
+package com.gy.widget.imageview;
 
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -15,11 +14,12 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
-import com.beva.bevatingting.R;
 
 public class RoundImageView extends ImageView {
 
@@ -166,7 +166,7 @@ public class RoundImageView extends ImageView {
         super.setImageDrawable(drawable);
         mBitmap = getBitmapFromDrawable(drawable);
         setup();
-    }
+     }
 
     @Override
     public void setImageResource(int resId) {

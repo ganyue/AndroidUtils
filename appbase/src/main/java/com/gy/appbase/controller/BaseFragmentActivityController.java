@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.gy.utils.log.LogUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -30,6 +32,11 @@ public class BaseFragmentActivityController {
     private final String Tag = BaseFragmentActivityController.class.getSimpleName();
 
     public BaseFragmentActivityController(FragmentActivity activity) {
+        bindActivity(activity);
+    }
+
+    public void bindActivity (FragmentActivity activity) {
+        if (activity == null) return;
         FragmentManager mFragmentManager = activity.getSupportFragmentManager();
 
         setController(activity);
@@ -57,7 +64,7 @@ public class BaseFragmentActivityController {
     public Fragment createFragment (Class fragClazz, Bundle arguments) {
         Fragment fragment = createFragment(fragClazz, null, null);
         if (fragment != null) {
-            fragment.setArguments(arguments);
+            setArgument(fragment, arguments);
         }
         return fragment;
     }
@@ -85,7 +92,7 @@ public class BaseFragmentActivityController {
         }
     }
 
-    protected String getTag (Class clazz) {
+    public String getTag (Class clazz) {
         return clazz.getSimpleName();
     }
 
@@ -95,9 +102,7 @@ public class BaseFragmentActivityController {
 
     public Fragment replaceFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Bundle arguments) {
         Fragment fragment = replaceFragment(fragmentManager, holderId, fragClazz, null, null);
-        if (fragment != null) {
-            fragment.setArguments(arguments);
-        }
+        setArgument(fragment, arguments);
         return fragment;
     }
 
@@ -112,7 +117,8 @@ public class BaseFragmentActivityController {
             return null;
         }
         setController(fragment);
-        fragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz)).commit();
+        fragmentManager.beginTransaction().replace(holderId, fragment, getTag(fragClazz))
+                .disallowAddToBackStack().disallowAddToBackStack().commitAllowingStateLoss();
 
         return fragment;
     }
@@ -124,7 +130,7 @@ public class BaseFragmentActivityController {
     public Fragment addFragment (FragmentManager fragmentManager, int holderId, Class fragClazz, Bundle arguments) {
         Fragment fragment = addFragment(fragmentManager, holderId, fragClazz, null, null);
         if (fragment != null) {
-            fragment.setArguments(arguments);
+            setArgument(fragment, arguments);
         }
         return fragment;
     }
@@ -137,7 +143,8 @@ public class BaseFragmentActivityController {
         Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
         if (fragment == null) {
             if ((fragment = createFragment(fragClazz, paramTypes, params)) != null) {
-                fragmentManager.beginTransaction().add(holderId, fragment, getTag(fragClazz)).commit();
+                fragmentManager.beginTransaction().add(holderId, fragment, getTag(fragClazz))
+                        .disallowAddToBackStack().commitAllowingStateLoss();
             }
         }
 
@@ -151,7 +158,7 @@ public class BaseFragmentActivityController {
     public Fragment hideFragment (FragmentManager fragmentManager, Class fragClazz) {
         Fragment fragment = fragmentManager.findFragmentByTag(getTag(fragClazz));
         if (fragment != null) {
-            fragmentManager.beginTransaction().hide(fragment).commit();
+            fragmentManager.beginTransaction().hide(fragment).disallowAddToBackStack().commitAllowingStateLoss();
         }
         return fragment;
     }
@@ -169,11 +176,9 @@ public class BaseFragmentActivityController {
                                   List<String> whiteTagList,
                                   int holderId,
                                   Class fragClazz,
-                                  Bundle arguments) {
+                                  Bundle argument) {
         Fragment fragment = showFragment(fragmentManager, hideOthers, whiteTagList, holderId, fragClazz, null, null);
-        if (fragment != null) {
-            fragment.setArguments(arguments);
-        }
+        setArgument(fragment, argument);
         return fragment;
     }
 
@@ -206,8 +211,23 @@ public class BaseFragmentActivityController {
         }
 
         transaction.show(fragment);
-        transaction.commit();
+        transaction.disallowAddToBackStack().commitAllowingStateLoss();
         return fragment;
+    }
+
+    private void setArgument (Fragment fragment, Bundle arg) {
+        if (fragment != null) {
+            if (fragment.getArguments() != null) {
+                fragment.getArguments().clear();
+                fragment.getArguments().putAll(arg);
+            } else {
+                try {
+                    fragment.setArguments(arg);
+                } catch (IllegalStateException e) {
+                    LogUtils.e("yue.gan", e.toString());
+                }
+            }
+        }
     }
 
 }

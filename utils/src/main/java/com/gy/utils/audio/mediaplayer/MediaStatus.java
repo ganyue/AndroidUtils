@@ -3,6 +3,8 @@ package com.gy.utils.audio.mediaplayer;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Field;
+
 /**
  * Created by ganyu on 2016/10/10.
  *
@@ -16,6 +18,15 @@ public class MediaStatus implements Parcelable {
     public String sourcePath;
 
     public MediaStatus (){}
+
+    public void update (MediaStatus status) {
+        if (status == null) return;
+        this.isPlaying = status.isPlaying;
+        this.duration = status.duration;
+        this.currentTime = status.currentTime;
+        this.volume = status.volume;
+        this.sourcePath = status.sourcePath;
+    }
 
     protected MediaStatus(Parcel in) {
         isPlaying = in.readInt();
@@ -49,5 +60,19 @@ public class MediaStatus implements Parcelable {
         dest.writeInt(currentTime);
         dest.writeInt(volume);
         dest.writeString(sourcePath);
+    }
+
+    @Override
+    public String toString() {
+        Field[] fields = getClass().getDeclaredFields();
+        String str = "";
+        for (Field field: fields) {
+            try {
+                str += field.getName() + ":" + field.get(this) + "\n";
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return str;
     }
 }

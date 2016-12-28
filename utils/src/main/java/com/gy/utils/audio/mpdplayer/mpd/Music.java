@@ -532,7 +532,7 @@ public class Music extends Item implements FilesystemTreeEntry {
      * @see Object#toString()
      */
     /*
-     * public String toString() { return track + " - " + album + " - " + artist + " - " + title + " (" + fullpath + ")"; }
+     * public String toString() { return track + " - " + album + " - " + artist + " - " + title + " (" + file + ")"; }
 	 */
     @Override
     public String mainText() {

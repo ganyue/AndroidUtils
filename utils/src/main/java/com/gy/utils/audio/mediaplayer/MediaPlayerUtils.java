@@ -5,6 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
+
+import com.gy.utils.constants.AppConstants;
+import com.gy.utils.log.LogUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ public class MediaPlayerUtils implements IMediaPlayer{
         mApp = new WeakReference<>(application);
         mediaPlayerStateReceiver = new MediaPlayerStateReceiver();
         IntentFilter intentFilter = new IntentFilter(MediaPlayerService.ACTION_PLAYER_STATUS_CHANGED);
+//        LocalBroadcastManager.getInstance(application).registerReceiver(mediaPlayerStateReceiver, intentFilter);
         application.registerReceiver(mediaPlayerStateReceiver, intentFilter);
     }
 
@@ -48,6 +53,27 @@ public class MediaPlayerUtils implements IMediaPlayer{
     public void playOrPause() {
         Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
         intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE);
+        mApp.get().startService(intent);
+    }
+
+    public void playOrPause(String path) {
+        Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
+        intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE);
+        intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH, path);
+        mApp.get().startService(intent);
+    }
+
+    @Override
+    public void playOnly() {
+        Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
+        intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_ONLY);
+        mApp.get().startService(intent);
+    }
+
+    @Override
+    public void pauseOnly() {
+        Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
+        intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PAUSE_ONLY);
         mApp.get().startService(intent);
     }
 
@@ -106,6 +132,13 @@ public class MediaPlayerUtils implements IMediaPlayer{
         public void onReceive(Context context, Intent intent) {
             MediaStatus mediaStatus = intent.getParcelableExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_MEDIA_STATUS_O);
             int state = intent.getIntExtra(MediaPlayerConst.BroadCastConsts.Keys.KEY_STATE_I, 0);
+
+//            LogUtils.d("yue.gan", "state : "+state + "\n"+mediaStatus);
+//            LogUtils.d("yue.gan", "process : " + AppConstants.getProcessName(context));
+
+            String processName = AppConstants.getProcessName(context);
+            if (processName.contains(":")) return;
+
             if (state == MediaPlayerConst.BroadCastConsts.States.PLAY) {
                 for (OnMediaListener listener: onMediaListeners) {
                     listener.onPlay(mediaStatus);

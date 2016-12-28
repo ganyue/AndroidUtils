@@ -1,16 +1,10 @@
 package com.gy.utils.img;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.widget.ImageView;
 
-import com.gy.utils.file.SdcardUtils;
-import com.gy.utils.log.LogUtils;
-import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.gy.utils.img.glide.GlideLoader;
+import com.gy.utils.img.uil.UilLoader;
 
 /**
  *<p> Created by sam_gan on 2016/7/6.
@@ -19,39 +13,62 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
  *<p> e.g:  ImageLoader loader = ImageLoaderUtils.getImageLoader(context);
  *<p>       ... ...
  */
-public class ImageLoaderUtils {
+public class ImageLoaderUtils implements IImageLoader {
 
-    private static ImageLoader imageLoader;
+    public enum Type {
+        UniversalImageLoader, Glide,
+    }
 
-    public static ImageLoader getImageLoader (Context context) {
-        if (imageLoader == null) {
-            LogUtils.i("ImageLoaderUtils", "init image loader");
+    private static ImageLoaderUtils mInstance;
+    private IImageLoader iImageLoader;
 
-            DisplayImageOptions displayImageOptions = new DisplayImageOptions.Builder()
-                    .cacheOnDisk(true)
-                    .cacheInMemory(true)
-                    .considerExifParams(true)
-                    .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-                    .bitmapConfig(Bitmap.Config.RGB_565)
-                    .build();
+    private Type loader_type = Type.Glide;
 
-            ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(context)
-                    .memoryCacheExtraOptions(480, 800)
-                    .diskCacheExtraOptions(480, 800, null)
-                    .threadPoolSize(3)
-                    .denyCacheImageMultipleSizesInMemory()
-                    .memoryCache(new LruMemoryCache(2 * 1024 * 1024))//可以使用WeakMemoryCache;更省内存
-                    .memoryCacheSize(2 * 1024 * 1024)
-                    .memoryCacheSizePercentage(13)
-                    .diskCache(new UnlimitedDiskCache(SdcardUtils.getUsableCacheDir(context))) // 优先放到external
-                    .diskCacheSize(60 * 1024 * 1024)
-                    .diskCacheFileCount(200)
-                    .defaultDisplayImageOptions(displayImageOptions) // default
-                    .build();
-            imageLoader = ImageLoader.getInstance();
-            imageLoader.init(configuration);
+    public static ImageLoaderUtils getInstance (Context context) {
+        if (mInstance == null) {
+            mInstance = new ImageLoaderUtils(context);
         }
+        return mInstance;
+    }
 
-        return imageLoader;
+    private ImageLoaderUtils (Context context) {
+        switch (loader_type) {
+            case UniversalImageLoader:
+                iImageLoader = new UilLoader(context);
+                break;
+            case Glide:
+                iImageLoader = new GlideLoader();
+                break;
+        }
+    }
+
+    public void displayImage (String url, ImageView imageView) {
+        iImageLoader.displayImage(url, imageView);
+    }
+
+    @Override
+    public void displayImage(String url, ImageView imageView, int imgHolderResId) {
+        iImageLoader.displayImage(url, imageView, imgHolderResId);
+    }
+
+    public void displayImageWithNoneDefaultImg(String url, ImageView imageView) {
+        iImageLoader.displayImageWithNoneDefaultImg(url, imageView);
+    }
+
+    public void displayImage (String url, ImageView imageView, int width, int height) {
+        iImageLoader.displayImage(url, imageView, width, height);
+    }
+
+    public void displayRoundImage (String url, ImageView imageView) {
+        iImageLoader.displayRoundImage(url, imageView);
+    }
+
+    public void loadImage (Context context, final String url, final OnImageloadListener listener) {
+        iImageLoader.loadImage(context, url, listener);
+    }
+
+    @Override
+    public void clearMemCache() {
+        iImageLoader.clearMemCache();
     }
 }

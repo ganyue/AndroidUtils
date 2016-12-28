@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+
+    <SeekBar
+        android:id="@+id/sb_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="2dp"
+        android:minHeight="2dp"
+        android:layout_marginLeft="@dimen/widget_normal_padding"
+        android:layout_marginRight="@dimen/widget_normal_padding"
+        android:progressDrawable="@drawable/widget_timer_seekbar_bg"
+        android:thumb="@drawable/widget_timer_seekbar_thumb"
+        android:max="100"
+        android:progress="25"
+        android:thumbOffset="0dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"/>
+
+</RelativeLayout>

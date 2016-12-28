@@ -23,6 +23,8 @@ public class MediaPlayerConst {
             public static final int CMD_SEEK = 4;
             public static final int CMD_SET_VOL = 5;
             public static final int CMD_UPDATE_STATUS = 6;
+            public static final int CMD_PAUSE_ONLY = 7;
+            public static final int CMD_PLAY_ONLY = 8;
         }
     }
 

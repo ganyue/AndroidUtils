@@ -2,6 +2,8 @@ package com.gy.appbase.controller;
 
 import android.support.v4.app.FragmentActivity;
 
+import com.gy.utils.log.LogUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,26 +22,42 @@ public abstract class BaseDataController extends BaseFragmentActivityController{
     protected Map<String, IDataLoadCallback> mDataLoadCallbacks;
     protected abstract void loadPageData (String key, Object extra);   //load data
 
-    protected void onLoadSuccess (String key, Object data){//load success
-        mDatas.put(key, data);
-        IDataLoadCallback dataLoadCallback = getDataLoadCallback(key);
+    protected void onLoadSuccess (String key, Object data, Object extra){//load success
+        /** removed by yue.gan to save some memory */
+//        mDatas.put(getKey(key, extra), data);
+        IDataLoadCallback dataLoadCallback = getDataLoadCallback(getKey(key, extra));
         if (dataLoadCallback != null) {
-            dataLoadCallback.onLoadSuccess(key, data);
+            try{
+                dataLoadCallback.onLoadSuccess(key, data, extra);
+            } catch (Exception e) {
+                // 页面不在了，fragment没有释放，然后这时候数据刚好拉到
+            }
         }
+        removeDataLoadCallback(getKey(key, extra));
     }
 
-    protected void onLoadFail (String key) {//data is integrity
-        IDataLoadCallback dataLoadCallback = getDataLoadCallback(key);
+    protected void onLoadFail (String key, Object extra) {//data is integrity
+        IDataLoadCallback dataLoadCallback = getDataLoadCallback(getKey(key, extra));
         if (dataLoadCallback != null) {
-            dataLoadCallback.onLoadFail(key);
+           try{
+               dataLoadCallback.onLoadFail(key, extra);
+           } catch (Exception e) {
+               // 页面不在了，fragment没有释放，然后这时候数据刚好拉到
+           }
         }
+        removeDataLoadCallback(getKey(key, extra));
     }
 
-    protected void onLoadError (String key) {//network not available or server is busy
-        IDataLoadCallback dataLoadCallback = getDataLoadCallback(key);
+    protected void onLoadError (String key, Object extra) {//network not available or server is busy
+        IDataLoadCallback dataLoadCallback = getDataLoadCallback(getKey(key, extra));
         if (dataLoadCallback != null) {
-            dataLoadCallback.onLoadError(key);
+            try {
+                dataLoadCallback.onLoadError(key, extra);
+            } catch (Exception e) {
+                // 页面不在了，fragment没有释放，然后这时候数据刚好拉到
+            }
         }
+        removeDataLoadCallback(getKey(key, extra));
     }
 
     /**
@@ -50,28 +68,36 @@ public abstract class BaseDataController extends BaseFragmentActivityController{
      */
     public final void loadData (String key, Object extra, IDataLoadCallback callback, boolean forceUpdate) {
         if (mDatas == null) {
-            mDatas = new HashMap<String, Object>();
+            mDatas = new HashMap<>();
         }
 
         if (mDataLoadCallbacks == null) {
-            mDataLoadCallbacks = new HashMap<String, IDataLoadCallback>();
+            mDataLoadCallbacks = new HashMap<>();
         }
 
         if (callback != null) {
-            mDataLoadCallbacks.put(key, callback);
+            mDataLoadCallbacks.put(getKey(key, extra), callback);
         }
 
-        Object data = mDatas.get(key);
-
+        Object data = mDatas.get(getKey(key, extra));
+        LogUtils.d("yue.gan", "data size : " + mDatas.size() + "  -- callback size : " +  mDataLoadCallbacks.size());
         if (forceUpdate || data == null) {
             loadPageData(key, extra);
         } else {
-            onLoadSuccess(key, data);
+            onLoadSuccess(key, data, extra);
         }
+    }
+
+    protected String getKey (String key, Object extra) {
+        return extra == null? key: key+extra.toString();
     }
 
     protected IDataLoadCallback getDataLoadCallback (String key) {
         return mDataLoadCallbacks == null? null: mDataLoadCallbacks.get(key);
+    }
+
+    protected IDataLoadCallback removeDataLoadCallback (String key) {
+        return mDataLoadCallbacks == null? null: mDataLoadCallbacks.remove(key);
     }
 
     public Object getData (String key) {

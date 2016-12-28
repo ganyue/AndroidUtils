@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.text.TextUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -63,11 +64,29 @@ public class WifiUtils {
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    public boolean isUseMobileNet () {
+        return isNetworkConnected()? getConnectedNetworkType()==ConnectivityManager.TYPE_MOBILE? true: false:false;
+    }
+
     public int getConnectedNetworkType () {
         if (isNetworkConnected()) {
             return connectivityManager.getActiveNetworkInfo().getType();
         }
         return -1;
+    }
+
+    //获取当前连接的wifi的ssid
+    public String getConnectedWifiSSid () {
+        try {
+            WifiManager wifiManager = (WifiManager) mApp.get().getSystemService(Context.WIFI_SERVICE);
+            String wifiSSID = wifiManager.getConnectionInfo().getSSID();
+            if (!TextUtils.isEmpty(wifiSSID)) {
+                wifiSSID = wifiSSID.replace("\"", "");
+            }
+            return wifiSSID;
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public String getIp () {

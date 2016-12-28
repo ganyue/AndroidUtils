@@ -29,6 +29,15 @@ public class DBHelper extends SQLiteOpenHelper {
         this.beans = beans;
     }
 
+    private SQLiteDatabase mSQLiteDataBase;
+
+    public SQLiteDatabase getSQLiteDataBase () {
+        if (mSQLiteDataBase == null) {
+            mSQLiteDataBase = getWritableDatabase();
+        }
+        return mSQLiteDataBase;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         if (beans == null || beans.length <= 0) {
@@ -53,10 +62,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     /**
      * 查询
-     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx");
+     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=?", new String[]{xxx});
      */
     public List query (Class bean, String sql, String[] selectionArgs) {
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = getSQLiteDataBase();
         Cursor cursor = db.rawQuery(sql, selectionArgs);
 
         List result = cursorToList(bean, cursor);
@@ -64,7 +73,6 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.close();
         }
-        db.close();
         return result;
     }
 
@@ -73,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx", null, 10, 10);
      */
     public List query (Class bean, String sql, String[] selectionArgs, int num, int offset) {
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = getSQLiteDataBase();
         sql += " limit " + num + "," + offset;
         Cursor cursor = db.rawQuery(sql, selectionArgs);
 
@@ -82,7 +90,6 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.close();
         }
-        db.close();
         return result;
     }
 
@@ -118,9 +125,8 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getSQLiteDataBase();
         int result = db.update(tableName, contentValues, sql, selectionArgs);
-        db.close();
         return result;
     }
 
@@ -137,9 +143,8 @@ public class DBHelper extends SQLiteOpenHelper {
      * <p> e.g: dbHelper.delete(xxx, "xxx=xxx", null);
      */
     public int delete (String tableName, String sql, String[] selectionArgs) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getSQLiteDataBase();
         int result = db.delete(tableName, sql, selectionArgs);
-        db.close();
         return result;
     }
 
@@ -170,10 +175,14 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getSQLiteDataBase();
         long result = db.insertWithOnConflict(tableName, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
         return result;
+    }
+
+    /** e.g: isExist(tableName, "xx=?", new String[]{xx}) */
+    public boolean isExist (String tableName, String whereClaus, String[] args) {
+        return getColumnCount(tableName, whereClaus, args) > 0;
     }
 
     /**
@@ -183,14 +192,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return getColumnCount(getTableName(bean));
     }
 
-    public int getColumnCount (String tableName) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select count(*) from " + tableName, null);
+    public int getColumnCount(String tableName, String whereClaus, String[] args) {
+        SQLiteDatabase db = getSQLiteDataBase();
+        Cursor cursor = db.rawQuery("select count(*) from " + tableName + " where " + whereClaus, args);
         if (cursor == null || cursor.getCount() <= 0) {
             if (cursor != null) {
                 cursor.close();
             }
-            db.close();
             return 0;
         }
 
@@ -198,7 +206,23 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getInt(0);
 
         cursor.close();
-        db.close();
+        return count;
+    }
+
+    public int getColumnCount (String tableName) {
+        SQLiteDatabase db = getSQLiteDataBase();
+        Cursor cursor = db.rawQuery("select count(*) from " + tableName, null);
+        if (cursor == null || cursor.getCount() <= 0) {
+            if (cursor != null) {
+                cursor.close();
+            }
+            return 0;
+        }
+
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+
+        cursor.close();
         return count;
     }
 

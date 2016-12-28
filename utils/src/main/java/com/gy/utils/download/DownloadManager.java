@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by ganyu on 2016/7/28.
@@ -26,6 +27,12 @@ public class DownloadManager {
     private List<DownloadBean> unfinishedBeans; //未下载完成
     private List<DownloadBean> finishedBeans;   //下载完成
     private int maxDownloadNum = 1; //最多同时下载个数
+    private boolean enable = true;//默认启用下载，在3g/4g下需要设置不启用，除非你是土豪
+
+    public void enableDownload (boolean enable) {
+        this.enable = enable;
+        check();
+    }
 
     public static DownloadManager getInstance (DBHelper dbHelper) {
         if (mInstance == null) {
@@ -47,10 +54,9 @@ public class DownloadManager {
 
     private void init () {
         //如果下载的数据库没创建，则创建
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getSQLiteDataBase();
         db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getFinishedTableName()));      //已完成表
         db.execSQL(dbHelper.getCreateSql(DownloadBean.class, getUnfinishedTableName()));    //未完成表
-        db.close();
 
         //使用Collections.synchronizedXXX封装的list或map防止异步操作导致的崩溃或者阻塞
         List qFinishedList = dbHelper.query(DownloadBean.class, "select * from " + getFinishedTableName(), null);
@@ -59,6 +65,7 @@ public class DownloadManager {
             finishedBeans = Collections.synchronizedList(new ArrayList<DownloadBean>()) ;
         } else {
             finishedBeans = Collections.synchronizedList(qFinishedList) ;
+            checkFinishedFiles();
         }
         if (qUnfinishedList == null) {
             unfinishedBeans = Collections.synchronizedList(new ArrayList<DownloadBean>()) ;
@@ -68,6 +75,24 @@ public class DownloadManager {
         downloadingTasks = Collections.synchronizedMap(new HashMap<DownloadBean, AsyncTask>());
 
         check();
+    }
+
+    /** 检查已完成的列表，如果已完成的文件不存在，直接删除对应的数据 */
+    public void checkFinishedFiles () {
+        List<DownloadBean> fileUnExistBeans = new ArrayList<>();
+        for (DownloadBean downloadBean: finishedBeans) {
+            File file = new File(downloadBean.storePath, downloadBean.fileName);
+            if (!file.exists() || file.isDirectory()) {
+                fileUnExistBeans.add(downloadBean);
+            }
+        }
+
+        for (DownloadBean downloadBean: fileUnExistBeans) {
+            DownloadBean removedBean = removeBeanFromList(finishedBeans, downloadBean);
+            if (removedBean == null) return;
+            dbHelper.delete(getFinishedTableName(), "fileName=? and storePath=?", new String[]{removedBean.fileName, removedBean.storePath});
+            finishedBeans.remove(downloadBean);
+        }
     }
 
     private String getFinishedTableName () {
@@ -86,10 +111,32 @@ public class DownloadManager {
         return unfinishedBeans;
     }
 
+    public String getFinishedLocalPath(DownloadBean b) {
+        for (DownloadBean bean: finishedBeans) {
+            if (bean.fileName.equals(b.fileName) && bean.storePath.equals(b.storePath)) {
+                File file = new File(bean.storePath, bean.fileName);
+                if (file.exists() && !file.isDirectory()) {
+                    return file.getAbsolutePath();
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * 检查是否新建下载
      */
     private void check () {
+        if (!enable) {
+            if (downloadingTasks.size() <= 0) return;
+            Set<DownloadBean> keys = downloadingTasks.keySet();
+            for (DownloadBean key: keys) {
+                AsyncTask task = downloadingTasks.remove(key);
+                task.cancel(true);
+            }
+            return;
+        }
+
         if (downloadingTasks.size() < maxDownloadNum) {
             int num = maxDownloadNum - downloadingTasks.size();
             for (int i = 0; i < num; i++) {
@@ -111,8 +158,9 @@ public class DownloadManager {
      */
     private DownloadBean removeBeanFromList (List<DownloadBean> list, DownloadBean bean) {
         DownloadBean beanInList = null;
+        if (list == null) return null;
         for (DownloadBean b: list) {
-            if (bean.url.equals(b.url)) {
+            if (bean.fileName.equals(b.fileName) && bean.storePath.equals(b.storePath)) {
                 beanInList = b;
                 break;
             }
@@ -127,7 +175,7 @@ public class DownloadManager {
     private DownloadBean getBeanFromList (List<DownloadBean> list, DownloadBean bean) {
         DownloadBean beanInList = null;
         for (DownloadBean b: list) {
-            if (bean.url.equals(b.url)) {
+            if (bean.fileName.equals(b.fileName) && bean.storePath.equals(b.storePath)) {
                 beanInList = b;
                 break;
             }
@@ -135,12 +183,48 @@ public class DownloadManager {
         return beanInList;
     }
 
+    public boolean isDownloaded (DownloadBean b) {
+        for (DownloadBean downloadBean: finishedBeans) {
+            if (downloadBean.fileName.equals(b.fileName)
+                    && downloadBean.storePath.equals(b.storePath)) return true;
+        }
+        return false;
+    }
+
+    public boolean isDownloading (DownloadBean b) {
+        for (DownloadBean downloadBean: unfinishedBeans) {
+            if (downloadBean.fileName.equals(b.fileName)
+                    && downloadBean.storePath.equals(b.storePath)) return true;
+        }
+        return false;
+    }
+
+    public int add (List<DownloadBean> beans) {
+        if (beans == null) return 0;
+        int count = 0;
+        for (DownloadBean bean: beans) {
+            if (add(bean)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void add2FinishedList (DownloadBean bean) {
+        dbHelper.insertOrReplace(getFinishedTableName(), bean);
+        if (!isDownloaded(bean)) {
+            finishedBeans.add(bean);
+        }
+    }
+
     public boolean add (DownloadBean bean) {
         //不能直接用contains查询是否已经有该下载任务
         List qFinishedList = dbHelper.query(bean.getClass(),
-                "select * from " + getFinishedTableName() + " where url=?", new String[]{bean.url});
+                "select * from " + getFinishedTableName() + " where fileName=? and storePath=?",
+                new String[]{bean.fileName, bean.storePath});
         List qUnfinishedList = dbHelper.query(bean.getClass(),
-                "select * from " + getUnfinishedTableName() + " where url=?", new String[]{bean.url});
+                "select * from " + getUnfinishedTableName() + " where fileName=? and storePath=?",
+                new String[]{bean.fileName, bean.storePath});
 
         if ( (qFinishedList == null || qFinishedList.size() <= 0)
                 && (qUnfinishedList == null || qUnfinishedList.size() <= 0)) {
@@ -163,7 +247,8 @@ public class DownloadManager {
 
         if (removedBean.state == DownloadState.DOWNLOADED) {
                 //如果该任务已下载完成，从已下载列表和数据库中删除
-            dbHelper.delete(getFinishedTableName(), "url=?", new String[]{removedBean.url});
+            dbHelper.delete(getFinishedTableName(), "fileName=? and storePath=?",
+                    new String[]{removedBean.fileName, removedBean.storePath});
         } else {
             //如果未下载完成，从未下载完成列表和数据库中删除
             //若正在下载，需要取消下载
@@ -171,7 +256,8 @@ public class DownloadManager {
             if (task != null) {
                 task.cancel(true);
             }
-            dbHelper.delete(getUnfinishedTableName(), "url=?", new String[]{removedBean.url});
+            dbHelper.delete(getUnfinishedTableName(), "fileName=? and storePath=?",
+                    new String[]{removedBean.fileName, removedBean.storePath});
         }
 
         //删除文件
@@ -179,6 +265,35 @@ public class DownloadManager {
         file.delete();
         check();
         onDownloadListener.onDownloadDelete(removedBean);
+    }
+
+    public void pauseAll () {
+        for (DownloadBean bean: unfinishedBeans) {
+            if ((bean.state == DownloadState.DELETEED
+                    || bean.state == DownloadState.DOWNLOADED)) continue;
+            if (bean.state != DownloadState.PAUSE) {
+                AsyncTask task = downloadingTasks.remove(bean);
+                if (task != null) {
+                    task.cancel(true);
+                }
+                bean.state = DownloadState.PAUSE;
+                dbHelper.insertOrReplace(getUnfinishedTableName(), bean);
+            }
+        }
+    }
+
+    public void startAll () {
+        for (DownloadBean bean: unfinishedBeans) {
+            if ((bean.state == DownloadState.DELETEED
+                    || bean.state == DownloadState.DOWNLOADED)) continue;
+            if (bean.state != DownloadState.DOWNLOADING &&
+                    bean.state != DownloadState.WAITEING) {
+
+                bean.state = DownloadState.WAITEING;
+                dbHelper.insertOrReplace(getUnfinishedTableName(), bean);
+            }
+        }
+        check();
     }
 
     public DownloadBean pauseOrStart (int index) {
@@ -195,6 +310,7 @@ public class DownloadManager {
         } else if (bean.state == DownloadState.PAUSE) {
             bean.state = DownloadState.WAITEING;
         } else {
+            //如果下载失败，需要删除之前的文件，重新下载，并把状态置为等待下载
             bean.state = DownloadState.WAITEING;
             File file = new File(bean.storePath + File.separator + bean.fileName);
             file.delete();
@@ -262,7 +378,7 @@ public class DownloadManager {
             unfinishedBeans.remove(bean);
             finishedBeans.add(bean);
             dbHelper.insertOrReplace(getFinishedTableName(), bean);
-            dbHelper.delete(getUnfinishedTableName(), "url=?", new String[]{bean.url});
+            dbHelper.delete(getUnfinishedTableName(), "fileName=? and storePath=?", new String[]{bean.fileName, bean.storePath});
             downloadingTasks.remove(bean);
             check();
             if (listeners != null) {

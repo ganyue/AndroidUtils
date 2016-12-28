@@ -99,11 +99,8 @@ public class PushLoadMoreListView extends ScrollObservedListView {
             switch (refreshViewStyle) {
                 //TODO add other style
                 default:
-                    footerV = LayoutInflater.from(getContext()).inflate(R.layout.item_normal_load_more_footer, this, false);
-//                    AbsListView.LayoutParams defaultParams = new AbsListView.LayoutParams(
-//                            LayoutParams.MATCH_PARENT,
-//                            getResources().getDisplayMetrics().widthPixels/6);
-//                    footerV.setLayoutParams(defaultParams);
+                    footerV = LayoutInflater.from(getContext()).inflate(
+                            R.layout.item_normal_load_more_footer, this, false);
                     break;
             }
         }
