@@ -31,7 +31,7 @@ public class BaseApplication extends Application{
         super.onCreate();
 
         application = this;
-//        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
+        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
         isDebug = false;
         LogUtils.enable(isDebug);   //debug 版本打印日志, release版本不打印
         initCrashHandler();         //设置全局异常处理器
