@@ -1,18 +1,24 @@
 package com.gy.appbase.application;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.support.annotation.CallSuper;
 
+import com.gy.appbase.activity.BaseFragmentActivity;
 import com.gy.utils.bluetooth.BluetoothUtils;
 import com.gy.utils.download.DownloadManager;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
+import com.gy.utils.screenlocker.ScreenLockerUtils;
 import com.gy.utils.wifi.WifiUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,6 +30,7 @@ public class BaseApplication extends Application{
 
     protected static Application application;
     protected static boolean isDebug;
+    private List<WeakReference<Activity>> activities;
 
     @CallSuper
     @Override
@@ -31,9 +38,9 @@ public class BaseApplication extends Application{
         super.onCreate();
 
         application = this;
-        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
+//        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
         isDebug = false;
-        LogUtils.enable(isDebug);   //debug 版本打印日志, release版本不打印
+//        LogUtils.enable(isDebug);   //debug 版本打印日志, release版本不打印
         initCrashHandler();         //设置全局异常处理器
         getImageLoader();           //初始化 image loader
         getHttpUtils();             //初始化 http utils
@@ -45,7 +52,7 @@ public class BaseApplication extends Application{
     }
 
     public void initCrashHandler () {
-//        new DefaultCrashHandler(application);
+        new DefaultCrashHandler(application);
     }
 
     public static Application getApplication () {
@@ -82,4 +89,19 @@ public class BaseApplication extends Application{
         if (executorService == null) executorService = Executors.newSingleThreadExecutor();
         return executorService;
     }
+
+    public void addActivity (Activity activity) {
+        if (activities == null) activities = new ArrayList<>();
+        activities.add(new WeakReference<>(activity));
+    }
+
+    public void finishAllActivity () {
+        if (activities == null) return;
+        for (WeakReference<Activity> activity: activities) {
+            if (activity.get() == null) continue;
+            activity.get().finish();
+        }
+        activities.clear();
+    }
+
 }

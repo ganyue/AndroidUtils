@@ -8,18 +8,18 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.gy.widget.R;
 import com.gy.widget.imageview.RatioImageView;
 import com.gy.widget.indicator.HCircleIndicator;
 import com.gy.widget.viewpager.ScrollSpeedAvailablePager;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by ganyu on 2016/10/8.
@@ -40,8 +40,14 @@ public class BannerView extends RelativeLayout {
     private float ratio = 0;
     private ScrollSpeedAvailablePager mViewPager;
     private HCircleIndicator indicator;
+
+    public ViewPager getViewPager () {
+        return mViewPager;
+    }
+
     private void init (Context context, AttributeSet attrs) {
         if (attrs == null) return;
+        mBannerView = new WeakReference<>(this);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RatioImageView);
         ratio = typedArray.getFloat(R.styleable.RatioImageView_ratio, 0);
         typedArray.recycle();
@@ -90,6 +96,9 @@ public class BannerView extends RelativeLayout {
     }
 
     private int count;
+    private int getCount () {
+        return count;
+    }
     /**
      * 必须调用setCount 方法才能刷新banner
      */
@@ -217,7 +226,15 @@ public class BannerView extends RelativeLayout {
 
     /*********************************** auto start **************************************/
     private boolean autoStart = false;
+    public boolean isAutoStart () {
+        return autoStart;
+    }
+
     private int interval = 3000;
+    public int getInterval () {
+        return interval;
+    }
+
     public void setAutoStart (boolean autoStart, int interval) {
         this.autoStart = autoStart;
         this.interval = interval;
@@ -258,19 +275,21 @@ public class BannerView extends RelativeLayout {
         return super.onInterceptTouchEvent(ev);
     }
 
-    private final int AUTO_SCROLL = 1;
-    private Handler handler = new Handler() {
+    private static final int AUTO_SCROLL = 1;
+    private static WeakReference<BannerView> mBannerView;
+    private static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            if (mBannerView == null || mBannerView.get() == null) return;
             switch (msg.what) {
                 case AUTO_SCROLL:
-                    if (count > 0 && autoStart) {
+                    if (mBannerView.get().getCount() > 0 && mBannerView.get().isAutoStart()) {
                         handler.removeMessages(AUTO_SCROLL);
-                        int currentItem = mViewPager.getCurrentItem();
-                        int count = mViewPager.getAdapter().getCount();
+                        int currentItem = mBannerView.get().getViewPager().getCurrentItem();
+                        int count = mBannerView.get().getViewPager().getAdapter().getCount();
                         currentItem = (currentItem + 1) % count;
-                        mViewPager.setCurrentItem(currentItem, true);
-                        handler.sendEmptyMessageDelayed(AUTO_SCROLL, interval);
+                        mBannerView.get().getViewPager().setCurrentItem(currentItem, true);
+                        handler.sendEmptyMessageDelayed(AUTO_SCROLL, mBannerView.get().getInterval());
                     }
                     break;
             }

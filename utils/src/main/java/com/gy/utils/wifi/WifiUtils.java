@@ -78,7 +78,7 @@ public class WifiUtils {
     //获取当前连接的wifi的ssid
     public String getConnectedWifiSSid () {
         try {
-            WifiManager wifiManager = (WifiManager) mApp.get().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) mApp.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             String wifiSSID = wifiManager.getConnectionInfo().getSSID();
             if (!TextUtils.isEmpty(wifiSSID)) {
                 wifiSSID = wifiSSID.replace("\"", "");
@@ -92,7 +92,7 @@ public class WifiUtils {
     public String getIp () {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            WifiManager wifiManager = (WifiManager) mApp.get().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) mApp.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo info = wifiManager.getConnectionInfo();
             int ipAddr = info.getIpAddress();
             return int2IpAddr(ipAddr);

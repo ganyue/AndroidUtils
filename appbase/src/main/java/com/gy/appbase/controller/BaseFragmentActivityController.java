@@ -201,6 +201,7 @@ public class BaseFragmentActivityController {
             List<Fragment> fragments = fragmentManager.getFragments();
             if (fragments != null) {
                 for (Fragment frag : fragments) {
+                    if (frag == null) continue;
                     String tag = frag.getTag();
                     if (!TextUtils.isEmpty(tag) && whiteTagList != null && whiteTagList.contains(tag)) {
                         continue;

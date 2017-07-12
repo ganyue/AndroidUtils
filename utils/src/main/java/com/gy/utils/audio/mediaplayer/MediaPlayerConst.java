@@ -13,6 +13,10 @@ public class MediaPlayerConst {
             public static final String KEY_SEEK_I = "seek";
             public static final String KEY_SOURCE_PATH = "source_path";
             public static final String KEY_VOLUME_I = "vol";
+
+            public static final String NAME = "name";
+            public static final String SINGER = "singer";
+            public static final String PIC_URL = "pic_url";
         }
 
         public static final class Cmds {
@@ -25,6 +29,7 @@ public class MediaPlayerConst {
             public static final int CMD_UPDATE_STATUS = 6;
             public static final int CMD_PAUSE_ONLY = 7;
             public static final int CMD_PLAY_ONLY = 8;
+            public static final int CMD_SEND_NOTIFICATION = 9;
         }
     }
 

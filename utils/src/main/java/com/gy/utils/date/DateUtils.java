@@ -26,6 +26,12 @@ public class DateUtils {
         return str;
     }
 
+    public static String getTimeInDay () {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        String str = format.format(Calendar.getInstance().getTime());
+        return str;
+    }
+
     public static String getTimestampString(Date paramDate)
     {
         String str = null;

@@ -9,10 +9,12 @@ import android.widget.ImageView;
  */
 public interface IImageLoader {
     void displayImage (String url, ImageView imageView);
+    void displayImage (int id, ImageView imageView);
     void displayImage (String url, ImageView imageView, int imgHolderResId);
     void displayImage (String url, ImageView imageView, int width, int height);
     void displayImageWithNoneDefaultImg(String url, ImageView imageView);
     void displayRoundImage (String url, ImageView imageView);
+    void displayRoundRectImage (String url, ImageView imageView);
     void loadImage (Context context, final String url, final OnImageloadListener listener);
     void clearMemCache ();
 }

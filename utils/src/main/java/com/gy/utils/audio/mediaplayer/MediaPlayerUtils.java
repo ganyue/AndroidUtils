@@ -5,10 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.Bundle;
 
 import com.gy.utils.constants.AppConstants;
-import com.gy.utils.log.LogUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -42,10 +41,11 @@ public class MediaPlayerUtils implements IMediaPlayer{
     }
 
     @Override
-    public void play(String path) {
+    public void play(String path, Bundle extras) {
         Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
         intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY);
         intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH, path);
+        intent.putExtras(extras);
         mApp.get().startService(intent);
     }
 
@@ -56,10 +56,11 @@ public class MediaPlayerUtils implements IMediaPlayer{
         mApp.get().startService(intent);
     }
 
-    public void playOrPause(String path) {
+    public void playOrPause(String path, Bundle extras) {
         Intent intent = new Intent(mApp.get(), MediaPlayerService.class);
         intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE);
         intent.putExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH, path);
+        intent.putExtras(extras);
         mApp.get().startService(intent);
     }
 

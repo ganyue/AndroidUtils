@@ -8,10 +8,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -86,6 +89,7 @@ public class TabPages extends LinearLayout{
     }
 
     public void bindTabs (List<Tab> tabs, FragmentManager fragmentManager) {
+
         if (tabs == null) return;
         if (this.tabs == null) this.tabs = new ArrayList<>();
         this.tabs.clear();
@@ -151,7 +155,6 @@ public class TabPages extends LinearLayout{
         }
     }
 
-
     /**************************** horizontal tabs *********************************/
     private OnClickListener onTabClickListener = new OnClickListener() {
         @Override
@@ -190,7 +193,7 @@ public class TabPages extends LinearLayout{
         }
     };
 
-    private class FragPageAdapter extends FragmentPagerAdapter {
+    private class FragPageAdapter extends TabPageAdapter {
 
         public FragPageAdapter(FragmentManager fm) {
             super(fm);
@@ -198,9 +201,11 @@ public class TabPages extends LinearLayout{
 
         @Override
         public Fragment getItem(int position) {
+            Log.d("yue.gan", "tabPages getItem ..." + position);
             Tab tab = tabs.get(position);
 
             Fragment fragment = null;
+
             if (callback != null) {
                 fragment = callback.createFragment(tab);
             } else {
@@ -213,6 +218,12 @@ public class TabPages extends LinearLayout{
         @Override
         public int getCount() {
             return tabs == null? 0: tabs.size();
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+            Log.d("yue.gan", "tabPages destroyItem ..." + position);
         }
     }
 

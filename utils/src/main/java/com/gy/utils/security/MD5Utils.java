@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
 
-import static com.gy.utils.String.StringUtils.toHexString;
+import static com.gy.utils.string.StringUtils.toHexString;
 
 public class MD5Utils {
 

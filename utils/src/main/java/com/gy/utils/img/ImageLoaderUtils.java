@@ -47,6 +47,11 @@ public class ImageLoaderUtils implements IImageLoader {
     }
 
     @Override
+    public void displayImage(int id, ImageView imageView) {
+        iImageLoader.displayImage(id, imageView);
+    }
+
+    @Override
     public void displayImage(String url, ImageView imageView, int imgHolderResId) {
         iImageLoader.displayImage(url, imageView, imgHolderResId);
     }
@@ -61,6 +66,11 @@ public class ImageLoaderUtils implements IImageLoader {
 
     public void displayRoundImage (String url, ImageView imageView) {
         iImageLoader.displayRoundImage(url, imageView);
+    }
+
+    @Override
+    public void displayRoundRectImage(String url, ImageView imageView) {
+        iImageLoader.displayRoundRectImage(url, imageView);
     }
 
     public void loadImage (Context context, final String url, final OnImageloadListener listener) {

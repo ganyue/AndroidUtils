@@ -39,9 +39,9 @@ public class UilLoader implements IImageLoader {
                     .considerExifParams(true)
                     .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
                     .bitmapConfig(Bitmap.Config.RGB_565)
-                    .showImageOnLoading(R.drawable.bg_imageloader_default)
-                    .showImageForEmptyUri(R.drawable.bg_imageloader_default)
-                    .showImageOnFail(R.drawable.bg_imageloader_default)
+                    .showImageOnLoading(R.mipmap.bg_imageloader_default)
+                    .showImageForEmptyUri(R.mipmap.bg_imageloader_default)
+                    .showImageOnFail(R.mipmap.bg_imageloader_default)
                     .build();
 
             ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(context)
@@ -86,6 +86,11 @@ public class UilLoader implements IImageLoader {
     }
 
     @Override
+    public void displayImage(int id, ImageView imageView) {
+        imageView.setImageResource(id);
+    }
+
+    @Override
     public void displayImage(String url, ImageView imageView, int imgHolderResId) {
         DisplayImageOptions displayImageOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisk(true)
@@ -119,6 +124,11 @@ public class UilLoader implements IImageLoader {
 
     @Override
     public void displayRoundImage(String url, ImageView imageView) {
+        imageLoader.displayImage(url, imageView);
+    }
+
+    @Override
+    public void displayRoundRectImage(String url, ImageView imageView) {
         imageLoader.displayImage(url, imageView);
     }
 

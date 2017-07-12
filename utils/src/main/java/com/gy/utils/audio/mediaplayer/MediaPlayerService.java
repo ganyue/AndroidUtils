@@ -4,10 +4,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+
+import com.gy.utils.log.LogUtils;
 
 import java.io.IOException;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
 public class MediaPlayerService extends Service implements IMediaPlayer {
 
     public static final String ACTION_PLAYER_STATUS_CHANGED = MediaPlayerService.class.getName();
+    public static final boolean enableNotification = true;
 
     enum  PlayerState {
         UNINITED,
@@ -27,13 +30,14 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
         PAUSE,
         STOP,
     }
-    
+
+    private MediaNotifier mediaNotifier;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
     private PlayerState state;
     private boolean startAfterPrepare;
     private String sourcePath = "";
-    
+    private Bundle trackInfos;
     
     @Override
     public void onCreate() {
@@ -66,12 +70,16 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             initMediaPlayer();
         }
 
+        if (mediaNotifier == null) {
+            mediaNotifier = new MediaNotifier(this);
+        }
+
         int cmd = intent.getIntExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_CMD_I, MediaPlayerConst.PlayerConsts.Cmds.CMD_UNKNOWN);
 
         switch (cmd) {
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY:
                 String path = intent.getStringExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH);
-                play(path);
+                play(path, intent.getExtras());
                 break;
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_STOP:
                 stop();
@@ -84,7 +92,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
                 break;
             case MediaPlayerConst.PlayerConsts.Cmds.CMD_PLAY_OR_PAUSE:
                 if (TextUtils.isEmpty(sourcePath)) {
-                    play(intent.getStringExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH));
+                    play(intent.getStringExtra(MediaPlayerConst.PlayerConsts.Keys.KEY_SOURCE_PATH), intent.getExtras());
                 } else {
                     playOrPause();
                 }
@@ -131,11 +139,15 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
 
     @Override
     public void stop() {
-        if (state != PlayerState.UNINITED) {
+        if (state != PlayerState.UNINITED && !TextUtils.isEmpty(sourcePath)) {
             mediaPlayer.stop();
-
             onStatusChanged(MediaPlayerConst.BroadCastConsts.States.STOP);
-
+            if (trackInfos != null) {
+                mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                        false);
+            }
         }
         state = PlayerState.STOP;
     }
@@ -153,7 +165,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
     }
 
     @Override
-    public void play(String path) {
+    public void play(String path, Bundle extras) {
         if (TextUtils.isEmpty(path)) {
             onStateError("error : data source is empty");
             return;
@@ -162,6 +174,9 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             seek(0);
             return;
         }
+
+        trackInfos = extras;
+        LogUtils.d("yue.gan", ""+extras);
         sourcePath = path;
         startAfterPrepare = true;
         preparePlayer();
@@ -175,7 +190,12 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             state = PlayerState.PAUSE;
 
             onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
-
+            if (trackInfos != null) {
+                mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                        false);
+            }
         } else if (state == PlayerState.PAUSE
                 || state == PlayerState.STOP
                 || state == PlayerState.PREPARED) {
@@ -185,7 +205,12 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             state = PlayerState.PLAYING;
 
             onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
-
+            if (trackInfos != null) {
+                mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                        true);
+            }
         } else if (state == PlayerState.PREPARING){
             //正在prepare
             startAfterPrepare = true;
@@ -207,6 +232,13 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             mediaPlayer.start();
             state = PlayerState.PLAYING;
             onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
+
+            if (trackInfos != null) {
+                mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                        true);
+            }
         }
     }
 
@@ -220,11 +252,18 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             mediaPlayer.pause();
             state = PlayerState.PAUSE;
             onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PAUSE);
+
+            if (trackInfos != null) {
+                mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                        trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                        false);
+            }
         }
     }
 
     public boolean isPlaying() {
-        return mediaPlayer != null && mediaPlayer.isPlaying() && state == PlayerState.PLAYING;
+        return mediaPlayer != null && state == PlayerState.PLAYING && mediaPlayer.isPlaying();
     }
 
     @Override
@@ -277,6 +316,13 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
                 state = PlayerState.PLAYING;
                 startAfterPrepare = false;
                 onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PLAY);
+
+                if (trackInfos != null) {
+                    mediaNotifier.sendNotification(trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.NAME),
+                            trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.SINGER),
+                            trackInfos.getString(MediaPlayerConst.PlayerConsts.Keys.PIC_URL),
+                            isPlaying());
+                }
             }
         }
     };
@@ -312,7 +358,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
     private MediaStatus getStatus () {
         MediaStatus status = new MediaStatus();
         status.sourcePath = sourcePath;
-        if (state == PlayerState.UNINITED || state == PlayerState.PREPARING)  {
+        if (state == PlayerState.UNINITED || state == PlayerState.PREPARING || state == PlayerState.STOP)  {
             status.duration = 0;
             status.currentTime = 0;
         } else {
@@ -352,4 +398,5 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
         mediaPlayer.release();
         mediaPlayer = null;
     }
+
 }

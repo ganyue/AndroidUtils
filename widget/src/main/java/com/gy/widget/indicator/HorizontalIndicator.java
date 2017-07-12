@@ -29,7 +29,8 @@ public class HorizontalIndicator extends IndicatorBase {
              * 默认“指示器”是最后一个view，所以需要child的个数至少要有一个。
              * 当然，想要有“指示器”的效果，肯定是要child个数至少要有三个的
              */
-            throw new InflateException("indicator shell has more than 1 child view");
+        return ;
+//            throw new InflateException("indicator shell has more than 1 child view");
         }
 
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);

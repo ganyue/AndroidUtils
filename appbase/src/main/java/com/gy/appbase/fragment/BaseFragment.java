@@ -90,8 +90,10 @@ public abstract class BaseFragment extends Fragment implements OnKeyDownCallback
     protected abstract void initViews (View view, Bundle savedInstanceState);
     protected abstract BaseFragmentActivityController instanceController ();
     protected boolean onKeyDown (int keyCode, KeyEvent event) {return false;}
+    protected boolean onBackPressed () {return false;}
 
     public boolean onKeyDownListener (int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) return onBackPressed();
         return onKeyDown(keyCode, event);
     }
 

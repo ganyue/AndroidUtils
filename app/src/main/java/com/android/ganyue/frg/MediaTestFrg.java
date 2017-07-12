@@ -132,7 +132,7 @@ public class MediaTestFrg extends BaseFragment {
         view.findViewById(R.id.btn_init).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mediaPlayerUtils.play("http://zzya.beva.cn/dq/lm9-E1JJDs5RrAKIclfIyJFZ9fQ0.mp3");
+//                mediaPlayerUtils.play("http://zzya.beva.cn/dq/lm9-E1JJDs5RrAKIclfIyJFZ9fQ0.mp3");
 //                List<Track> tracks = new ArrayList<Track>();
 //                Track track1 = new Track();
 //                track1.mp3Url = "http://zzya.beva.cn/dq/lm9-E1JJDs5RrAKIclfIyJFZ9fQ0.mp3";

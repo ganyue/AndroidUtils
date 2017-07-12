@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e8000000">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:textSize="20dp"
+        android:textColor="@android:color/white"
+        android:text="@string/app_name"/>
+
+    <TextView
+        android:id="@+id/tv_descript"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textColor="@android:color/white"
+        android:text="@string/app_name"
+        android:layout_below="@+id/tv_title"
+        android:layout_alignLeft="@+id/tv_title"
+        android:layout_alignStart="@+id/tv_title" />
+
+    <LinearLayout
+        android:id="@+id/llyt_ctrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/tv_descript"
+        android:layout_alignLeft="@+id/tv_descript"
+        android:layout_alignStart="@+id/tv_descript">
+
+        <ImageView
+            android:id="@+id/iv_prev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/widget_player_pre"/>
+        <ImageView
+            android:id="@+id/iv_playOrPause"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/widget_player_play"
+            android:layout_marginLeft="15dp"/>
+
+        <ImageView
+            android:id="@+id/iv_next"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/widget_player_next"
+            android:layout_marginLeft="15dp"/>
+
+    </LinearLayout>
+
+    <com.gy.widget.imageview.RoundRectImageView
+        android:id="@+id/iv_cover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:layout_below="@id/llyt_ctrl"
+        app:ratio="1"
+        android:src="@mipmap/widget_img_player_default" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="20dp"
+        android:textColor="@android:color/white"
+        android:text="上滑解锁"/>
+
+</RelativeLayout>

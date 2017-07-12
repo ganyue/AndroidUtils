@@ -28,7 +28,7 @@ public class SettingsHelper implements OnSharedPreferenceChangeListener {
 		settings.registerOnSharedPreferenceChangeListener(this);
 
 		// get reference on WiFi service
-		mWifiManager = (WifiManager) parent.getSystemService(Context.WIFI_SERVICE);
+		mWifiManager = (WifiManager) parent.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
 		oMPDAsyncHelper = MPDAsyncHelper;
 	}

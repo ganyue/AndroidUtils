@@ -31,7 +31,17 @@ public class GlideLoader implements IImageLoader{
                 .load(url)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .skipMemoryCache(true)
-                .placeholder(R.drawable.bg_imageloader_default)
+                .placeholder(R.mipmap.bg_imageloader_default)
+                .crossFade()
+                .into(imageView);
+    }
+
+    @Override
+    public void displayImage(int id, ImageView imageView) {
+        Glide.with(imageView.getContext())
+                .load(id)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .skipMemoryCache(true)
                 .crossFade()
                 .into(imageView);
     }
@@ -74,7 +84,19 @@ public class GlideLoader implements IImageLoader{
                 .transform(new GlideRoundImgTransform(imageView.getContext()))
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .skipMemoryCache(true)
-                .placeholder(R.drawable.bg_imageloader_default)
+                .placeholder(R.mipmap.bg_imageloader_default_round)
+                .crossFade()
+                .into(imageView);
+    }
+
+    @Override
+    public void displayRoundRectImage(String url, ImageView imageView) {
+        Glide.with(imageView.getContext())
+                .load(url)
+                .transform(new GlideRoundRectImgTransform(imageView.getContext()))
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .skipMemoryCache(true)
+                .placeholder(R.mipmap.bg_imageloader_default)
                 .crossFade()
                 .into(imageView);
     }
