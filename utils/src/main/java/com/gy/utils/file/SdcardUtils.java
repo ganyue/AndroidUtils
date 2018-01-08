@@ -130,6 +130,7 @@ public class SdcardUtils {
         return avaiBlocks * bolckSize;
     }
 
+    //这里只是听听使用的方法，其他应用应该做修改
     public static String getUsableDownloadDir(Context context) {
         File root = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
         if (root == null) {
@@ -142,6 +143,7 @@ public class SdcardUtils {
         return root.getAbsolutePath();
     }
 
+    //这里只是听听使用的方法，其他应用应该做修改
     public static String getUsableDownloadMp3Dir (Context context) {
         File root = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
         if (root == null) {

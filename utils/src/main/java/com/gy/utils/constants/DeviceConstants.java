@@ -19,6 +19,11 @@ import java.util.Random;
  */
 public class DeviceConstants {
 
+    /**
+     * 主要用于获取设备唯一识别号，在设备没有序列号、mac地址的情况下
+     * 使用当前时间做唯一识别，所以最好保存一份到手机指定文件，在没有
+     * 该文件的情况下再使用此方法获取以达到设备唯一识别号的目的。
+     */
     public static String getUniqueCode(Context context) {
         String result = null;
 

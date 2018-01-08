@@ -65,15 +65,20 @@ public class DBHelper extends SQLiteOpenHelper {
      * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=?", new String[]{xxx});
      */
     public List query (Class bean, String sql, String[] selectionArgs) {
-        SQLiteDatabase db = getSQLiteDataBase();
-        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        try {
+            SQLiteDatabase db = getSQLiteDataBase();
+            Cursor cursor = db.rawQuery(sql, selectionArgs);
 
-        List result = cursorToList(bean, cursor);
+            List result = cursorToList(bean, cursor);
 
-        if (cursor != null) {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList();
         }
-        return result;
     }
 
     /**

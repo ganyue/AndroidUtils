@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
+import com.gy.utils.app.AppUtils;
 import com.gy.utils.constants.AppConstants;
 
 import java.lang.ref.WeakReference;
@@ -137,7 +138,7 @@ public class MediaPlayerUtils implements IMediaPlayer{
 //            LogUtils.d("yue.gan", "state : "+state + "\n"+mediaStatus);
 //            LogUtils.d("yue.gan", "process : " + AppConstants.getProcessName(context));
 
-            String processName = AppConstants.getProcessName(context);
+            String processName = AppUtils.getProcessName(context);
             if (processName.contains(":")) return;
 
             if (state == MediaPlayerConst.BroadCastConsts.States.PLAY) {

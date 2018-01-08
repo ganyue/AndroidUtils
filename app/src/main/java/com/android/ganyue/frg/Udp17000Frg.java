@@ -43,14 +43,16 @@ public class Udp17000Frg extends BaseFragment {
         view.findViewById(R.id.btn_keepAlive).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpSpeaker17000.send(getKeepAliveStr(), "255.255.255.255", 18000);
+//                udpSpeaker17000.send(getKeepAliveStr(), "255.255.255.255", 18000);
+                udpSpeaker17000.send(getKeepAliveStr(), "183.14.29.208", 17021);
             }
         });
         view.findViewById(R.id.btn_sdcardInfo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                udpSpeaker17000.send(getSDcardInfoStr(), "255.255.255.255", 17000);
-                udpSpeaker17000.send(getDeviceInfo(), "255.255.255.255", 18000);
+//                udpSpeaker17000.send(getDeviceInfo(), "255.255.255.255", 18000);
+                udpSpeaker17000.send(getDeviceInfo(), "60.205.219.190", 8110);
             }
         });
         view.findViewById(R.id.btn_battery).setOnClickListener(new View.OnClickListener() {

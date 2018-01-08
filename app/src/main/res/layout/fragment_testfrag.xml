@@ -8,6 +8,8 @@
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxHeight="10dp"
+        android:minHeight="7dp"
         android:layout_margin="10dp"
         android:progressDrawable="@drawable/seekbar_player_bg"/>
 

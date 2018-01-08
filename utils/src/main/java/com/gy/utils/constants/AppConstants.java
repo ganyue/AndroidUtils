@@ -1,17 +1,10 @@
 package com.gy.utils.constants;
 
-import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.os.Process;
 import android.text.TextUtils;
-
-import java.util.List;
 
 /**
  * Created by ganyu on 2016/10/10.
@@ -22,57 +15,9 @@ import java.util.List;
  */
 public class AppConstants {
 
-    public static Intent getAppIntentByPackageName (Context context, String pkgName) {
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = context.getPackageManager().getPackageInfo(pkgName, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (packageInfo == null) return null;
-
-        Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setPackage(packageInfo.packageName);
-
-        List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, 0);
-        ResolveInfo info = resolveInfos.iterator().next();
-        if (info != null) {
-            String packageName = info.activityInfo.packageName;
-            String className = info.activityInfo.name;
-            Intent i = new Intent(Intent.ACTION_MAIN);
-            i.addCategory(Intent.CATEGORY_LAUNCHER);
-            ComponentName componentName = new ComponentName(packageName, className);
-            i.setComponent(componentName);
-            return i;
-        }
-        return null;
-    }
-
-    public static String getProcessName (Context context) {
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        int pid = Process.myPid();
-        List<ActivityManager.RunningAppProcessInfo> infos = activityManager.getRunningAppProcesses();
-        for (ActivityManager.RunningAppProcessInfo info: infos) {
-            if (pid == info.pid) {
-                return info.processName;
-            }
-        }
-        return "";
-    }
-
-    public static boolean isBackground(Context context) {
-        android.app.ActivityManager activityManager = (android.app.ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> taskInfos = activityManager.getRunningTasks(1);
-        if (!taskInfos.isEmpty()) {
-            ComponentName topActivity = taskInfos.get(0).topActivity;
-            if (!topActivity.getPackageName().equals(context.getPackageName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    /**
+     * 获取版本名
+     */
     public static String getVersionName(Context context) {
         String versionName = null;
         try {
@@ -85,6 +30,9 @@ public class AppConstants {
         return versionName;
     }
 
+    /**
+     * 获取版本号
+     */
     public static int getVersionCode(Context context) {
         int versionCode = 0;
         try {
@@ -97,6 +45,9 @@ public class AppConstants {
         return versionCode;
     }
 
+    /**
+     * 获取包名
+     */
     public static String getPackageName(Context context) {
         try {
             return context.getPackageName();
@@ -105,6 +56,9 @@ public class AppConstants {
         }
     }
 
+    /**
+     * 获取meta data
+     */
     public static String getMetaData (Context context, String key, String defaultVal) {
         try {
             ApplicationInfo applicationInfo = context.getPackageManager().
@@ -117,23 +71,4 @@ public class AppConstants {
         return defaultVal;
     }
 
-    public static boolean isApkExist (Context context, String packageName){
-        if (TextUtils.isEmpty(packageName)) return false;
-        try {
-            ApplicationInfo info = context.getPackageManager()
-                    .getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-    }
-
-    public static boolean isApkExist (Context context, Intent intent) {
-        List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent, 0);
-        return list.size() > 0;
-    }
-
-    public static String getMarketSchemeStr (String pkgName) {
-        return "market:/details?id="+pkgName;
-    }
 }

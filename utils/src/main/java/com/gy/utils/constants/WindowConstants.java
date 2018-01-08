@@ -1,7 +1,6 @@
 package com.gy.utils.constants;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -10,6 +9,8 @@ import android.view.View;
 /**
  * Created by ganyu on 2016/5/16.
  *
+ * 设备屏幕宽、高等信息，由于需要初始化通知栏高度，所以
+ * 最好在Activity的onWindowFocusChanged里头初始化一次
  */
 public class WindowConstants {
 
@@ -23,11 +24,11 @@ public class WindowConstants {
     }
 
     private boolean isInited;
-    private int windowWidth;
-    private int windowHeight;
-    private int notificationBarHeight;
-    private int contentHeight;
-    private float density;
+    private int windowWidth;            //屏幕宽度
+    private int windowHeight;           //屏幕高度
+    private int notificationBarHeight;  //顶部通知栏高度
+    private int contentHeight;          //页面高度
+    private float density;              //像素密度
 
     private WindowConstants (Activity activity) {
         if (!isInited) {
@@ -51,22 +52,37 @@ public class WindowConstants {
         }
     }
 
+    /**
+     * 获取顶部通知栏高度
+     */
     public int getNotificationBarHeight() {
         return notificationBarHeight;
     }
 
+    /**
+     * 获取屏幕高度
+     */
     public int getWindowHeight() {
         return windowHeight;
     }
 
+    /**
+     * 获取屏幕宽度
+     */
     public int getWindowWidth() {
         return windowWidth;
     }
 
+    /**
+     * 获取页面高度
+     */
     public int getContentHeight() {
         return contentHeight;
     }
 
+    /**
+     * 把dp转换成实际像素数
+     */
     public float convertDpToPix (int dp) {
         return dp * density;
     }
