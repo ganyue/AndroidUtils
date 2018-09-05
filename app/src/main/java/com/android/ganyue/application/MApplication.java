@@ -4,7 +4,6 @@ package com.android.ganyue.application;
 import com.baidu.mapapi.SDKInitializer;
 import com.gy.appbase.application.BaseApplication;
 import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
-import com.gy.utils.audio.mpd.MpdPlayerUtils;
 import com.gy.xunfei.XunfeiUtils;
 
 /**
@@ -25,9 +24,5 @@ public class MApplication extends BaseApplication {
 
     public static MediaPlayerUtils getMediaPlayerUtils () {
         return MediaPlayerUtils.getInstance(application);
-    }
-
-    public static MpdPlayerUtils getMpdPlayerUtils () {
-        return MpdPlayerUtils.getInstance();
     }
 }

@@ -14,7 +14,6 @@ import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
 import com.gy.utils.screenlocker.ScreenLockerUtils;
 import com.gy.utils.wifi.WifiUtils;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

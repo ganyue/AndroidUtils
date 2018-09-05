@@ -4,7 +4,6 @@ import android.content.Context;
 import android.widget.ImageView;
 
 import com.gy.utils.img.glide.GlideLoader;
-import com.gy.utils.img.uil.UilLoader;
 
 /**
  *<p> Created by sam_gan on 2016/7/6.
@@ -16,7 +15,7 @@ import com.gy.utils.img.uil.UilLoader;
 public class ImageLoaderUtils implements IImageLoader {
 
     public enum Type {
-        UniversalImageLoader, Glide,
+        Glide,
     }
 
     private static ImageLoaderUtils mInstance;
@@ -33,9 +32,6 @@ public class ImageLoaderUtils implements IImageLoader {
 
     private ImageLoaderUtils (Context context) {
         switch (loader_type) {
-            case UniversalImageLoader:
-                iImageLoader = new UilLoader(context);
-                break;
             case Glide:
                 iImageLoader = new GlideLoader();
                 break;

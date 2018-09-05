@@ -23,27 +23,24 @@ public class LogUtils {
     public static int writeCount = 0;
 
     static {
-        //日志文件总大小不超4M
         Calendar calendar = Calendar.getInstance();
         checkLogFileSize();
-        logFileName = "log_" + calendar.get(Calendar.YEAR) +
-                "_" + calendar.get(Calendar.MONTH) +
-                "_" + calendar.get(Calendar.DAY_OF_MONTH);
+        logFileName = "log_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
         logFileName += ".html";
     }
 
     /**
-     * 检查日志文件大小，大于2M，删除所有日志
+     * 检查日志文件大小，大于5M，删除所有日志
      */
     private static void checkLogFileSize () {
         long fileSize = FileUtils.getFileSize(logFilePath);
-        if (fileSize > 2100000) {
+        if (fileSize > 5000000) {
             FileUtils.deleteFiles(logFilePath, null);
         }
     }
 
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-    private static void writeToLogFile (String str, int logLevel) {
+    private static SimpleDateFormat fileLogDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    public static void writeToLogFile (String str, int logLevel) {
         //每写1000条日志检查一次日志文件大小
         if (writeCount >= 1000) {
             checkLogFileSize();
@@ -71,7 +68,7 @@ public class LogUtils {
             }
 
             stringBuffer.append("[time-->&nbsp");
-            stringBuffer.append(simpleDateFormat.format(new Date()));
+            stringBuffer.append(fileLogDateFormat.format(new Date()));
             stringBuffer.append("&nbsp]&nbsp");
             stringBuffer.append(str);
             stringBuffer.append("</p>");

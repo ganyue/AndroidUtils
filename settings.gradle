@@ -1,1 +1,1 @@
-include ':app', ':widget', ':utils', ':appbase', ':map', ':libgdx', ':xunfei', ':soundtouch', ':txplayer'
+include ':app', ':widget', ':utils', ':appbase', ':map', ':libgdx', ':xunfei'

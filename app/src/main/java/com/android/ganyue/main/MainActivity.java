@@ -7,26 +7,24 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.android.ganyue.R;
 import com.android.ganyue.application.MApplication;
+import com.android.ganyue.frg.ARecordTestFrg;
 import com.android.ganyue.frg.BannerFrag;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.GameTestFrg;
+import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
-import com.android.ganyue.frg.MpdTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
 import com.android.ganyue.frg.TcpTestFrg;
-import com.android.ganyue.frg.TestFrag;
 import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
 import com.android.ganyue.frg.XunFeiTestFrg;
 import com.gy.utils.constants.WindowConstants;
-import com.android.ganyue.R;
-import com.android.ganyue.frg.HorizontalIndicatorFrg;
-import com.android.ganyue.frg.ARecordTestFrg;
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.wifi.WifiUtils;
 
@@ -55,10 +53,8 @@ public class MainActivity extends Activity{
             MapTestFrg.class,
             GameTestFrg.class,
             XunFeiTestFrg.class,
-            MpdTestFrg.class,
             ScrollObservListFrag.class,
             BannerFrag.class,
-            TestFrag.class,
     };
 
     @Override

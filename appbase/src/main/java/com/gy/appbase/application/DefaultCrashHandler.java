@@ -26,7 +26,7 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        LogUtils.writeToLogFile("******* crash log ******* : "+getStackTrace(ex));
+        LogUtils.writeToLogFile("******* crash log ******* : "+getStackTrace(ex), Log.ERROR);
         Log.e("yue.gan", "unCaughtException : " + ex.toString());
         ex.printStackTrace();
 

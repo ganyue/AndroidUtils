@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
 //        applicationId "com.android.ganyue"
         applicationId "com.lsj.mapapp"
-        minSdkVersion 11
-        targetSdkVersion 23
+        minSdkVersion 19
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
@@ -22,12 +22,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':appbase')
-    compile project(':widget')
-    compile project(':utils')
-    compile project(':map')
-    compile project(path: ':appbase')
-    compile project(':libgdx')
-    compile project(':xunfei')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:support-v4:25.1.1'
+    implementation project(':appbase')
+    implementation project(':widget')
+    implementation project(':utils')
+    implementation project(':map')
+    implementation project(':libgdx')
+    implementation project(':xunfei')
 }
