@@ -2,17 +2,12 @@ package com.gy.appbase.application;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.ApplicationInfo;
 import android.support.annotation.CallSuper;
 
-import com.gy.appbase.activity.BaseFragmentActivity;
 import com.gy.utils.bluetooth.BluetoothUtils;
-import com.gy.utils.download.DownloadManager;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
-import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
-import com.gy.utils.screenlocker.ScreenLockerUtils;
 import com.gy.utils.wifi.WifiUtils;
 
 import java.lang.ref.WeakReference;

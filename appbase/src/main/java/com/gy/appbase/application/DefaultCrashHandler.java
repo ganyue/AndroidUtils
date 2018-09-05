@@ -7,6 +7,9 @@ import android.util.Log;
 
 import com.gy.utils.log.LogUtils;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.ref.WeakReference;
 
 /**
@@ -26,21 +29,24 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        LogUtils.writeToLogFile("******* crash log ******* : "+getStackTrace(ex), Log.ERROR);
+        LogUtils.enableLogToFile(true);
+        LogUtils.e2f("********** ↓ ↓ ↓ ↓ ↓ ↓ crash log ↓ ↓ ↓ ↓ ↓ ↓ **********");
+        LogUtils.e2f(""+getStackTrace(ex));
+        LogUtils.e2f("********** ↑ ↑ ↑ ↑ ↑ ↑ crash log ↑ ↑ ↑ ↑ ↑ ↑ **********");
+        LogUtils.enableLogToFile(false);
         Log.e("yue.gan", "unCaughtException : " + ex.toString());
         ex.printStackTrace();
 
-//        //其他线程出现异常直接返回，只要不影响主线程就ok
-//        if (Looper.myLooper() != Looper.getMainLooper()) {
-//            return;
-//        }
+        //其他线程出现异常直接返回，只要不影响主线程就ok
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            return;
+        }
 
         if (!handleException(thread, ex) && mDefaultHandler != null) {
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
             Process.killProcess(Process.myPid());
             System.exit(1);
-
         }
     }
 
@@ -50,32 +56,9 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
     }
 
     public String getStackTrace (Throwable ex) {
-        StringBuffer err = new StringBuffer();
-        err.append(toString());
-        err.append("\n");
-
-        StackTraceElement[] stack = ex.getStackTrace();
-        if (stack != null) {
-            for (int i = 0; i < stack.length; i++) {
-                err.append("\tat ");
-                err.append(stack[i].toString());
-                err.append("\n");
-            }
-        }
-
-        Throwable cause = ex.getCause();
-        if (cause != null) {
-            err.append("Caused by: ");
-            err.append(cause.toString());
-            stack = cause.getStackTrace();
-            if (stack != null) {
-                for (int i = 0; i < stack.length; i++) {
-                    err.append("\tat ");
-                    err.append(stack[i].toString());
-                    err.append("\n");
-                }
-            }
-        }
-        return err.toString();
+        Writer result = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(result);
+        ex.printStackTrace(printWriter);
+        return  result.toString();
     }
 }

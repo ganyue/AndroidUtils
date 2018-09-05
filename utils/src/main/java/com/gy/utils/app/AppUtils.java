@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Process;
 
-import com.gy.utils.log.LogUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

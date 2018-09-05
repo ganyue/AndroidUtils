@@ -1,8 +1,6 @@
 package com.android.ganyue.frg;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +13,10 @@ import com.android.ganyue.controller.FuncCtrl;
 import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
-import com.gy.utils.log.LogUtils;
 import com.gy.utils.tcp.TcpClient;
 import com.gy.utils.tcp.TcpServer;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**

@@ -37,6 +37,9 @@ public class BannerFrag extends BaseFragment {
 
         mGuide.setBannerCallback(bannerCallback);
         mGuide.setCount(3);
+
+        int[] array = new int[2];
+        array[3] = 2;
     }
 
     @Override

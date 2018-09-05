@@ -22,7 +22,6 @@ import com.gy.utils.download.DownloadManager;
 import com.gy.utils.download.OnDownloadListener;
 import com.gy.utils.file.SdcardUtils;
 import com.gy.utils.log.LogUtils;
-import com.gy.utils.preference.SharedPreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
