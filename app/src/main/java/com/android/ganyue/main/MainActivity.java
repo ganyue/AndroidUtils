@@ -19,6 +19,7 @@ import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
 import com.android.ganyue.frg.TcpTestFrg;
+import com.android.ganyue.frg.TestFrg;
 import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
 import com.android.ganyue.frg.UdpTestFrg;
@@ -40,6 +41,7 @@ import java.util.Map;
 public class MainActivity extends Activity{
 
     private final Class[] types = {
+            TestFrg.class,
             ARecordTestFrg.class,
             HorizontalIndicatorFrg.class,
             WifiConnectTestFrg.class,

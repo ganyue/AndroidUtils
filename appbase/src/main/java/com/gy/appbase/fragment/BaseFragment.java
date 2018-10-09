@@ -1,10 +1,14 @@
 package com.gy.appbase.fragment;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +20,7 @@ import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.inject.ViewInjectInterpreter;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 /**
  * Created by ganyu on 2016/4/30.
@@ -97,4 +102,18 @@ public abstract class BaseFragment extends Fragment implements OnKeyDownCallback
         return onKeyDown(keyCode, event);
     }
 
+    protected void requestPermission (String ...permissions) {
+        ArrayList<String> unpermited = new ArrayList<>();
+
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                unpermited.add(permission);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 }
