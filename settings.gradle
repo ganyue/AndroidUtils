@@ -1,1 +1,7 @@
-include ':app', ':widget', ':utils', ':appbase', ':map', ':libgdx', ':xunfei'
+include ':app'
+include ':appbase'
+include ':libgdx'
+include ':map'
+include ':utils'
+include ':widget'
+include ':xunfei'
