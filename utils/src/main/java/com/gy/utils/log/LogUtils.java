@@ -11,6 +11,8 @@ import com.gy.utils.file.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -21,18 +23,20 @@ import java.util.concurrent.ArrayBlockingQueue;
  *
  */
 public class LogUtils {
-    private static boolean isDebug = false;
+    private static boolean isLogEnabled = false;
     private static boolean isLogToFileEnabled = false;
     private static LogThread logThread;
 
     public static void enableLog (boolean enable) {
-        isDebug = enable;
+        isLogEnabled = enable;
     }
 
-    public static void enableLogToFile (boolean enable) {
+    public static void enableLogToFile (Context context, boolean enable) {
+        isLogEnabled = enable;
         isLogToFileEnabled = enable;
         if (enable && logThread == null) {
-            logThread = new LogThread();
+            if (context == null) logThread = new LogThread();
+            else logThread = new LogThread(context.getExternalCacheDir());
             logThread.start();
         } else if (!enable && logThread != null) {
             if (logThread.isAlive() && logQueue.size() <= 0) {
@@ -42,29 +46,33 @@ public class LogUtils {
         }
     }
 
+    public static void enableLogToFile (boolean enable) {
+        enableLogToFile(null, enable);
+    }
+
     public static void d (String tag, String log) {
-        if (isDebug) {
+        if (isLogEnabled) {
             Log.d(tag, log);
             if (isLogToFileEnabled) d2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void e (String tag, String log) {
-        if (isDebug) {
+        if (isLogEnabled) {
             Log.e(tag, log);
             if (isLogToFileEnabled) e2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void i (String tag, String log) {
-        if (isDebug) {
+        if (isLogEnabled) {
             Log.i(tag, log);
             if (isLogToFileEnabled) i2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void v (String tag, String log) {
-        if (isDebug) {
+        if (isLogEnabled) {
             Log.v(tag, log);
             if (isLogToFileEnabled) v2f(tag + "&nbsp--&nbsp" + log);
         }
@@ -100,6 +108,10 @@ public class LogUtils {
         }
     }
 
+    public static final void crashLog (Throwable t) {
+        if (logThread != null) logThread.writeCrashLogSync(t);
+    }
+
     /**
      * 文件日志线程
      */
@@ -110,7 +122,45 @@ public class LogUtils {
         private SimpleDateFormat logDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         private final long MAX_LOG_SIZE = 10 * 1024 * 1024;
 
+        public LogThread() {
+        }
+
+        public LogThread(File logFileDir) {
+            if (logFileDir != null) {
+                this.logFileDir = logFileDir;
+            }
+        }
+
+        private void writeCrashLogSync (Throwable t) {
+            logFileName = "log_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date()) + "_crash";
+            logFileName += ".html";
+            if (!logFileDir.exists() && !logFileDir.mkdirs()) return;
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            String logStr = sw.toString();
+            logStr.replaceAll("\\n", "<br\\>");
+            try {
+                FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append("<p style='color:red'>");
+                stringBuilder.append("[time-->&nbsp");
+                stringBuilder.append(logDateFormat.format(new Date()));
+                stringBuilder.append("&nbsp]&nbsp");
+                stringBuilder.append("Throwable toString : ").append(t.toString()).append("<br\\>");
+                stringBuilder.append("Throwable toWriter : ").append(sw.toString()).append("<br\\>");
+                stringBuilder.append("</p>");
+                fOut.write(stringBuilder.toString().getBytes());
+                fOut.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         private void checkLogFileSize () {
+            logFileDir.mkdirs();
             long fileSize = FileUtils.getFileSize(logFileDir.getAbsolutePath());
             if (fileSize > MAX_LOG_SIZE) {
                 FileUtils.deleteFiles(logFileDir.getPath(), null);
@@ -127,7 +177,7 @@ public class LogUtils {
             try {
                 FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
                 StringBuilder stringBuilder = new StringBuilder();
-                while (isLogToFileEnabled || logQueue.size() > 0) {
+                while (isLogToFileEnabled) {
                     LogItem logItem = logQueue.take();
                     stringBuilder.append("<p");
                     switch (logItem.level) {
@@ -149,7 +199,7 @@ public class LogUtils {
                     stringBuilder.setLength(0);
 
                     writeCount++;
-                    if (writeCount >= 1000) {
+                    if (writeCount >= 3000) {
                         checkLogFileSize();
                         writeCount = 0;
                     }
@@ -162,7 +212,7 @@ public class LogUtils {
     }
 
     private static LogEnableReciver logEnableReciver;
-    private static void registReceiverForRuntime (Context context) {
+    public static void registReceiverForRuntime (Context context) {
         if (logEnableReciver != null) return;
         logEnableReciver = new LogEnableReciver();
         IntentFilter intentFilter = new IntentFilter();
@@ -173,7 +223,7 @@ public class LogUtils {
         context.registerReceiver(logEnableReciver, intentFilter);
     }
 
-    private static void unRegistReceiverForRuntime (Context context) {
+    public static void unRegistReceiverForRuntime (Context context) {
         if (logEnableReciver != null) {
             context.unregisterReceiver(logEnableReciver);
             logEnableReciver = null;
@@ -193,10 +243,10 @@ public class LogUtils {
                     enableLog(false);
                     break;
                 case "log2file.enable":
-                    enableLogToFile(true);
+                    enableLogToFile(context, true);
                     break;
                 case "log2file.disable":
-                    enableLogToFile(false);
+                    enableLogToFile(context, false);
                     break;
             }
         }

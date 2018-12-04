@@ -1,7 +1,9 @@
 package com.android.ganyue.main;
 
+import android.Manifest;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -85,6 +87,8 @@ public class MainActivity extends Activity{
         });
 
         MApplication.getWifiUtils().addOnNetworkChangedListener(onNetworkChangedListener);
+
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
 
     private void addData (String dataKey, String dataVal, List<Map<String, ?>> container) {

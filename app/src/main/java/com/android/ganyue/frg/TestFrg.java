@@ -26,8 +26,13 @@ public class TestFrg extends BaseFragment{
 
     @Override
     protected void initViews(View view, Bundle savedInstanceState) {
-        List permissions = AppUtils.getAllUnPermitedPermissions(getContext());
-        LogUtils.d(permissions.toString());
+        LogUtils.enableLogToFile(true);
+        LogUtils.d("aaa1");
+        LogUtils.d("test21");
+        LogUtils.d("test2");
+        LogUtils.d("test3");
+//        int i = 0;
+//        int j = i/0;
     }
 
     @Override

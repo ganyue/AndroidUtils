@@ -33,6 +33,7 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
         LogUtils.e2f("********** ↓ ↓ ↓ ↓ ↓ ↓ crash log ↓ ↓ ↓ ↓ ↓ ↓ **********");
         LogUtils.e2f(""+getStackTrace(ex));
         LogUtils.e2f("********** ↑ ↑ ↑ ↑ ↑ ↑ crash log ↑ ↑ ↑ ↑ ↑ ↑ **********");
+        LogUtils.crashLog(ex);
         LogUtils.enableLogToFile(false);
         Log.e("yue.gan", "unCaughtException : " + ex.toString());
         ex.printStackTrace();

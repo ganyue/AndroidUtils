@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.Application;
 import android.support.annotation.CallSuper;
 
+import com.gy.utils.BuildConfig;
 import com.gy.utils.bluetooth.BluetoothUtils;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
+import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
 import com.gy.utils.wifi.WifiUtils;
 
@@ -32,9 +34,11 @@ public class BaseApplication extends Application{
         super.onCreate();
 
         application = this;
-//        isDebug = (getApplicationInfo().flags& ApplicationInfo.FLAG_DEBUGGABLE)!=0;
-        isDebug = false;
-//        LogUtils.enable(isDebug);   //debug 版本打印日志, release版本不打印
+        isDebug = BuildConfig.DEBUG;
+        LogUtils.enableLogToFile(this, isDebug);   //debug 版本打印日志, release版本不打印
+        if (!isDebug()) {
+            LogUtils.registReceiverForRuntime(this);
+        }
         initCrashHandler();         //设置全局异常处理器
         getImageLoader();           //初始化 image loader
         getHttpUtils();             //初始化 http utils
@@ -98,4 +102,11 @@ public class BaseApplication extends Application{
         activities.clear();
     }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        if (!isDebug()) {
+            LogUtils.unRegistReceiverForRuntime(this);
+        }
+    }
 }
