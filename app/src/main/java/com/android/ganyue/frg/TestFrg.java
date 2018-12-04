@@ -31,8 +31,8 @@ public class TestFrg extends BaseFragment{
         LogUtils.d("test21");
         LogUtils.d("test2");
         LogUtils.d("test3");
-//        int i = 0;
-//        int j = i/0;
+        int i = 0;
+        int j = i/0;
     }
 
     @Override

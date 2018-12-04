@@ -140,7 +140,7 @@ public class LogUtils {
             PrintWriter pw = new PrintWriter(sw);
             t.printStackTrace(pw);
             String logStr = sw.toString();
-            logStr.replaceAll("\\n", "<br\\>");
+            logStr = logStr.replaceAll("\n\t", "\n\t<br\\>");
             try {
                 FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
                 StringBuilder stringBuilder = new StringBuilder();
@@ -149,9 +149,8 @@ public class LogUtils {
                 stringBuilder.append("[time-->&nbsp");
                 stringBuilder.append(logDateFormat.format(new Date()));
                 stringBuilder.append("&nbsp]&nbsp");
-                stringBuilder.append("Throwable toString : ").append(t.toString()).append("<br\\>");
-                stringBuilder.append("Throwable toWriter : ").append(sw.toString()).append("<br\\>");
-                stringBuilder.append("</p>");
+                stringBuilder.append("Throwable : ").append(logStr).append("<br\\>");
+                stringBuilder.append("</p><br\\>\n\t\n\t");
                 fOut.write(stringBuilder.toString().getBytes());
                 fOut.close();
             } catch (Exception e) {
