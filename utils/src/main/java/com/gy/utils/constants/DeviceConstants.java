@@ -1,17 +1,21 @@
 package com.gy.utils.constants;
 
 import android.content.Context;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.text.TextUtils;
 
 import com.gy.utils.security.MD5Utils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.Random;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 /**
  * Created by ganyu on 2016/10/10.
@@ -30,20 +34,20 @@ public class DeviceConstants {
         result = Build.SERIAL;
 
         if (TextUtils.isEmpty(result)) {
-            result = getMacAddr(context);
+            result = getMacAddr();
         }
 
         if(TextUtils.isEmpty(result)){
-            Random random=new Random();
-            result = System.currentTimeMillis()+""+random.nextInt(10000);
+            result = getRandUniqeCode(context);
         }
 
         result = MD5Utils.getStringMD5(result);
+
         return result;
     }
 
-    private static String getMacAddr (Context context) {
-        String mac = getMacFromWifiManager(context);
+    private static String getMacAddr () {
+        String mac = getMacFromNetworkInterface();
         if (TextUtils.isEmpty(mac)) {
             mac = getMacFromConfigFile();
         }
@@ -51,16 +55,31 @@ public class DeviceConstants {
         return mac;
     }
 
-    private static String getMacFromWifiManager (Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo != null) {
-            return null;
+    private static String getMacFromNetworkInterface() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                byte[] addr = networkInterface.getHardwareAddress();
+                if (addr == null || addr.length == 0) continue;
+                StringBuilder sb = new StringBuilder();
+                for (byte b: addr) {
+                    sb.append(String.format("%02x:", b));
+                }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                return sb.toString();
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
-
-        return wifiInfo.getMacAddress();
+        return null;
     }
 
+    /**
+     * @deprecated
+     */
     private static String getMacFromConfigFile () {
         String str = "";
         try {
@@ -81,5 +100,40 @@ public class DeviceConstants {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    private static String getRandUniqeCode (Context context) {
+        String result = "";
+        File file = context.getExternalFilesDir(null);
+        File uniqueCodeFile = new File (file, "unique_code");
+        if (uniqueCodeFile.exists() && uniqueCodeFile.isFile()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(uniqueCodeFile));
+                String tmp;
+                StringBuilder sb = new StringBuilder();
+                while ((tmp = reader.readLine()) != null) {
+                    sb.append(tmp);
+                }
+                reader.close();
+                result = sb.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        if (TextUtils.isEmpty(result)) {
+            result = System.currentTimeMillis()+""+System.nanoTime();
+            if (file == null || (!file.exists() && !file.mkdirs())) return result;
+            try {
+                FileOutputStream fOut = new FileOutputStream(uniqueCodeFile);
+                fOut.write(result.getBytes());
+                fOut.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return result;
     }
 }
