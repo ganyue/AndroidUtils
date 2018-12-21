@@ -128,6 +128,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             mediaPlayer.setDataSource(sourcePath);
             mediaPlayer.prepareAsync();
             state = PlayerState.PREPARING;
+            onStatusChanged(MediaPlayerConst.BroadCastConsts.States.PREPARING);
             return true;
         } catch (IOException e) {
             onStateError("************ exception while setDataSource or prepareAsync **************");
@@ -288,6 +289,7 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
+            if (mediaPlayer == null) return;
             switch (focusChange) {
                 case AudioManager.AUDIOFOCUS_LOSS:
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -365,7 +367,11 @@ public class MediaPlayerService extends Service implements IMediaPlayer {
             status.duration = mediaPlayer.getDuration();
             status.currentTime = mediaPlayer.getCurrentPosition();
         }
-        status.isPlaying = isPlaying()?1:0;
+        if (state == PlayerState.PREPARING) {
+            status.isPlaying = 2;
+        } else {
+            status.isPlaying = isPlaying()?1:0;
+        }
         status.volume = getVolume();
         return status;
     }

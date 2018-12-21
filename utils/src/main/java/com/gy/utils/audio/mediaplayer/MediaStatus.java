@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  */
 public class MediaStatus implements Parcelable {
 
-    public int isPlaying;
+    public int isPlaying;   //prepare 2, playing 1, other 0
     public int duration;
     public int currentTime;
     public int volume;

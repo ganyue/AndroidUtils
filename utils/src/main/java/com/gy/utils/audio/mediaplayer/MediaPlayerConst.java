@@ -47,6 +47,7 @@ public class MediaPlayerConst {
             public static final int SEEK = 4;
             public static final int COMPLETE = 5;
             public static final int ERROR = 6;
+            public static final int PREPARING = 7;
         }
     }
 }
