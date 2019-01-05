@@ -26,6 +26,7 @@ public class FuncActivity extends BaseFragmentActivity{
     private FuncCtrl controller;
 
     public void setController (BaseFragmentActivityController controller) {
+        super.setController(controller);
         this.controller = (FuncCtrl) controller;
     }
 
