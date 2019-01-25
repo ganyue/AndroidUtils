@@ -27,4 +27,15 @@
         <attr name="text_color_normal" format="color" />
         <attr name="text_color_selected" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="PinyinTextView">
+        <!--拼音字体大小-->
+        <attr name="textSizePinyin" format="dimension"/>
+        <!--汉字字体大小-->
+        <attr name="textSizeChinese" format="dimension"/>
+        <!--拼音字体颜色-->
+        <attr name="textColorPinyin" format="color"/>
+        <!--汉字字体颜色-->
+        <attr name="textColorChinese" format="color"/>
+    </declare-styleable>
 </resources>

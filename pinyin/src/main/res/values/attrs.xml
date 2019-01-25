@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PinyinTextView">
+        <!-- 拼音字体大小 -->
+        <attr name="textSizePinyin" format="dimension"/>
+        <!-- 汉字字体大小 -->
+        <attr name="textSizeChinese" format="dimension"/>
+        <!-- 拼音字体颜色 -->
+        <attr name="textColorPinyin" format="color"/>
+        <!-- 汉字字体颜色 -->
+        <attr name="textColorChinese" format="color"/>
+        <!-- 最小字间距， 水平 -->
+        <attr name="textSpaceHorizontal" format="dimension"/>
+        <!-- 最小字间距， 拼音和汉字之间 -->
+        <attr name="textSpaceVertical" format="dimension"/>
+        <!-- 行间距 -->
+        <attr name="textSpaceLine" format="dimension"/>
+    </declare-styleable>
+</resources>

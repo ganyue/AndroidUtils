@@ -1,4 +1,4 @@
-include ':app', ':dimens'
+include ':app', ':dimens', ':pinyin'
 include ':appbase'
 include ':libgdx'
 include ':map'
