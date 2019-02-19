@@ -17,7 +17,7 @@ public class TextVUtils {
         int i = 0;
         while(i++ < 10) {
             textPaint.setTextSize(textSize);
-
+            tw = 0;
             for (String text: texts) {
                 int textWidth = (int) textPaint.measureText(text);
                 if (textWidth > tw) {
