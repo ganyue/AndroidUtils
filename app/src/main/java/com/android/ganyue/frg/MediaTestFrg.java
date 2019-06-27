@@ -167,6 +167,11 @@ public class MediaTestFrg extends BaseFragment {
         public void onError(MediaStatus mediaStatus, String errorMsg) {
             LogUtils.d("yue.gan", "onError : " + errorMsg);
         }
+
+        @Override
+        public void onPreparing(MediaStatus mediaStatus) {
+            LogUtils.d("yue.gan", "onPreparing");
+        }
     };
 
 
