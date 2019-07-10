@@ -2,7 +2,6 @@ package com.android.ganyue.frg;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,11 +75,11 @@ public class FileUtilTestFrg extends BaseFragment {
 //            }
 //        });
 
-        Log.d("yue.gan", "ex root : " + SdcardUtils.getExternalRootDir());
-        Log.d("yue.gan", "ex public down : " + SdcardUtils.getExternalPublicDir(Environment.DIRECTORY_DOWNLOADS));
-        Log.d("yue.gan", "ex cache : " + SdcardUtils.getExternalCacheDir(mActivity));
-        Log.d("yue.gan", "ap cache : " + SdcardUtils.getCacheDir(mActivity));
-        Log.d("yue.gan", "ap file : " + SdcardUtils.getFileDir(mActivity));
+        LogUtils.d("yue.gan", "ex root : " + SdcardUtils.getExternalRootDir());
+        LogUtils.d("yue.gan", "ex public down : " + SdcardUtils.getExternalPublicDir(Environment.DIRECTORY_DOWNLOADS));
+        LogUtils.d("yue.gan", "ex cache : " + SdcardUtils.getExternalCacheDir(mActivity));
+        LogUtils.d("yue.gan", "ap cache : " + SdcardUtils.getCacheDir(mActivity));
+        LogUtils.d("yue.gan", "ap file : " + SdcardUtils.getFileDir(mActivity));
 
         DBHelper dbHelper = new DBHelper(mActivity, "test", 1, null);
         downloadManager = DownloadManager.getInstance(dbHelper);

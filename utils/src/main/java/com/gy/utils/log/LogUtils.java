@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.gy.utils.file.FileUtils;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -19,35 +20,58 @@ import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by ganyu on 2016/5/23.
- *
+ * <p>Created by ganyu on 2016/5/23.</p>
+ * <p>1、在/sdcard下创建/tmp/logs文件夹下次启动时会自动启用日志并写入/tmp/logs下</p>
+ * <p>2、使用广播打开关闭日志：am broadcast -a log.enable(log.disable、log2file.enable、log2file.disable)</p>
+ * <p>3、代码中直接使用
+ * <p>{@link LogUtils#enableLog(boolean)}</p>
+ * <p>{@link LogUtils#enableLogToFile(boolean)}</p>
+ * <p>{@link LogUtils#enableLogToFile(Context, boolean)} </p>
+ * <p>打开/关闭日志</p>
  */
 public class LogUtils {
+    private static final String DEFAULT_TAG = "devlog";
     private static boolean isLogEnabled = false;
     private static boolean isLogToFileEnabled = false;
     private static LogThread logThread;
+    private static final String DEFAULT_LOG_DIR = "" + Environment.getExternalStorageDirectory() + "/tmp/logs";
+
+    static {
+        //如果日志文件夹存在，直接打开日志
+        File file = new File(DEFAULT_LOG_DIR);
+        if (file.exists() && file.isDirectory()) {
+            enableLogToFile(true);
+        }
+    }
 
     public static void enableLog (boolean enable) {
         isLogEnabled = enable;
+        i("******************↓ ↓ ↓ log begin ↓ ↓ ↓******************");
+        i("******************- - - log only  - - -******************");
+        i("******************↑ ↑ ↑ log begin ↑ ↑ ↑******************");
+    }
+
+    public static void enableLogToFile (boolean enable) {
+        enableLogToFile(null, enable);
     }
 
     public static void enableLogToFile (Context context, boolean enable) {
         isLogEnabled = enable;
         isLogToFileEnabled = enable;
         if (enable && logThread == null) {
+            if (logQueue == null) logQueue = new ArrayBlockingQueue<>(128);
             if (context == null) logThread = new LogThread();
             else logThread = new LogThread(context.getExternalCacheDir());
             logThread.start();
+            i("******************↓ ↓ ↓ log begin ↓ ↓ ↓******************");
+            i("***  logFileDir: " + logThread.getLogFileDir().getPath());
+            i("******************↑ ↑ ↑ log begin ↑ ↑ ↑******************");
         } else if (!enable && logThread != null) {
             if (logThread.isAlive() && logQueue.size() <= 0) {
                 logThread.interrupt();
             }
             logThread = null;
         }
-    }
-
-    public static void enableLogToFile (boolean enable) {
-        enableLogToFile(null, enable);
     }
 
     public static void d (String tag, String log) {
@@ -81,21 +105,17 @@ public class LogUtils {
     private static ArrayBlockingQueue<LogItem> logQueue;
     private static void l2f (String str, int logLevel) {
         if (!isLogToFileEnabled) return;
-        if (logQueue == null) {
-            logQueue = new ArrayBlockingQueue<>(128);
-        }
         logQueue.offer(new LogItem(System.currentTimeMillis(), str, logLevel));
     }
 
-    public static final String DEFAULT_TAG = "developer";
     public static void d (String log) {d(DEFAULT_TAG, log);}
     public static void e (String log) {e(DEFAULT_TAG, log);}
     public static void i (String log) {i(DEFAULT_TAG, log);}
     public static void v (String log) {v(DEFAULT_TAG, log);}
-    public static void d2f (String str) {l2f(str, Log.DEBUG); }
-    public static void e2f (String str) {l2f(str, Log.ERROR); }
-    public static void i2f (String str) {l2f(str, Log.INFO); }
-    public static void v2f (String str) {l2f(str, Log.VERBOSE); }
+    private static void d2f(String str) {l2f(str, Log.DEBUG); }
+    private static void e2f(String str) {l2f(str, Log.ERROR); }
+    private static void i2f(String str) {l2f(str, Log.INFO); }
+    private static void v2f(String str) {l2f(str, Log.VERBOSE); }
 
     private static class LogItem {
         long time;
@@ -108,7 +128,7 @@ public class LogUtils {
         }
     }
 
-    public static final void crashLog (Throwable t) {
+    public static void crashLog (Throwable t) {
         if (logThread != null) logThread.writeCrashLogSync(t);
     }
 
@@ -116,16 +136,20 @@ public class LogUtils {
      * 文件日志线程
      */
     private static class LogThread extends Thread {
-        private File logFileDir = new File (Environment.getExternalStorageDirectory(), "tmp/log");
+        private File logFileDir = new File (DEFAULT_LOG_DIR);
         private String logFileName = "log";
         private int writeCount = 0;
         private SimpleDateFormat logDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         private final long MAX_LOG_SIZE = 10 * 1024 * 1024;
 
-        public LogThread() {
+        File getLogFileDir () {
+            return logFileDir;
         }
 
-        public LogThread(File logFileDir) {
+        LogThread() {
+        }
+
+        LogThread(File logFileDir) {
             if (logFileDir != null) {
                 this.logFileDir = logFileDir;
             }
@@ -143,15 +167,14 @@ public class LogUtils {
             logStr = logStr.replaceAll("\n\t", "\n\t<br\\>");
             try {
                 FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
-                StringBuilder stringBuilder = new StringBuilder();
 
-                stringBuilder.append("<p style='color:red'>");
-                stringBuilder.append("[time-->&nbsp");
-                stringBuilder.append(logDateFormat.format(new Date()));
-                stringBuilder.append("&nbsp]&nbsp");
-                stringBuilder.append("Throwable : ").append(logStr).append("<br\\>");
-                stringBuilder.append("</p><br\\>\n\t\n\t");
-                fOut.write(stringBuilder.toString().getBytes());
+                String logHtmlStr = "<p style='color:red'>" +
+                        "[time-->&nbsp" +
+                        logDateFormat.format(new Date()) +
+                        "&nbsp]&nbsp" +
+                        "Throwable : " + logStr + "<br\\>" +
+                        "</p><br\\>\n\t\n\t";
+                fOut.write(logHtmlStr.getBytes());
                 fOut.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -159,7 +182,7 @@ public class LogUtils {
         }
 
         private void checkLogFileSize () {
-            logFileDir.mkdirs();
+            if (!logFileDir.exists() && !logFileDir.mkdirs()) return;
             long fileSize = FileUtils.getFileSize(logFileDir.getAbsolutePath());
             if (fileSize > MAX_LOG_SIZE) {
                 FileUtils.deleteFiles(logFileDir.getPath(), null);
@@ -172,16 +195,24 @@ public class LogUtils {
             checkLogFileSize();
             logFileName = "log_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
             logFileName += ".html";
-
             try {
-                FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
+                File logFile = new File(logFileDir, logFileName);
+                FileOutputStream fOut = new FileOutputStream(logFile, true);
                 StringBuilder stringBuilder = new StringBuilder();
                 while (isLogToFileEnabled) {
                     LogItem logItem = logQueue.take();
+                    if (!logFile.exists()) {
+                        if (!logFileDir.exists() && !logFileDir.mkdirs()) continue;
+                        closeClosable(fOut);
+                        fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
+                    }
                     stringBuilder.append("<p");
                     switch (logItem.level) {
                         case Log.INFO:
                             stringBuilder.append(" style='color:green'>");
+                            break;
+                        case Log.WARN:
+                            stringBuilder.append(" style='color:yellow'>");
                             break;
                         case Log.ERROR:
                             stringBuilder.append(" style='color:red'>");
@@ -203,7 +234,15 @@ public class LogUtils {
                         writeCount = 0;
                     }
                 }
-                fOut.close();
+                closeClosable(fOut);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void closeClosable (Closeable closeable) {
+            try {
+                closeable.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -234,6 +273,7 @@ public class LogUtils {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            if (action == null) return;
             switch (action) {
                 case "log.enable":
                     enableLog(true);
@@ -242,7 +282,7 @@ public class LogUtils {
                     enableLog(false);
                     break;
                 case "log2file.enable":
-                    enableLogToFile(context, true);
+                    enableLogToFile(null, true);
                     break;
                 case "log2file.disable":
                     enableLogToFile(context, false);
