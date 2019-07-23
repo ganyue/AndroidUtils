@@ -88,6 +88,17 @@ public class LogUtils {
         }
     }
 
+    public static void e (String tag, Throwable t) {
+        if (isLogEnabled) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            t.printStackTrace(pw);
+            String logStr = sw.toString();
+            Log.e(tag, logStr);
+            if (isLogToFileEnabled) e2f(tag + "&nbsp--&nbsp" + logStr.replaceAll("\n\t", "\n\t<br\\>"));
+        }
+    }
+
     public static void i (String tag, String log) {
         if (isLogEnabled) {
             Log.i(tag, log);
@@ -110,6 +121,7 @@ public class LogUtils {
 
     public static void d (String log) {d(DEFAULT_TAG, log);}
     public static void e (String log) {e(DEFAULT_TAG, log);}
+    public static void e (Throwable t) {e(DEFAULT_TAG, t);}
     public static void i (String log) {i(DEFAULT_TAG, log);}
     public static void v (String log) {v(DEFAULT_TAG, log);}
     private static void d2f(String str) {l2f(str, Log.DEBUG); }
