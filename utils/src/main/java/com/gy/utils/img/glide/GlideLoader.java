@@ -17,7 +17,7 @@ import com.gy.utils.img.IImageLoader;
 import com.gy.utils.img.OnImageloadListener;
 
 /**
- * Created by ganyu on 2016/12/14.
+ * Created by yue.gan on 2016/12/14.
  *
  */
 public class GlideLoader implements IImageLoader{

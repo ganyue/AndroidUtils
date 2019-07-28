@@ -20,7 +20,7 @@ import com.gy.widget.indicator.HCircleIndicator;
 import com.gy.widget.viewpager.ScrollSpeedAvailablePager;
 
 /**
- * Created by ganyu on 2016/10/8.
+ * Created by yue.gan on 2016/10/8.
  *
  */
 public class FirstStartGuideView extends RelativeLayout {

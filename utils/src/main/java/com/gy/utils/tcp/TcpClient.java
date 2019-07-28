@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by ganyu on 2016/6/3.
+ * Created by yue.gan on 2016/6/3.
  *
  */
 public class TcpClient extends Thread{

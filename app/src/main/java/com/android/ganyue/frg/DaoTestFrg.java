@@ -15,7 +15,7 @@ import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  * Nsd test
  */
 public class DaoTestFrg extends BaseFragment {

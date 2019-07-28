@@ -1,7 +1,7 @@
 package com.gy.utils.audio.mediaplayer;
 
 /**
- * Created by ganyu on 2016/10/10.
+ * Created by yue.gan on 2016/10/10.
  *
  */
 public interface OnMediaListener {

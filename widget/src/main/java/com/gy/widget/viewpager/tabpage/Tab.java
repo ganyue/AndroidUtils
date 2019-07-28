@@ -3,7 +3,7 @@ package com.gy.widget.viewpager.tabpage;
 import android.os.Bundle;
 
 /**
- * Created by ganyu on 2016/9/13.
+ * Created by yue.gan on 2016/9/13.
  */
 public class Tab {
     public String tabName;

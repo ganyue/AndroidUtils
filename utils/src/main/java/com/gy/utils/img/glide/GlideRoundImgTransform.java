@@ -12,7 +12,7 @@ import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
 /**
- * Created by ganyu on 2016/12/13.
+ * Created by yue.gan on 2016/12/13.
  */
 public class GlideRoundImgTransform extends BitmapTransformation{
     public GlideRoundImgTransform(Context context) {

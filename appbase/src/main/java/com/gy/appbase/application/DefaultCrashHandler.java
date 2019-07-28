@@ -13,7 +13,7 @@ import java.io.Writer;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ganyu on 2016/7/19.
+ * Created by yue.gan on 2016/7/19.
  *
  */
 public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{

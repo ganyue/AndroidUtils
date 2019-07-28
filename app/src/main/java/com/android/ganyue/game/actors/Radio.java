@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
- * Created by ganyu on 2016/8/1.
+ * Created by yue.gan on 2016/8/1.
  *
  */
 public class Radio extends Actor {

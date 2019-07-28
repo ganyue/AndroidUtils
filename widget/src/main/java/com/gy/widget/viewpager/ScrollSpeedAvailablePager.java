@@ -8,7 +8,7 @@ import android.view.animation.DecelerateInterpolator;
 import java.lang.reflect.Field;
 
 /**
- * Created by ganyu on 2016/10/9.
+ * Created by yue.gan on 2016/10/9.
  *
  * 可以改变pager自动滑动速度
  */

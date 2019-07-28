@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ganyu on 2016/5/17.
+ * Created by yue.gan on 2016/5/17.
  *
  */
 public class ScrollObservedListView extends android.widget.ListView implements AbsListView.OnScrollListener {

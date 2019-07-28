@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 /**
- * Created by ganyu on 2016/10/10.
+ * Created by yue.gan on 2016/10/10.
  *
  * <p>1、获取版本号、版本名、包名、meta data</p>
  * <p>2、检查指定应用是否存在，启动其他应用</p>

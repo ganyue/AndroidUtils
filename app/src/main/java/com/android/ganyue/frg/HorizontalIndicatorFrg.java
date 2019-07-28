@@ -21,7 +21,7 @@ import com.gy.widget.indicator.HorizontalIndicator;
 import com.gy.widget.shapview.Circle;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  * head view & list with a head
  */
 public class HorizontalIndicatorFrg extends BaseFragment {

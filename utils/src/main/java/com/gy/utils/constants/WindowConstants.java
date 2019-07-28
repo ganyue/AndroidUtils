@@ -7,11 +7,12 @@ import android.view.Display;
 import android.view.View;
 
 /**
- * Created by ganyu on 2016/5/16.
+ * Created by yue.gan on 2016/5/16.
  *
  * 设备屏幕宽、高等信息，由于需要初始化通知栏高度，所以
  * 最好在Activity的onWindowFocusChanged里头初始化一次
  */
+@Deprecated
 public class WindowConstants {
 
     private static WindowConstants mInstance;

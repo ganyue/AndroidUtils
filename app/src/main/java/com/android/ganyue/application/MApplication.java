@@ -8,7 +8,7 @@ import com.gy.utils.log.LogUtils;
 import com.gy.xunfei.XunfeiUtils;
 
 /**
- * Created by ganyu on 2016/7/21.
+ * Created by yue.gan on 2016/7/21.
  *
  */
 public class MApplication extends BaseApplication {

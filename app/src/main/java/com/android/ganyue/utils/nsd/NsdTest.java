@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  */
 public class NsdTest {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

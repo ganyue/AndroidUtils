@@ -22,7 +22,7 @@ import com.gy.widget.viewpager.ScrollSpeedAvailablePager;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ganyu on 2016/10/8.
+ * Created by yue.gan on 2016/10/8.
  *
  */
 public class BannerView extends RelativeLayout {

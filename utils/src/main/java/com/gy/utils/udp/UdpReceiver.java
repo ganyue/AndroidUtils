@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 /**
- * Created by ganyu on 2016/5/19.
+ * Created by yue.gan on 2016/5/19.
  *
  */
 public class UdpReceiver extends Thread {

@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by ganyu on 2016/5/17.
+ * Created by yue.gan on 2016/5/17.
  *
  */
 public class FrameLayout extends ViewGroup {

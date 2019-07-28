@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ganyu on 2016/10/10.
+ * Created by yue.gan on 2016/10/10.
  *
  */
 public class MediaPlayerUtils implements IMediaPlayer{

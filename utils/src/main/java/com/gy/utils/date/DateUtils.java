@@ -8,7 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
- * Created by ganyu on 2016/11/2.
+ * Created by yue.gan on 2016/11/2.
  *
  */
 public class DateUtils {

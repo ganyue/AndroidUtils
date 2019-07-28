@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import com.gy.widget.R;
 
 /**
- * Created by ganyu on 2017/8/4.
+ * Created by yue.gan on 2017/8/4.
  */
 
 public class TestActivity extends Activity {

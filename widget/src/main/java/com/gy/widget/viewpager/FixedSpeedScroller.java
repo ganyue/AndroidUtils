@@ -5,7 +5,7 @@ import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
 /**
- * Created by ganyu on 2016/10/9.
+ * Created by yue.gan on 2016/10/9.
  *
  */
 public class FixedSpeedScroller extends Scroller {

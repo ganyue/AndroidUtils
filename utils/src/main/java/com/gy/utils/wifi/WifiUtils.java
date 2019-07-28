@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ganyu on 2016/7/25.
+ * Created by yue.gan on 2016/7/25.
  *
  */
 public class WifiUtils {

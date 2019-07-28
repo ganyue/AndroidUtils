@@ -16,7 +16,7 @@ import com.gy.widget.viewpager.banner.BannerView;
 import com.gy.widget.viewpager.banner.FirstStartGuideView;
 
 /**
- * Created by ganyu on 2016/10/8.
+ * Created by yue.gan on 2016/10/8.
  *
  */
 public class BannerFrag extends BaseFragment {

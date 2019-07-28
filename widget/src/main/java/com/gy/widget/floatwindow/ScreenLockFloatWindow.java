@@ -16,7 +16,7 @@ import com.gy.widget.imageview.RoundRectImageView;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ganyu on 2017/4/24.
+ * Created by yue.gan on 2017/4/24.
  *
  */
 

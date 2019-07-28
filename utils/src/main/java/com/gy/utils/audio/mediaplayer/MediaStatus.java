@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.lang.reflect.Field;
 
 /**
- * Created by ganyu on 2016/10/10.
+ * Created by yue.gan on 2016/10/10.
  *
  */
 public class MediaStatus implements Parcelable {

@@ -14,7 +14,7 @@ import com.gy.utils.log.LogUtils;
 import java.io.IOException;
 
 /**
- * Created by ganyu on 2016/7/19.
+ * Created by yue.gan on 2016/7/19.
  *
  */
 public class MediaPlayerService extends Service implements IMediaPlayer {

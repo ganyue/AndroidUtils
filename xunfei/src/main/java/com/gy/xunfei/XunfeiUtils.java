@@ -10,7 +10,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.iflytek.cloud.SynthesizerListener;
 
 /**
- * Created by ganyu on 2016/8/11.
+ * Created by yue.gan on 2016/8/11.
  *
  * <p>讯飞sdk， 使用前要把本类的构造方法中的appid修改成你的app的appid</p>
  * <p></p>

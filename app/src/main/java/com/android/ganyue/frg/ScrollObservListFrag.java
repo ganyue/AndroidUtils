@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by ganyu on 2016/10/5.
+ * Created by yue.gan on 2016/10/5.
  *
  */
 public class ScrollObservListFrag extends BaseFragment {

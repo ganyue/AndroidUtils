@@ -13,7 +13,7 @@ import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  * Nsd test
  */
 public class MapTestFrg extends BaseFragment {

@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by ganyu on 2016/8/6.
+ * Created by yue.gan on 2016/8/6.
  *
  */
 public class AudioTrackTask extends AsyncTask<Void, Void, Void> {

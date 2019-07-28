@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ganyu on 2016/4/2.
+ * Created by yue.gan on 2016/4/2.
  *
  * 创建简单表，满足应用正常使用就好
  * 结合注解可以指定表名、主键

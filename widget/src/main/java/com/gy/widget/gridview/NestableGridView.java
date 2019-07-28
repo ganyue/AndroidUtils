@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.widget.GridView;
 
 /**
- * Created by ganyu on 2016/11/2.
+ * Created by yue.gan on 2016/11/2.
  *
  */
 public class NestableGridView extends GridView {

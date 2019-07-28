@@ -1,7 +1,7 @@
 package com.gy.utils.date;
 
 /**
- * Created by ganyu on 2016/11/2.
+ * Created by yue.gan on 2016/11/2.
  *
  */
 public class TimeInfo {

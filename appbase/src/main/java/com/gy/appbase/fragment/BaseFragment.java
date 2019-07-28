@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  *
  */
 public abstract class BaseFragment extends Fragment implements OnKeyDownCallback {

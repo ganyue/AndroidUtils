@@ -11,7 +11,7 @@ import java.net.SocketException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by ganyu on 2016/5/20.
+ * Created by yue.gan on 2016/5/20.
  *
  */
 public class UdpSender extends Thread {

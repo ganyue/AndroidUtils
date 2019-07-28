@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * <p>Created by ganyu on 2016/5/23.</p>
+ * <p>Created by yue.gan on 2016/5/23.</p>
  * <p>1、在/sdcard下创建/tmp/logs文件夹下次启动时会自动启用日志并写入/tmp/logs下</p>
  * <p>2、使用广播打开关闭日志：am broadcast -a log.enable(log.disable、log2file.enable、log2file.disable)</p>
  * <p>3、代码中直接使用

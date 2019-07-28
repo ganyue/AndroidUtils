@@ -3,7 +3,7 @@ package com.gy.utils.audio.mediaplayer;
 import android.os.Bundle;
 
 /**
- * Created by ganyu on 2016/10/10.
+ * Created by yue.gan on 2016/10/10.
  *
  */
 public interface IMediaPlayer {

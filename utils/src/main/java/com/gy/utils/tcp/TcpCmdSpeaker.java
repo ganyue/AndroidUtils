@@ -17,7 +17,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by ganyu on 2016/6/3.
+ * Created by yue.gan on 2016/6/3.
  *
  */
 public class TcpCmdSpeaker extends Thread{

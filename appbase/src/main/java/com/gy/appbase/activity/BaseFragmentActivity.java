@@ -12,7 +12,7 @@ import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInjectInterpreter;
 
 /**
- * Created by ganyu on 2016/5/19.
+ * Created by yue.gan on 2016/5/19.
  *
  */
 public abstract class BaseFragmentActivity extends FragmentActivity {

@@ -14,7 +14,7 @@ import android.widget.PopupWindow;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by ganyu on 2016/11/9.
+ * Created by yue.gan on 2016/11/9.
  *
  */
 public abstract class BasePopupWindow extends PopupWindow{

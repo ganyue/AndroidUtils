@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by ganyu on 2016/5/15.
+ * Created by yue.gan on 2016/5/15.
  *
  */
 public class Circle extends View {

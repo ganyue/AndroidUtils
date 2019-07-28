@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.ImageView;
 
 /**
- * Created by ganyu on 2016/12/14.
+ * Created by yue.gan on 2016/12/14.
  *
  */
 public interface IImageLoader {

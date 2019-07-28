@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import com.gy.utils.database.annotation.DBTable;
 
 /**
- * Created by ganyu on 2016/7/27.
+ * Created by yue.gan on 2016/7/27.
  *
  */
 @DBTable (primaryKey = "url")

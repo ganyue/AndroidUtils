@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.gy.utils.constants.WindowConstants;
 
 /**
- * Created by ganyu on 2016/7/29.
+ * Created by yue.gan on 2016/7/29.
  *
  */
 public class TestGameAdapter extends ApplicationAdapter {

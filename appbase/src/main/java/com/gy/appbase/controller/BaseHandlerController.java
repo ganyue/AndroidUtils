@@ -7,7 +7,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 /**
- * Created by ganyu on 2017/5/27.
+ * Created by yue.gan on 2017/5/27.
  *
  */
 

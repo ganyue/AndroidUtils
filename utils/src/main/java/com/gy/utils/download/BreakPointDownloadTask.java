@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by ganyu on 2016/7/27.
+ * Created by yue.gan on 2016/7/27.
  * <p>only support download file smaller than 1GB
  */
 public class BreakPointDownloadTask extends AsyncTask <Void, Integer, Boolean>{

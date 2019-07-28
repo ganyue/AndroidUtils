@@ -3,7 +3,7 @@ package com.gy.utils.http;
 import java.util.Map;
 
 /**
- * Created by ganyu on 2016/7/19.
+ * Created by yue.gan on 2016/7/19.
  *
  */
 public interface IHttpRequest {

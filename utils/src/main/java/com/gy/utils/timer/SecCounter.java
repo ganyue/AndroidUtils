@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by ganyu on 2016/11/8.
+ * Created by yue.gan on 2016/11/8.
  *
  */
 public class SecCounter extends Thread {

@@ -23,7 +23,7 @@ import com.gy.utils.recorder.AudioTrackTask;
 import java.io.File;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  * Nsd test
  */
 public class ARecordTestFrg extends BaseFragment {

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import com.gy.widget.listview.ScrollObservedListView;
 
 /**
- * Created by ganyu on 2016/10/24.
+ * Created by yue.gan on 2016/10/24.
  *
  */
 public class ScrollView extends android.widget.ScrollView{

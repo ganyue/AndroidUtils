@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by ganyu on 2016/7/28.
+ * Created by yue.gan on 2016/7/28.
  *
  */
 public class DownloadManager {

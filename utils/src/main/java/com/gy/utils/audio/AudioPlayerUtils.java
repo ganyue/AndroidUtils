@@ -5,7 +5,7 @@ import android.app.Application;
 import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
 
 /**
- * Created by ganyu on 2016/10/13.
+ * Created by yue.gan on 2016/10/13.
  *
  */
 public class AudioPlayerUtils {

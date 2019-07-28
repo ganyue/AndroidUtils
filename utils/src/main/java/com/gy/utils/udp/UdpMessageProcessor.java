@@ -3,7 +3,7 @@ package com.gy.utils.udp;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created by ganyu on 2016/7/25.
+ * Created by yue.gan on 2016/7/25.
  *
  */
 public class UdpMessageProcessor extends Thread{

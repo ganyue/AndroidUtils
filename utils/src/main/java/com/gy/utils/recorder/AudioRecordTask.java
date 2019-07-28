@@ -8,7 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Created by ganyu on 2016/8/6.
+ * Created by yue.gan on 2016/8/6.
  *
  */
 public class AudioRecordTask extends AsyncTask <Void, Integer, Void> {

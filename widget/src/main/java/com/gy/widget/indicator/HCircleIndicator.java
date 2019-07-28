@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import com.gy.widget.shapview.Circle;
 
 /**
- * Created by ganyu on 2016/10/9.
+ * Created by yue.gan on 2016/10/9.
  *
  */
 public class HCircleIndicator extends  HorizontalIndicator{

@@ -12,7 +12,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Created by ganyu on 2017/8/9.
+ * Created by yue.gan on 2017/8/9.
  */
 
 public class OkHttpUtils implements IHttpRequest {

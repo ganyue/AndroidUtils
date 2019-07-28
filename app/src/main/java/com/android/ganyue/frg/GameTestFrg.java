@@ -19,7 +19,7 @@ import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.constants.WindowConstants;
 
 /**
- * Created by ganyu on 2016/4/30.
+ * Created by yue.gan on 2016/4/30.
  * Nsd test
  */
 public class GameTestFrg extends BaseFragment {

@@ -15,7 +15,7 @@ import android.widget.SeekBar;
 import com.gy.widget.R;
 
 /**
- * Created by ganyu on 2016/11/8.
+ * Created by yue.gan on 2016/11/8.
  *
  */
 public class SegSeeker extends FrameLayout{
