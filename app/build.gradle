@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion rootProject.ext.conf.compileSdkVersion
+    buildToolsVersion rootProject.ext.conf.buildToolsVersion
     defaultConfig {
 //        applicationId "com.android.ganyue"
         applicationId "com.lsj.mapapp"
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.conf.minSdkVersion
+        targetSdkVersion rootProject.ext.conf.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -23,7 +23,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:support-v4:25.1.1'
+    implementation rootProject.ext.dep.support_v4
     implementation project(':appbase')
     implementation project(':widget')
     implementation project(':utils')
