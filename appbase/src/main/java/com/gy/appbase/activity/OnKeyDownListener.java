@@ -6,6 +6,6 @@ import android.view.KeyEvent;
  * Created by yue.gan on 2016/11/4.
  *
  */
-public interface OnKeyDownCallback {
-    boolean onKeyDownListener (int keyCode, KeyEvent event);
+public interface OnKeyDownListener {
+    boolean onKeyDownListener(int keyCode, KeyEvent event);
 }

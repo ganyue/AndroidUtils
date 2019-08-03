@@ -3,13 +3,17 @@ package com.gy.appbase.activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 
 import com.gy.appbase.controller.BaseFragmentActivityController;
-import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInjectInterpreter;
+import com.gy.utils.weakreference.EWeakReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yue.gan on 2016/5/19.
@@ -31,6 +35,13 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 
     protected void setTransluentNavigation (boolean transluentNavigation) {
         this.transluentNavigation = transluentNavigation;
+    }
+
+    /** 不保存状态，如果activity因为内存、切换横竖屏等原因销毁，fragment也随着销毁 */
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.remove("android:support:fragments");
     }
 
     @CallSuper
@@ -87,17 +98,31 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
 
 
     /** 按键监听，主要为了方便fragment监听KeyDown消息 */
-    protected OnKeyDownCallback onKeyDownCallback;
-    public void setOnKeyDownCallback (OnKeyDownCallback callback) {
-        onKeyDownCallback = callback;
+    protected List<EWeakReference<OnKeyDownListener>> onKeyDownListeners;
+    public void addOnKeyDownListener(OnKeyDownListener listener) {
+        if (listener == null) return;
+        if (onKeyDownListeners == null) onKeyDownListeners = new ArrayList<>();
+        EWeakReference<OnKeyDownListener> reference = new EWeakReference<>(listener);
+        if (onKeyDownListeners.contains(reference)) return;
+        onKeyDownListeners.add(reference);
     }
+
+    public void removeOnKeyDownListener (OnKeyDownListener listener) {
+        if (onKeyDownListeners == null) return;
+        onKeyDownListeners.remove(new EWeakReference<>(listener));
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (onKeyDownCallback != null) {
-            if (onKeyDownCallback.onKeyDownListener(keyCode, event)) {
-                return true;
+        boolean ret = false;
+        if (onKeyDownListeners != null) {
+            for (EWeakReference<OnKeyDownListener> listener: onKeyDownListeners) {
+                if (listener.get() != null) {
+                    boolean result = listener.get().onKeyDownListener(keyCode, event);
+                    ret = ret || result;
+                }
             }
         }
-        return super.onKeyDown(keyCode, event);
+        return ret || super.onKeyDown(keyCode, event);
     }
 }
