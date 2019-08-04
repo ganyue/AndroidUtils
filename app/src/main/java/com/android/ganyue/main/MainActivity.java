@@ -15,9 +15,7 @@ import com.android.ganyue.frg.ARecordTestFrg;
 import com.android.ganyue.frg.BannerFrag;
 import com.android.ganyue.frg.DaoTestFrg;
 import com.android.ganyue.frg.FileUtilTestFrg;
-import com.android.ganyue.frg.GameTestFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
-import com.android.ganyue.frg.MapTestFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
 import com.android.ganyue.frg.TcpTestFrg;
@@ -26,7 +24,6 @@ import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
 import com.android.ganyue.frg.UdpTestFrg;
 import com.android.ganyue.frg.WifiConnectTestFrg;
-import com.android.ganyue.frg.XunFeiTestFrg;
 import com.gy.utils.constants.WindowConstants;
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.wifi.WifiUtils;
@@ -54,9 +51,6 @@ public class MainActivity extends Activity{
             DaoTestFrg.class,
             FileUtilTestFrg.class,
             MediaTestFrg.class,
-            MapTestFrg.class,
-            GameTestFrg.class,
-            XunFeiTestFrg.class,
             ScrollObservListFrag.class,
             BannerFrag.class,
     };

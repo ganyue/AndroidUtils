@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.gy.appbase.activity.BaseFragmentActivity;
 import com.gy.utils.reflect.ReflectUtil;
