@@ -9,8 +9,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.tcp.TcpClient;
@@ -43,7 +41,7 @@ public class TcpTestFrg extends BaseFragment implements View.OnClickListener{
     private TcpClient tcpClient;
     private TcpServer tcpServer;
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         btnStartServer.setOnClickListener(this);
         btnConnect.setOnClickListener(this);
         btnSend.setOnClickListener(this);
@@ -140,6 +138,11 @@ public class TcpTestFrg extends BaseFragment implements View.OnClickListener{
         }
     }
 
+    @Override
+    public void activityCall(int type, Object extra) {
+
+    }
+
     private void writeLog (final String log) {
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -147,11 +150,6 @@ public class TcpTestFrg extends BaseFragment implements View.OnClickListener{
                 tvLog.setText(tvLog.getText()+"\n" + log);
             }
         });
-    }
-
-    @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
     }
 
     @Override

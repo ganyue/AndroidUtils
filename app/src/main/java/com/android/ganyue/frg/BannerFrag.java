@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.ganyue.R;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.widget.viewpager.banner.BannerCallback;
@@ -30,7 +29,7 @@ public class BannerFrag extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         mBanner.setBannerCallback(bannerCallback);
         mBanner.setCount(3);
         mBanner.setAutoStart(true, 3000);
@@ -43,8 +42,13 @@ public class BannerFrag extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return null;
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     private BannerCallback bannerCallback = new BannerCallback() {

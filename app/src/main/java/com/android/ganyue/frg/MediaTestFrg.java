@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import com.android.ganyue.R;
 import com.android.ganyue.application.MApplication;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.audio.mediaplayer.MediaPlayerUtils;
@@ -42,7 +40,7 @@ public class MediaTestFrg extends BaseFragment {
 
     private List<String> musicUrls = new ArrayList<>();
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         clearLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,6 +54,16 @@ public class MediaTestFrg extends BaseFragment {
         musicUrls.add("http://zzya.beva.cn/dq/lkQpVHJtFpZIQOP87xj85c-EW-76.mp3");
         musicUrls.add("http://zzya.beva.cn/dq/lu6QCotRNQvAdoPeNV3FUb1MVa8Z.mp3");
         musicUrls.add("http://zzya.beva.cn/dq/lo0gttnKbiObx39gquvOk3ES-BiI.mp3");
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     public void testMpdPlayer (View view) {
@@ -173,13 +181,6 @@ public class MediaTestFrg extends BaseFragment {
             LogUtils.d("yue.gan", "onPreparing");
         }
     };
-
-
-
-    @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
-    }
 
     @Override
     public void onPause() {

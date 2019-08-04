@@ -9,8 +9,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.constants.WindowConstants;
@@ -37,7 +35,7 @@ public class ScrollObservListFrag extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         mLvContent.addOnScrollObservedListener(onScrollObservedListener);
         mLvContent.setObservedItem(3);
         List<Map<String, String>> datas = new ArrayList<>();
@@ -53,8 +51,13 @@ public class ScrollObservListFrag extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     private PushLoadMoreListView.OnLoadMoreListener onLoadMoreListener

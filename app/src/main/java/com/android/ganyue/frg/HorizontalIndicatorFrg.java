@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.widget.indicator.HorizontalIndicator;
@@ -36,7 +34,7 @@ public class HorizontalIndicatorFrg extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         mViewPager.setAdapter(new MPagerAdapter());
         mViewPager.addOnPageChangeListener(onPageChangeListener);
 
@@ -44,8 +42,13 @@ public class HorizontalIndicatorFrg extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     private void initCircleIndicator () {

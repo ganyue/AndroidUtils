@@ -3,26 +3,16 @@ package com.android.ganyue.frg;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.application.MApplication;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.udp.UdpSpeaker;
 import com.gy.utils.udp.UdpSpeakerCallback;
-
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by yue.gan on 2016/4/30.
@@ -43,7 +33,7 @@ public class UdpTestFrg extends BaseFragment {
     private TextView logText;
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
 
         udpSpeaker17000 = UdpSpeaker.get(18000);
         udpSpeaker17000.addCallback(udpSpeakerCallback);
@@ -80,6 +70,16 @@ public class UdpTestFrg extends BaseFragment {
                 logText.setText("");
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     public static String getKeepAliveStr () {
@@ -143,9 +143,4 @@ public class UdpTestFrg extends BaseFragment {
             logText.setText(msg.obj+"\n"+logText.getText()+"\n");
         }
     };
-
-    @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
-    }
 }

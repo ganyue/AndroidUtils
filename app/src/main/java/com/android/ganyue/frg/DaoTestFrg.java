@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 
 import com.android.ganyue.bean.Dao1;
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.database.DBHelper;
 import com.gy.utils.log.LogUtils;
@@ -27,7 +25,7 @@ public class DaoTestFrg extends BaseFragment {
 
     DBHelper dbHelper;
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         Class[] beans = {Dao1.class};
 //        dbHelper = new DBHelper(getActivity(), "test", 1, beans);
 //        dbHelper.insertOrReplace(new Dao1());
@@ -65,7 +63,12 @@ public class DaoTestFrg extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 }

@@ -6,9 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
 import com.baidu.mapapi.map.MapView;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 
@@ -27,11 +25,16 @@ public class MapTestFrg extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 }

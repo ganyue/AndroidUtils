@@ -3,23 +3,17 @@ package com.android.ganyue.frg;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.ganyue.R;
 import com.android.ganyue.application.MApplication;
-import com.android.ganyue.controller.FuncCtrl;
-import com.android.ganyue.utils.nsd.NsdTest;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.utils.wifi.WiFi;
-import com.gy.utils.wifi.WiFiConnecter;
 import com.gy.utils.wifi.WifiUtils;
 
 import java.util.List;
@@ -36,13 +30,13 @@ public class WifiConnectTestFrg extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         view.findViewById(R.id.btn_connect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String networkSSID = "BEVA_1F5ACC";
                 String networkPass = "admin888";
-                WifiManager wifiManager = (WifiManager)mActivity.getSystemService(mActivity.WIFI_SERVICE);
+                WifiManager wifiManager = (WifiManager)mActivity.getApplicationContext().getSystemService(mActivity.WIFI_SERVICE);
                 List<ScanResult> results = wifiManager.getScanResults();
                 for (ScanResult scanResult: results) {
                     if (scanResult.SSID.contains("BEVA_")) {
@@ -56,7 +50,7 @@ public class WifiConnectTestFrg extends BaseFragment {
         view.findViewById(R.id.btn_remove_config).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WifiManager wifiManager = (WifiManager)mActivity.getSystemService(mActivity.WIFI_SERVICE);
+                WifiManager wifiManager = (WifiManager)mActivity.getApplicationContext().getSystemService(mActivity.WIFI_SERVICE);
                 List<WifiConfiguration> configurations = wifiManager.getConfiguredNetworks();
                 for (WifiConfiguration configuration : configurations) {
                     if (configuration.SSID.contains("BEVA_")) {
@@ -76,7 +70,12 @@ public class WifiConnectTestFrg extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 }

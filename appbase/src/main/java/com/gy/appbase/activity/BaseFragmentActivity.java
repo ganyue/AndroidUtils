@@ -6,9 +6,9 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
 
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.inject.ViewInjectInterpreter;
 import com.gy.utils.weakreference.EWeakReference;
 
@@ -19,8 +19,7 @@ import java.util.List;
  * Created by yue.gan on 2016/5/19.
  *
  */
-public abstract class BaseFragmentActivity extends FragmentActivity {
-    protected BaseFragmentActivityController mController;
+public abstract class BaseFragmentActivity extends FragmentActivity implements View.OnClickListener, IBaseFragmentActivity {
     private boolean transluentStatus = false;
     private boolean transluentNavigation = false;
 
@@ -44,32 +43,18 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         outState.remove("android:support:fragments");
     }
 
-    @CallSuper
-    public void setController (BaseFragmentActivityController controller) {
-        mController = controller;
-    }
-
-    public BaseFragmentActivityController getController () {
-        return mController;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (mController == null) {
-            instanceController();
-        }
-
         setContent(savedInstanceState);
-        findViews(savedInstanceState);
+        findViews();
         initViews(savedInstanceState);
 
-        /**
+        /*
          * android4.4.4 (sdk 19) 以后可以实现沉浸式
          */
         if ((transluentStatus || transluentNavigation) && Build.VERSION.SDK_INT >= 19) {
-            /**
+            /*
              * 这里只是这样的话会导致view被拉上去，要避免的话需要在布局文件里头加入下面两句
              * android:clipToPadding="false"     //绘制到padding区域
              * android:fitsSystemWindows="true"  //4.4.4以后这个属性可以给跟布局添加通知栏高度的padding
@@ -79,50 +64,62 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (mController == null) {
-            instanceController();
-        }
-    }
-
     @CallSuper
-    protected void findViews (Bundle savedInstanceState) {
+    protected void findViews () {
         ViewInjectInterpreter.interpret(this);
     }
 
     protected abstract void setContent (Bundle savedInstanceState);
     protected abstract void initViews (Bundle savedInstanceState);
-    protected abstract BaseFragmentActivityController instanceController ();
-
+    public abstract void onClick(View v);
+    public abstract void fragmentCall(int type, Object extra);
 
     /** 按键监听，主要为了方便fragment监听KeyDown消息 */
-    protected List<EWeakReference<OnKeyDownListener>> onKeyDownListeners;
-    public void addOnKeyDownListener(OnKeyDownListener listener) {
+    protected List<EWeakReference<OnKeyListener>> onKeyListeners;
+    public void addOnKeyDownListener(OnKeyListener listener) {
         if (listener == null) return;
-        if (onKeyDownListeners == null) onKeyDownListeners = new ArrayList<>();
-        EWeakReference<OnKeyDownListener> reference = new EWeakReference<>(listener);
-        if (onKeyDownListeners.contains(reference)) return;
-        onKeyDownListeners.add(reference);
+        if (onKeyListeners == null) onKeyListeners = new ArrayList<>();
+        EWeakReference<OnKeyListener> reference = new EWeakReference<>(listener);
+        if (onKeyListeners.contains(reference)) return;
+        onKeyListeners.add(reference);
     }
 
-    public void removeOnKeyDownListener (OnKeyDownListener listener) {
-        if (onKeyDownListeners == null) return;
-        onKeyDownListeners.remove(new EWeakReference<>(listener));
+    public void removeOnKeyDownListener (OnKeyListener listener) {
+        if (onKeyListeners == null) return;
+        onKeyListeners.remove(new EWeakReference<>(listener));
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean ret = false;
-        if (onKeyDownListeners != null) {
-            for (EWeakReference<OnKeyDownListener> listener: onKeyDownListeners) {
+        if (onKeyListeners != null) {
+            for (EWeakReference<OnKeyListener> listener: onKeyListeners) {
                 if (listener.get() != null) {
-                    boolean result = listener.get().onKeyDownListener(keyCode, event);
+                    boolean result = listener.get().onKeyDown(keyCode, event);
                     ret = ret || result;
                 }
             }
         }
         return ret || super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        boolean ret = false;
+        if (onKeyListeners != null) {
+            for (EWeakReference<OnKeyListener> listener: onKeyListeners) {
+                if (listener.get() != null) {
+                    boolean result = listener.get().onKeyUp(keyCode, event);
+                    ret = ret || result;
+                }
+            }
+        }
+        return ret || super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    protected void onDestroy() {
+        onKeyListeners.clear();
+        super.onDestroy();
     }
 }

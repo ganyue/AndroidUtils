@@ -6,13 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
-import com.gy.utils.app.AppUtils;
 import com.gy.utils.log.LogUtils;
-
-import java.util.List;
 
 /**
  * created by yue.gan 18-9-22
@@ -25,7 +20,7 @@ public class TestFrg extends BaseFragment{
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         LogUtils.enableLogToFile(true);
         LogUtils.d("aaa1");
         LogUtils.d("test21");
@@ -36,7 +31,12 @@ public class TestFrg extends BaseFragment{
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 }

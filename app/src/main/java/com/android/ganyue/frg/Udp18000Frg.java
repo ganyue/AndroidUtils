@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.udp.UdpSpeaker;
@@ -35,7 +33,7 @@ public class Udp18000Frg extends BaseFragment {
     private TextView logText;
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
 
         udpSpeaker17000 = UdpSpeaker.get(18000);
         udpSpeaker17000.addCallback(udpSpeakerCallback);
@@ -66,6 +64,16 @@ public class Udp18000Frg extends BaseFragment {
                 logText.setText("");
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 
     public static String getKeepAliveStr () {
@@ -129,9 +137,4 @@ public class Udp18000Frg extends BaseFragment {
             logText.setText(msg.obj+"\n"+logText.getText()+"\n");
         }
     };
-
-    @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
-    }
 }

@@ -8,8 +8,6 @@ import android.widget.Button;
 
 import com.android.ganyue.R;
 import com.android.ganyue.application.MApplication;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.file.SdcardUtils;
@@ -43,7 +41,7 @@ public class XunFeiTestFrg extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         btnV2T.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +130,10 @@ public class XunFeiTestFrg extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
     }
 }

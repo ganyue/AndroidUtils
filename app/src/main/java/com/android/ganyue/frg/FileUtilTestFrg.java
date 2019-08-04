@@ -11,8 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.database.DBHelper;
@@ -39,7 +37,7 @@ public class FileUtilTestFrg extends BaseFragment {
     @ViewInject (R.id.list)     private ListView listView;
     private DownloadManager downloadManager;
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         //test copy
 //        FileUtils.copyFiles("/mnt/sdcard/test", SdcardUtils.getFileDir(mActivity).getPath(), new FileUtils.OnCopyCallback() {
 //            @Override
@@ -129,6 +127,16 @@ public class FileUtilTestFrg extends BaseFragment {
         });
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
+    }
+
     class MAdapter extends BaseAdapter {
 
         private List<DownloadBean> beans;
@@ -198,10 +206,5 @@ public class FileUtilTestFrg extends BaseFragment {
                 downloadManager.delete((DownloadBean) getItem((Integer) v.getTag()));
             }
         };
-    }
-
-    @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
     }
 }

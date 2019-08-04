@@ -9,11 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.ganyue.R;
-import com.android.ganyue.controller.FuncCtrl;
 import com.android.ganyue.game.TestGameAdapter;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.BaseGdxViewIniter;
-import com.gy.appbase.controller.BaseFragmentActivityController;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.constants.WindowConstants;
@@ -34,7 +32,7 @@ public class GameTestFrg extends BaseFragment {
     }
 
     @Override
-    protected void initViews(View view, Bundle savedInstanceState) {
+    protected void initViews(View view) {
         WindowConstants.getInstance(mActivity);
         BaseGdxViewIniter baseGdxViewIniter = new BaseGdxViewIniter(mActivity);
         View gameView = baseGdxViewIniter.initializeForView(
@@ -56,7 +54,12 @@ public class GameTestFrg extends BaseFragment {
     }
 
     @Override
-    protected BaseFragmentActivityController instanceController() {
-        return new FuncCtrl(mActivity);
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void activityCall(int type, Object extra) {
+
     }
 }
