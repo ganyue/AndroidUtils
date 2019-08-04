@@ -4,8 +4,7 @@ android {
     compileSdkVersion rootProject.ext.conf.compileSdkVersion
     buildToolsVersion rootProject.ext.conf.buildToolsVersion
     defaultConfig {
-//        applicationId "com.android.ganyue"
-        applicationId "com.lsj.mapapp"
+        applicationId "com.android.ganyue"
         minSdkVersion rootProject.ext.conf.minSdkVersion
         targetSdkVersion rootProject.ext.conf.targetSdkVersion
         versionCode 1
