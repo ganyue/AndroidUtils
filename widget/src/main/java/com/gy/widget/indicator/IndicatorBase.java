@@ -30,12 +30,12 @@ public abstract class IndicatorBase extends ViewGroup implements IIndicator {
     }
 
     private void init () {
-        mPositions = new SparseArray<PointF>();
+        mPositions = new SparseArray<>();
     }
 
     /**
      * add a indicator view at the index of 0
-     * @param indicatorV
+     * @param indicatorV .
      */
     public void setIndicator (View indicatorV) {
         addView(indicatorV);

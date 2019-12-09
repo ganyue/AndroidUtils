@@ -6,8 +6,10 @@ import android.util.AttributeSet;
 
 import com.gy.widget.shapview.Circle;
 
+
+
 /**
- * Created by yue.gan on 2016/10/9.
+ * Created by ganyu on 2016/10/9.
  *
  */
 public class HCircleIndicator extends  HorizontalIndicator{
@@ -34,6 +36,25 @@ public class HCircleIndicator extends  HorizontalIndicator{
         circle.setLayoutParams(indicatorParams);
         circle.setFillContent(true);
         circle.setColor(Color.WHITE);
+        addView(circle);
+    }
+
+    public void setCount (int count, int colorNormal, int colorSelected, int itemWidth, int itemHeight) {
+        float density = getResources().getDisplayMetrics().density;
+        HorizontalIndicator.LayoutParams indicatorParams = new HorizontalIndicator.LayoutParams(
+                ((int)density * itemWidth), ((int)density * itemHeight));
+        for (int i = 0; i < count; i++) {
+            Circle circle = new Circle(getContext());
+            circle.setColor(colorNormal);
+            circle.setFillContent(true);
+            circle.setLayoutParams(indicatorParams);
+            addView(circle);
+        }
+
+        Circle circle = new Circle(getContext());
+        circle.setLayoutParams(indicatorParams);
+        circle.setFillContent(true);
+        circle.setColor(colorSelected);
         addView(circle);
     }
 }

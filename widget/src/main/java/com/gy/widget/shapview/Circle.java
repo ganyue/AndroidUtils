@@ -2,20 +2,22 @@ package com.gy.widget.shapview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by yue.gan on 2016/5/15.
+ * Created by ganyu on 2016/5/15.
  *
  */
 public class Circle extends View {
 
-
-    private boolean fillContent;
-    private int color;
+    private boolean fillContent = false;
+    private int color = Color.WHITE;
     private Paint paint;
+    private float r;
+    private int cx,cy;
 
     public Circle(Context context) {
         super(context);
@@ -40,6 +42,7 @@ public class Circle extends View {
     public void setColor(int color) {
         this.color = color;
     }
+
     public int getColor() {
         return color;
     }
@@ -57,13 +60,18 @@ public class Circle extends View {
                 paint.setStrokeWidth(2);
             }
             paint.setAntiAlias(true);
+            int width = getWidth();
+            int height = getHeight();
+
+            cx = width /2;
+            cy = height /2;
+            r = (Math.min(width, height) - paint.getStrokeWidth())/2f;
         }
-        int width = getWidth();
-        int height = getHeight();
+
         if (fillContent) {
-            canvas.drawCircle(width/2, height/2, Math.min(width, height)/2 - 3*paint.getStrokeWidth(), paint);
+            canvas.drawCircle(cx, cy, r, paint);
         } else {
-            canvas.drawCircle(width/2, height/2, Math.min(width, height)/2 - paint.getStrokeWidth(), paint);
+            canvas.drawCircle(cx, cy, r, paint);
         }
     }
 }

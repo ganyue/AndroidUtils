@@ -2,7 +2,6 @@ package com.gy.widget.indicator;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.InflateException;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ public class HorizontalIndicator extends IndicatorBase {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
         if (getChildCount() < 1) {
-            /**
+            /*
              * 默认“指示器”是最后一个view，所以需要child的个数至少要有一个。
              * 当然，想要有“指示器”的效果，肯定是要child个数至少要有三个的
              */
@@ -39,7 +38,7 @@ public class HorizontalIndicator extends IndicatorBase {
         int childWidth = 0;
         int childHeight = 0;
 
-        /**
+        /*
          * 衡量标准是MeasureSpec.EXACTLY的时候，直接使用传入的宽高，
          * 不再通过子view来计算
          */
@@ -51,7 +50,7 @@ public class HorizontalIndicator extends IndicatorBase {
             childHeight = MeasureSpec.getSize(heightMeasureSpec);
         }
 
-        /**
+        /*
          * 衡量标准是MeasureSpec.UNSPECIFIED和MeasureSpec.AT_MOST的时候，通过子view计算宽高
          */
         measureChildren(widthMeasureSpec, heightMeasureSpec);
@@ -84,7 +83,7 @@ public class HorizontalIndicator extends IndicatorBase {
         if (!changed) {
             return;
         }
-        /**
+        /*
          * 把子节点横向排列起来，为了更好的移植性，不使用自定义属性来排列子view，
          * 根据平时使用场景，直接把view放在中间的位置就好
          */

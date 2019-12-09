@@ -5,5 +5,5 @@ package com.gy.widget.indicator;
  *
  */
 public interface IIndicator {
-    void scrollToPosition (int position, float percentage);
+    void scrollToPosition(int position, float percentage);
 }
