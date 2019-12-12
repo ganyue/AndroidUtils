@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.gy.utils.ref.ComparableWeakRef;
@@ -57,7 +58,7 @@ public class WifiUtils {
 
     /**
      * @param listener .
-     * @param callOnAdd .添加后会主动回调一次
+     * @param callOnAdd .true添加后会主动回调一次
      */
     public void addOnNetworkChangedListener (OnNetworkChangedListener listener, boolean callOnAdd) {
         if (listeners == null) {
@@ -137,18 +138,34 @@ public class WifiUtils {
      * 用ping命令检查外网是否可用
      * 这是个耗时操作
      */
-    public static boolean isInternetConnected() {
-        try {
-            String ip = "www.baidu.com";
-            Process p = Runtime.getRuntime().exec("ping -c 3 -w 100 " + ip);
-            int status = p.waitFor();
-            if (status == 0) {
-                return true;
+    public static void pingNetwork(String url, final PingCallback callback) {
+        new AsyncTask<Void, Integer, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {try {
+                String ip = "www.baidu.com";
+                Process p = Runtime.getRuntime().exec("ping -c 3 -w 100 " + ip);
+                int status = p.waitFor();
+                if (status == 0) {
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                if (callback != null) {
+                    callback.onPingCallback(aBoolean);
+                }
+            }
+        }.execute();
+    }
+
+    public interface PingCallback {
+        void onPingCallback (boolean success);
     }
 
     public void release () {
