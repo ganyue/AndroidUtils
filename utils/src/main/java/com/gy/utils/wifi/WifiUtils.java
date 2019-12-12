@@ -1,6 +1,5 @@
 package com.gy.utils.wifi;
 
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +9,8 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+
+import com.gy.utils.ref.ComparableWeakRef;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,41 +22,62 @@ import java.util.List;
  */
 public class WifiUtils {
     private static WifiUtils mInstance;
-    private WeakReference<Application> mApp;
+    private WeakReference<Context> mCxt;
     private NetStateReceiver netStateReceiver;
     private ConnectivityManager connectivityManager;
-    private List<OnNetworkChangedListener> listeners;
+    private List<ComparableWeakRef<OnNetworkChangedListener>> listeners;
 
-    public static WifiUtils getInstance (Application application) {
+    public static WifiUtils getInstance (Context context) {
         if (mInstance == null) {
-            mInstance = new WifiUtils(application);
+            mInstance = new WifiUtils(context);
         }
 
         return mInstance;
     }
 
-    private WifiUtils (Application application) {
-        mApp = new WeakReference<>(application);
-        connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
+    private WifiUtils (Context context) {
+        mCxt = new WeakReference<>(context.getApplicationContext());
+        connectivityManager = (ConnectivityManager) mCxt.get().getSystemService(Context.CONNECTIVITY_SERVICE);
         netStateReceiver = new NetStateReceiver();
 
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        mApp.get().registerReceiver(netStateReceiver, intentFilter);
+        mCxt.get().registerReceiver(netStateReceiver, intentFilter);
     }
 
     public void addOnNetworkChangedListener (OnNetworkChangedListener listener) {
         if (listeners == null) {
-            listeners = new ArrayList<>();
+            listeners = new ArrayList<>(8);
         }
 
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
+        ComparableWeakRef<OnNetworkChangedListener> ref = new ComparableWeakRef<>(listener);
+        if (!listeners.contains(ref)) {
+            listeners.add(ref);
+        }
+    }
+
+    /**
+     * @param listener .
+     * @param callOnAdd .添加后会主动回调一次
+     */
+    public void addOnNetworkChangedListener (OnNetworkChangedListener listener, boolean callOnAdd) {
+        if (listeners == null) {
+            listeners = new ArrayList<>(8);
+        }
+
+        ComparableWeakRef<OnNetworkChangedListener> ref = new ComparableWeakRef<>(listener);
+        if (!listeners.contains(ref)) {
+            listeners.add(ref);
+
+            if (callOnAdd) {
+                listener.onNetworkChanged(isNetworkConnected(), getConnectedNetworkType());
+            }
         }
     }
 
     public void removeOnNetworkChangedListener (OnNetworkChangedListener listener) {
-        if (listeners != null && listeners.contains(listener)) {
-            listeners.remove(listener);
+        if (listeners != null) {
+            ComparableWeakRef<OnNetworkChangedListener> ref = new ComparableWeakRef<>(listener);
+            listeners.remove(ref);
         }
     }
 
@@ -65,7 +87,7 @@ public class WifiUtils {
     }
 
     public boolean isUseMobileNet () {
-        return isNetworkConnected()? getConnectedNetworkType()==ConnectivityManager.TYPE_MOBILE? true: false:false;
+        return isNetworkConnected() && (getConnectedNetworkType() == ConnectivityManager.TYPE_MOBILE);
     }
 
     public int getConnectedNetworkType () {
@@ -75,10 +97,12 @@ public class WifiUtils {
         return -1;
     }
 
-    //获取当前连接的wifi的ssid
+    /**
+     * 获取当前连接的wifi的ssid,如果不是链接的wifi返回 “”
+     */
     public String getConnectedWifiSSid () {
         try {
-            WifiManager wifiManager = (WifiManager) mApp.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) mCxt.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             String wifiSSID = wifiManager.getConnectionInfo().getSSID();
             if (!TextUtils.isEmpty(wifiSSID)) {
                 wifiSSID = wifiSSID.replace("\"", "");
@@ -89,10 +113,14 @@ public class WifiUtils {
         }
     }
 
+
+    /**
+     * 获取当前连接的wifi的本机ip,如果不是链接的wifi返回 “”
+     */
     public String getIp () {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-            WifiManager wifiManager = (WifiManager) mApp.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) mCxt.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo info = wifiManager.getConnectionInfo();
             int ipAddr = info.getIpAddress();
             return int2IpAddr(ipAddr);
@@ -100,15 +128,14 @@ public class WifiUtils {
         return "";
     }
 
-    public String int2IpAddr (int ipAddr) {
-        String ip = ((ipAddr & 0xff) + "." + (ipAddr >> 8 & 0xff) + "."
+    private String int2IpAddr(int ipAddr) {
+        return ((ipAddr & 0xff) + "." + (ipAddr >> 8 & 0xff) + "."
                 + (ipAddr >> 16 & 0xff) + "." + (ipAddr >> 24 & 0xff));
-        return ip;
     }
 
     /**
      * 用ping命令检查外网是否可用
-     * 这是个耗时操作，最好放到handler里头去做
+     * 这是个耗时操作
      */
     public static boolean isInternetConnected() {
         try {
@@ -125,7 +152,7 @@ public class WifiUtils {
     }
 
     public void release () {
-        mApp.get().unregisterReceiver(netStateReceiver);
+        mCxt.get().unregisterReceiver(netStateReceiver);
     }
 
     class NetStateReceiver extends BroadcastReceiver {
@@ -133,13 +160,19 @@ public class WifiUtils {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (listeners == null || listeners.size() <= 0) return;
-            for (OnNetworkChangedListener listener : listeners) {
-                listener.onNetworkChanged(isNetworkConnected(), getConnectedNetworkType());
+            for (ComparableWeakRef<OnNetworkChangedListener> listener : listeners) {
+                if (listener.get() != null) {
+                    listener.get().onNetworkChanged(isNetworkConnected(), getConnectedNetworkType());
+                }
             }
         }
     }
 
     public interface OnNetworkChangedListener {
+        /**
+         * @param isConnected .当前网络是否可用
+         * @param type .网络类型 ConnectivityManager.TYPE_MOBILE
+         */
         void onNetworkChanged (boolean isConnected, int type);
     }
 }
