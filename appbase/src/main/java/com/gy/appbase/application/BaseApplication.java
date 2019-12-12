@@ -2,6 +2,7 @@ package com.gy.appbase.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.support.annotation.CallSuper;
 
 import com.gy.utils.BuildConfig;
@@ -10,9 +11,9 @@ import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
+import com.gy.utils.ref.ComparableWeakRef;
 import com.gy.utils.wifi.WifiUtils;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,11 +23,11 @@ import java.util.concurrent.Executors;
  * Created by yue.gan on 2016/7/19.
  *
  */
-public class BaseApplication extends Application{
+public class BaseApplication extends Application implements Application.ActivityLifecycleCallbacks {
 
     protected static Application application;
     protected static boolean isDebug;
-    private List<WeakReference<Activity>> activities;
+    private List<ComparableWeakRef<Activity>> activities;
 
     @CallSuper
     @Override
@@ -36,13 +37,15 @@ public class BaseApplication extends Application{
         application = this;
         isDebug = BuildConfig.DEBUG;
         LogUtils.enableLogToFile(this, isDebug);   //debug 版本打印日志, release版本不打印
-        if (!isDebug()) {
+        if (!isDebug) {
             LogUtils.registReceiverForRuntime(this);
         }
         initCrashHandler();         //设置全局异常处理器
         getImageLoader();           //初始化 image loader
         getHttpUtils();             //初始化 http utils
         getWifiUtils();             //初始化网络状态监听
+
+        registerActivityLifecycleCallbacks(this);
     }
 
     public static boolean isDebug () {
@@ -88,25 +91,55 @@ public class BaseApplication extends Application{
         return executorService;
     }
 
-    public void addActivity (Activity activity) {
-        if (activities == null) activities = new ArrayList<>();
-        activities.add(new WeakReference<>(activity));
-    }
-
-    public void finishAllActivity () {
-        if (activities == null) return;
-        for (WeakReference<Activity> activity: activities) {
-            if (activity.get() == null) continue;
-            activity.get().finish();
-        }
-        activities.clear();
-    }
-
     @Override
     public void onTerminate() {
         super.onTerminate();
         if (!isDebug()) {
             LogUtils.unRegistReceiverForRuntime(this);
         }
+    }
+
+    public void addActivity (Activity activity) {
+        if (activities == null) activities = new ArrayList<>();
+        ComparableWeakRef<Activity> ref = new ComparableWeakRef<>(activity);
+        if (!activities.contains(ref)) {
+            activities.add(ref);
+        }
+    }
+
+    public void removeActivity (Activity activity) {
+        if (activities == null) return;
+        ComparableWeakRef<Activity> ref = new ComparableWeakRef<>(activity);
+        activities.remove(ref);
+    }
+
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        addActivity(activity);
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+        removeActivity(activity);
     }
 }
