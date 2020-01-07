@@ -10,6 +10,7 @@ import com.gy.utils.bluetooth.BluetoothUtils;
 import com.gy.utils.http.HttpUtils;
 import com.gy.utils.img.ImageLoaderUtils;
 import com.gy.utils.log.LogUtils;
+import com.gy.utils.audiodevice.MediaButtonUtil;
 import com.gy.utils.preference.SharedPreferenceUtils;
 import com.gy.utils.ref.ComparableWeakRef;
 import com.gy.utils.wifi.WifiUtils;
@@ -44,6 +45,8 @@ public class BaseApplication extends Application implements Application.Activity
         getImageLoader();           //初始化 image loader
         getHttpUtils();             //初始化 http utils
         getWifiUtils();             //初始化网络状态监听
+        MediaButtonUtil.getInstance(this).start();
+
 
         registerActivityLifecycleCallbacks(this);
     }

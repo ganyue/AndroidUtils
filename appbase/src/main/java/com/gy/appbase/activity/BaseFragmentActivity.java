@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.gy.appbase.inject.ViewInjectInterpreter;
-import com.gy.utils.weakreference.EWeakReference;
+import com.gy.utils.ref.ComparableWeakRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,25 +75,25 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements V
     public abstract void fragmentCall(int type, Object extra);
 
     /** 按键监听，主要为了方便fragment监听KeyDown消息 */
-    protected List<EWeakReference<OnKeyListener>> onKeyListeners;
+    protected List<ComparableWeakRef<OnKeyListener>> onKeyListeners;
     public void addOnKeyDownListener(OnKeyListener listener) {
         if (listener == null) return;
         if (onKeyListeners == null) onKeyListeners = new ArrayList<>();
-        EWeakReference<OnKeyListener> reference = new EWeakReference<>(listener);
+        ComparableWeakRef<OnKeyListener> reference = new ComparableWeakRef<>(listener);
         if (onKeyListeners.contains(reference)) return;
         onKeyListeners.add(reference);
     }
 
     public void removeOnKeyDownListener (OnKeyListener listener) {
         if (onKeyListeners == null) return;
-        onKeyListeners.remove(new EWeakReference<>(listener));
+        onKeyListeners.remove(new ComparableWeakRef<>(listener));
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean ret = false;
         if (onKeyListeners != null) {
-            for (EWeakReference<OnKeyListener> listener: onKeyListeners) {
+            for (ComparableWeakRef<OnKeyListener> listener: onKeyListeners) {
                 if (listener.get() != null) {
                     boolean result = listener.get().onKeyDown(keyCode, event);
                     ret = ret || result;
@@ -107,7 +107,7 @@ public abstract class BaseFragmentActivity extends FragmentActivity implements V
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         boolean ret = false;
         if (onKeyListeners != null) {
-            for (EWeakReference<OnKeyListener> listener: onKeyListeners) {
+            for (ComparableWeakRef<OnKeyListener> listener: onKeyListeners) {
                 if (listener.get() != null) {
                     boolean result = listener.get().onKeyUp(keyCode, event);
                     ret = ret || result;
