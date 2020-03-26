@@ -76,41 +76,62 @@ public class LogUtils {
 
     public static void d (String tag, String log) {
         if (isLogEnabled) {
-            Log.d(tag, log);
+            dd(tag, log);
             if (isLogToFileEnabled) d2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void e (String tag, String log) {
         if (isLogEnabled) {
-            Log.e(tag, log);
+            ee(tag, log);
             if (isLogToFileEnabled) e2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void e (String tag, Throwable t) {
         if (isLogEnabled) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            t.printStackTrace(pw);
-            String logStr = sw.toString();
-            Log.e(tag, logStr);
+            String logStr = ee(tag, t);
             if (isLogToFileEnabled) e2f(tag + "&nbsp--&nbsp" + logStr.replaceAll("\n\t", "\n\t<br\\>"));
         }
     }
 
     public static void i (String tag, String log) {
         if (isLogEnabled) {
-            Log.i(tag, log);
+            ii(tag, log);
             if (isLogToFileEnabled) i2f(tag + "&nbsp--&nbsp" + log);
         }
     }
 
     public static void v (String tag, String log) {
         if (isLogEnabled) {
-            Log.v(tag, log);
+            vv(tag, log);
             if (isLogToFileEnabled) v2f(tag + "&nbsp--&nbsp" + log);
         }
+    }
+
+    public static void dd (String tag, String log) {
+        Log.d(tag, log);
+    }
+
+    public static void ee (String tag, String log) {
+        Log.e(tag, log);
+    }
+
+    public static String ee (String tag, Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        String logStr = sw.toString();
+        Log.e(tag, logStr);
+        return logStr;
+    }
+
+    public static void ii (String tag, String log) {
+        Log.i(tag, log);
+    }
+
+    public static void vv (String tag, String log) {
+        Log.v(tag, log);
     }
 
     private static ArrayBlockingQueue<LogItem> logQueue;
@@ -124,6 +145,11 @@ public class LogUtils {
     public static void e (Throwable t) {e(DEFAULT_TAG, t);}
     public static void i (String log) {i(DEFAULT_TAG, log);}
     public static void v (String log) {v(DEFAULT_TAG, log);}
+    public static void dd (String log) {dd(DEFAULT_TAG, log);}
+    public static void ee (String log) {ee(DEFAULT_TAG, log);}
+    public static void ee (Throwable t) {ee(DEFAULT_TAG, t);}
+    public static void ii (String log) {ii(DEFAULT_TAG, log);}
+    public static void vv (String log) {vv(DEFAULT_TAG, log);}
     private static void d2f(String str) {l2f(str, Log.DEBUG); }
     private static void e2f(String str) {l2f(str, Log.ERROR); }
     private static void i2f(String str) {l2f(str, Log.INFO); }
