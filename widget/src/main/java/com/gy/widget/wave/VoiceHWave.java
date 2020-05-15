@@ -136,7 +136,6 @@ public class VoiceHWave extends View {
     private Choreographer.FrameCallback mFrameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
-            Log.i(TAG, "mFrameCallback : " + frameTimeNanos/1000000);
             choreographer.postFrameCallbackDelayed(mFrameCallback, mUpdateMillis);
             addLine();
             invalidate();
@@ -162,7 +161,6 @@ public class VoiceHWave extends View {
             mLines.add(line);
             mNextLineHeightLevel = 0;
             mStartMove = line.xStart > mWidth;
-            Log.i(TAG, "addNew Line : " + line.xStart);
             return;
         }
 
@@ -176,8 +174,6 @@ public class VoiceHWave extends View {
         line.reset(lineEnd.xStart + mLineStep, mNextLineHeightLevel);
         mLines.add(line);
         mNextLineHeightLevel = 0;
-        Log.i(TAG, "reuse Line : " + line.xStart);
-        Log.i(TAG, "mLines size() " + mLines.size());
     }
 
     public void setMaxVolume (float maxVolume) {
