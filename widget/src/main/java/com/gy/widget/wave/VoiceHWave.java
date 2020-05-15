@@ -40,7 +40,7 @@ public class VoiceHWave extends View {
     private float mLineCap = 2;                         // 线与线之间间隔 (dp 需要在init中转换成px)
     private float mLineStep = mLineWidth + mLineCap;    // 步长 (dp 需要在init中转换成px)
     private List<Line> mLines;                          // 需要绘制的线
-    private int mLineHLevel = 5;                        // 线高分级 （把line高度分成几个级别）
+    private int mLineHLevel = 8;                        // 线高分级 （把line高度分成几个级别）
     private float[] mLineHLevels;                       // 分级后的每级别的线高
     private float[] mLineStartYs;                       // 每个级别线对应的线绘制的起始Y（提前计算，节省计算时间）
     private float[] mLineEndYs;                         // 每个级别线对应的线绘制的结束Y（提前计算，节省计算时间）
