@@ -4,14 +4,17 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Choreographer;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -19,17 +22,14 @@ import java.util.List;
 public class VoiceHWave extends View {
     public VoiceHWave(Context context) {
         super(context);
-        init();
     }
 
     public VoiceHWave(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public VoiceHWave(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     private final String TAG = "VoiceHWave";
@@ -46,17 +46,37 @@ public class VoiceHWave extends View {
     private float[] mLineEndYs;                         // 每个级别线对应的线绘制的结束Y（提前计算，节省计算时间）
     private float mMaxScaleLevel = 20;                  // 最大音量 （用于吧外部出入数据分别对应到某个线高上）
     private float[] mScaleLevels;                       // 音量的分级 （用于把外部传入数据对应到某个线高上）
-    private int mNextLineHeightLevel;                   // 下个被添加进 mLines 中的线的高度的级别
     private boolean mIsMeasured = false;                // 是否已经测量完毕，只有onMeasure后才可以绘制
     private boolean mStartMove = false;                 // 是否开始移动mLines的坐标，最后一个线段超框后需要开始移动
     private float startReuseX;                          // 判断是否要把第一条线放到最后的标准（最后一条线移动到需要添加下调线的时候）
+    private AtomicInteger mCurVolume = new AtomicInteger(0);
+
 
     private int mLineColor = Color.BLACK;               // 线颜色
     private Paint mLinePaint;                           // 画笔
     private float density;                              // 像素密度，用来重新计算线宽，线间距（dp转px）
 
-    private Choreographer choreographer = Choreographer.getInstance();
+    private HandlerThread mWorkThread;
+    private Handler mWorkHandler;
+    private boolean mStartOnAttach = false;
+    private boolean mIsStarted = false;
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        init();
+        if (mStartOnAttach) startAnim();
+        mStartOnAttach = false;
+    }
+
     private void init () {
+        if (mWorkThread != null) {
+            mWorkThread.quitSafely();
+        }
+        mWorkThread = new HandlerThread(TAG);
+        mWorkThread.start();
+        mWorkHandler = new Handler(mWorkThread.getLooper());
+
         mLineHLevels = new float[mLineHLevel];
         mLineStartYs = new float[mLineHLevel];
         mLineEndYs = new float[mLineHLevel];
@@ -81,7 +101,6 @@ public class VoiceHWave extends View {
         mWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
         mHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
 
-
         // 高度分成 mLineHLevel + 1 段，留1段是为了不绘制到边框
         float dy = mHeight / (mLineHLevel + 1f);
         for (int i = 0; i < mLineHLevel; i++) {
@@ -90,7 +109,6 @@ public class VoiceHWave extends View {
             mLineEndYs[i] = mLineStartYs[i] + mLineHLevels[i];
         }
 
-        mNextLineHeightLevel = 0;
         startReuseX = mWidth - mLineStep;
         mIsMeasured = true;
         Log.i(TAG, "onMeasure  w=" + mWidth + " h=" + mHeight);
@@ -121,24 +139,44 @@ public class VoiceHWave extends View {
         super.onDetachedFromWindow();
         Log.i(TAG, "onDetachedFromWindow");
         stop();
+        mWorkThread.quitSafely();
+        mWorkThread = null;
+        mWorkHandler = null;
+        mLines.clear();
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        mWorkHandler.removeCallbacksAndMessages(null);
+        if (visibility == VISIBLE && mIsStarted) {
+            mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
+        }
     }
 
     public void start () {
         Log.i(TAG, "start");
-        choreographer.postFrameCallbackDelayed(mFrameCallback, mUpdateMillis);
+        if (isAttachedToWindow()) startAnim();
+        else mStartOnAttach = true;
     }
 
     public void stop () {
         Log.i(TAG, "stop");
-        choreographer.removeFrameCallback(mFrameCallback);
+        mIsStarted = false;
+        mWorkHandler.removeCallbacksAndMessages(null);
     }
 
-    private Choreographer.FrameCallback mFrameCallback = new Choreographer.FrameCallback() {
+    private void startAnim () {
+        mIsStarted = true;
+        mWorkHandler.removeCallbacksAndMessages(null);
+        mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
+    }
+
+    private Runnable mAnimRunable = new Runnable() {
         @Override
-        public void doFrame(long frameTimeNanos) {
-            choreographer.postFrameCallbackDelayed(mFrameCallback, mUpdateMillis);
+        public void run() {
+            if (mWorkHandler != null) mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
             addLine();
-            invalidate();
+            postInvalidate();
         }
     };
 
@@ -149,17 +187,28 @@ public class VoiceHWave extends View {
         }
 
         if (mLines.isEmpty()) {
-            mLines.add(new Line(0, mNextLineHeightLevel));
+            mLines.add(new Line(0, 0));
             return;
+        }
+
+        int curVol = mCurVolume.get();
+        int heightLevel = 0;
+        mCurVolume.set(0);
+
+        for (int i = 1; i < mLineHLevel; i++) {
+            if (curVol > mScaleLevels[i]) {
+                heightLevel = i;
+            } else {
+                break;
+            }
         }
 
         Line lineEnd = mLines.get(mLines.size() - 1);
 
         if (!mStartMove) {
             // 最后一条线还未超框
-            Line line = new Line(lineEnd.xStart + mLineStep, mNextLineHeightLevel);
+            Line line = new Line(lineEnd.xStart + mLineStep, heightLevel);
             mLines.add(line);
-            mNextLineHeightLevel = 0;
             mStartMove = line.xStart > mWidth;
             return;
         }
@@ -171,9 +220,8 @@ public class VoiceHWave extends View {
 
         // 直接复用第一条线，因为第一条线这时候已经出框，看不到了
         Line line = mLines.remove(0);
-        line.reset(lineEnd.xStart + mLineStep, mNextLineHeightLevel);
+        line.reset(lineEnd.xStart + mLineStep, heightLevel);
         mLines.add(line);
-        mNextLineHeightLevel = 0;
     }
 
     public void setMaxVolume (float maxVolume) {
@@ -184,15 +232,8 @@ public class VoiceHWave extends View {
         }
     }
 
-    public void setVolume (float volume) {
-        mNextLineHeightLevel = 0;
-        for (int i = 1; i < mLineHLevel; i++) {
-            if (volume > mScaleLevels[i]) {
-                mNextLineHeightLevel = i;
-            } else {
-                break;
-            }
-        }
+    public void setVolume (int volume) {
+        mCurVolume.set(volume);
     }
 
     class Line {

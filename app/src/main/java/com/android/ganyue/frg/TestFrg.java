@@ -51,6 +51,8 @@ public class TestFrg extends BaseFragment{
                 mVVoiceHWave.setVolume(volume);
             }
         });
+
+
     }
 
     @Override
