@@ -3,6 +3,8 @@ package com.gy.smatch;
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.laosj.dimens.R;
+
 /**
  * Created by yue.gan. 2019/7/28
  */
@@ -29,8 +31,7 @@ public class ScreenUtil {
         Resources res = context.getResources();
         int id = res.getIdentifier("status_bar_height", "dimen", "android");
         if (id != 0) return res.getDimensionPixelSize(id);
-        float px = 25 * context.getResources().getDisplayMetrics().density;
-        return (int) (px > 0? px + 0.5: px - 0.5);
+        return getResDimenPx(context, R.dimen.dp_25) + 1;
     }
 
     /**
