@@ -18,6 +18,7 @@ import com.gy.utils.log.LogUtils;
 import com.gy.utils.recorder.AudioRecordInfo;
 import com.gy.utils.recorder.AudioRecordTask;
 import com.gy.utils.recorder.AudioTrackTask;
+import com.gy.widget.wave.TestView;
 import com.gy.widget.wave.VoiceWave;
 
 import java.io.File;
@@ -53,6 +54,13 @@ public class ARecordTestFrg extends BaseFragment {
     @Override
     protected void initViews(View view) {
         LogUtils.enableLog(true);
+
+        view.findViewById(R.id.v_test).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!((TestView)v).start(soundPath))((TestView)v).stop();
+            }
+        });
 
         audioRecordInfo = AudioRecordInfo.getInstance();
         playFreq = audioRecordInfo.audioRate;

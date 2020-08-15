@@ -167,7 +167,8 @@ public class VoiceWave extends View {
             if (mVisualizer == null) {
                 mVisualizer = new Visualizer(0);
                 mVisualizer.setCaptureSize(mLineNum.get());
-                mVisualizer.setDataCaptureListener(mOnDataCaptureListener, Visualizer.getMaxCaptureRate()/2, true, false);
+                mVisualizer.setDataCaptureListener(mOnDataCaptureListener,
+                        Visualizer.getMaxCaptureRate()/2, false, true);
                 int ret = mVisualizer.setEnabled(true);
                 Log.d(TAG, "mVisualizer.setEnabled ret="+(ret==Visualizer.SUCCESS));
             }
@@ -183,16 +184,14 @@ public class VoiceWave extends View {
     private Visualizer.OnDataCaptureListener mOnDataCaptureListener = new Visualizer.OnDataCaptureListener() {
         @Override
         public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveform, int samplingRate) {
-            Log.d(TAG, "onFftDataCapture samplingRate="+samplingRate+", fftLen="+waveform.length+", rate="+samplingRate);
+            Log.d(TAG, "onWaveFormDataCapture samplingRate="+samplingRate+", len="+waveform.length+", rate="+samplingRate);
             System.arraycopy(waveform, 0, mFftData, 0, Math.min(waveform.length, mLineNum.get()));
-            Log.d(TAG, "onFftDataCapture mFftData="+toHexString(mFftData));
         }
 
         @Override
         public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
-            Log.d(TAG, "onFftDataCapture samplingRate="+samplingRate+", fftLen="+fft.length+", rate="+samplingRate);
+            Log.d(TAG, "onFftDataCapture samplingRate="+samplingRate+", len="+fft.length+", rate="+samplingRate);
             System.arraycopy(fft, 0, mFftData, 0, Math.min(fft.length, mLineNum.get()));
-            Log.d(TAG, "onFftDataCapture mFftData="+toHexString(mFftData));
         }
     };
 
@@ -201,34 +200,16 @@ public class VoiceWave extends View {
         int xEnd;
         int yStart;
         int yEnd;
-        private int height;
 
-        Line(int x, int height) {
+        Line(int x, int h) {
             xStart = x;
             xEnd = xStart;
-            yStart = 0;
-            yEnd = Math.max(mMinLineHeight, height);
+            yStart = mHeight;
+            yEnd = mHeight - Math.max(mMinLineHeight, h);
         }
 
         void setHeight (int h) {
-            height = Math.max(mMinLineHeight, h);
-            yEnd = yStart + height;
+            yEnd = mHeight - Math.max(mMinLineHeight, h);
         }
-    }
-
-    private static final char HEX_DIGITS[] = { '0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-    /**
-     * 转换byte数组成16进制字符串
-     * @param b byte数组
-     * @return String byte数组处理后字符串
-     */
-    private static String toHexString(byte[] b) {// String to byte
-        StringBuilder sb = new StringBuilder(b.length * 2);
-        for (int i = 0; i < b.length; i++) {
-            sb.append(HEX_DIGITS[(b[i] & 0xf0) >>> 4]);
-            sb.append(HEX_DIGITS[b[i] & 0x0f]);
-        }
-        return sb.toString();
     }
 }

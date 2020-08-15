@@ -5,12 +5,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff">
 
+    <com.gy.widget.wave.TestView
+        android:id="@+id/v_test"
+        android:layout_width="360dp"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_orange_light"/>
+
     <com.gy.widget.wave.VoiceWave
         android:id="@+id/vw_voiceWave"
         android:layout_width="240dp"
         android:layout_height="60dp"
         android:background="@android:color/holo_green_light"
         android:layout_marginTop="@dimen/widget_normal_padding"
+        android:layout_below="@id/v_test"
         app:voicewave_line_width="4dp"
         app:voicewave_line_cap="1dp"
         app:voicewave_line_color="@android:color/holo_red_dark"
