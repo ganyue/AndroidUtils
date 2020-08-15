@@ -38,4 +38,11 @@
         <!--汉字字体颜色-->
         <attr name="textColorChinese" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="VoiceWave">
+        <attr name="voicewave_line_color" format="color"/>
+        <attr name="voicewave_line_width" format="dimension"/>
+        <attr name="voicewave_line_cap" format="dimension"/>
+        <attr name="voicewave_line_update_interval" format="integer"/>
+    </declare-styleable>
 </resources>

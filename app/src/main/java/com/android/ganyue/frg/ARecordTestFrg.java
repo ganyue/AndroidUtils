@@ -18,6 +18,7 @@ import com.gy.utils.log.LogUtils;
 import com.gy.utils.recorder.AudioRecordInfo;
 import com.gy.utils.recorder.AudioRecordTask;
 import com.gy.utils.recorder.AudioTrackTask;
+import com.gy.widget.wave.VoiceWave;
 
 import java.io.File;
 
@@ -35,6 +36,7 @@ public class ARecordTestFrg extends BaseFragment {
     @ViewInject (R.id.btn_plus)         Button btnPlus;
     @ViewInject (R.id.btn_add)          Button btnAdd;
     @ViewInject (R.id.tv_playfreq)      TextView tvFreq;
+    @ViewInject (R.id.vw_voiceWave)     VoiceWave mVWVoiceWave;
 
     private String soundPath = SdcardUtils.getUsableCacheDir(MApplication.getApplication()) + File.separator + "test";
     private int playFreq;
@@ -53,13 +55,14 @@ public class ARecordTestFrg extends BaseFragment {
         LogUtils.enableLog(true);
 
         audioRecordInfo = AudioRecordInfo.getInstance();
-        audioRecordInfo.audioRate = 8000;
-        audioRecordInfo.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         playFreq = audioRecordInfo.audioRate;
 
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (recordTask != null) {
+                    return;
+                }
                 recordTask = new AudioRecordTask(soundPath);
                 recordTask.setOnRecordListener(onRecordListener);
                 recordTask.execute();
@@ -69,25 +72,34 @@ public class ARecordTestFrg extends BaseFragment {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (playTask != null) return;
                 playTask = new AudioTrackTask(soundPath,
                         playFreq,
                         audioRecordInfo.audioRecordConfig,
                         audioRecordInfo.audioFormat);
                 playTask.execute();
+                mVWVoiceWave.start();
             }
         });
 
         btnStopRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (recordTask != null) recordTask.stopRecord();
+                if (recordTask != null) {
+                    recordTask.stopRecord();
+                    recordTask = null;
+                }
             }
         });
 
         btnStopPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (playTask != null) playTask.stopPlay();
+                if (playTask != null) {
+                    playTask.stopPlay();
+                    playTask = null;
+                    mVWVoiceWave.stop();
+                }
             }
         });
 
@@ -130,11 +142,13 @@ public class ARecordTestFrg extends BaseFragment {
         @Override
         public void onRecordStart(int audioSource, int sampleRateInHz, int channelConfig, int audioFormat, int bufferSizeInBytes, int audioRecordSessionId) {
             LogUtils.d("yue.gan", "onRecordStart sampleRateInHz="+sampleRateInHz);
+            mVWVoiceWave.start();
         }
 
         @Override
         public void onRecordStop() {
             LogUtils.d("yue.gan", "stop record");
+            mVWVoiceWave.stop();
         }
 
         @Override

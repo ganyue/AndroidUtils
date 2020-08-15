@@ -39,7 +39,7 @@ public class AudioRecordInfo {
         for (int rate : rates) {
             short[] format1 = new short[]{AudioFormat.ENCODING_PCM_16BIT, AudioFormat.ENCODING_PCM_8BIT};
             for (short format : format1) {
-                short[] recordConfig = new short[]{AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO};
+                short[] recordConfig = new short[]{AudioFormat.CHANNEL_IN_STEREO, AudioFormat.CHANNEL_IN_MONO};
                 for (short channelConfig : recordConfig) {
                     try {
                         audioRate = rate;

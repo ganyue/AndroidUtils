@@ -10,6 +10,7 @@ import com.android.ganyue.R;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.widget.wave.VoiceHWave;
+import com.gy.widget.wave.VoiceWave;
 
 import java.util.Random;
 

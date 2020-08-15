@@ -2,13 +2,27 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff">
+
+    <com.gy.widget.wave.VoiceWave
+        android:id="@+id/vw_voiceWave"
+        android:layout_width="240dp"
+        android:layout_height="60dp"
+        android:background="@android:color/holo_green_light"
+        android:layout_marginTop="@dimen/widget_normal_padding"
+        app:voicewave_line_width="4dp"
+        app:voicewave_line_cap="1dp"
+        app:voicewave_line_color="@android:color/holo_red_dark"
+        app:voicewave_line_update_interval="100"/>
 
     <Button
         android:id="@+id/btn_record"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="record"/>
+        android:text="record"
+        android:layout_marginTop="@dimen/widget_normal_padding"
+        android:layout_below="@id/vw_voiceWave"/>
 
     <Button
         android:id="@+id/btn_stop_record"
