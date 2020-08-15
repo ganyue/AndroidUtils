@@ -58,7 +58,13 @@ public class AudioRecordTask extends AsyncTask <Void, Integer, Void> {
             audioRecord.startRecording();
             isRecording = true;
             if (onRecordListener != null) {
-                onRecordListener.onRecordStart();
+                onRecordListener.onRecordStart(
+                        audioRecordInfo.audioSource,
+                        audioRecordInfo.audioRate,
+                        audioRecordInfo.audioRecordConfig,
+                        audioRecordInfo.audioFormat,
+                        audioRecordInfo.audioRecordMinBuffSize,
+                        audioRecord.getAudioSessionId());
             }
 
             long lastProgressUpdateTime = System.currentTimeMillis();
@@ -133,7 +139,8 @@ public class AudioRecordTask extends AsyncTask <Void, Integer, Void> {
     }
 
     public interface OnRecordListener {
-        void onRecordStart ();
+        void onRecordStart (int audioSource, int sampleRateInHz, int channelConfig, int audioFormat,
+                            int bufferSizeInBytes, int audioRecordSessionId);
         void onRecordStop ();
         void onRecordError (Exception e);
         void onRecord (byte[] buff, int len);

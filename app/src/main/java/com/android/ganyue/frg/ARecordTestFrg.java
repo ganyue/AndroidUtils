@@ -1,6 +1,7 @@
 package com.android.ganyue.frg;
 
 import android.media.AudioFormat;
+import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,8 @@ public class ARecordTestFrg extends BaseFragment {
 
     @Override
     protected void initViews(View view) {
+        LogUtils.enableLog(true);
+
         audioRecordInfo = AudioRecordInfo.getInstance();
         audioRecordInfo.audioRate = 8000;
         audioRecordInfo.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
@@ -125,8 +128,8 @@ public class ARecordTestFrg extends BaseFragment {
 
     private AudioRecordTask.OnRecordListener onRecordListener = new AudioRecordTask.OnRecordListener() {
         @Override
-        public void onRecordStart() {
-            LogUtils.d("yue.gan", "start record");
+        public void onRecordStart(int audioSource, int sampleRateInHz, int channelConfig, int audioFormat, int bufferSizeInBytes, int audioRecordSessionId) {
+            LogUtils.d("yue.gan", "onRecordStart sampleRateInHz="+sampleRateInHz);
         }
 
         @Override
@@ -148,4 +151,5 @@ public class ARecordTestFrg extends BaseFragment {
             LogUtils.d("yue.gan", "record db : " + db);
         }
     };
+
 }
