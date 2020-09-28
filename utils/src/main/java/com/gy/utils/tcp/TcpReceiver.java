@@ -35,7 +35,7 @@ public class TcpReceiver extends Thread {
         tcpMessageProcessor.start();
         isRun = true;
 
-        byte[] buff = new byte[1024];
+        byte[] buff = new byte[2048];
         int len = 0;
         while (isRun) {
             try {

@@ -1,3 +1,4 @@
+include ':kline'
 include ':app'
 include ':appbase'
 include ':screen_match'

@@ -1,6 +1,16 @@
 package com.gy.utils.tcp;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+
+import com.gy.utils.wifi.WifiUtils;
+
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,12 +22,14 @@ public class TcpServer extends Thread {
 
     private ServerSocket mServerSocket;
     private int port;
+    private String ip;
 
     private TcpServerListener mOnServerListener;
     private boolean isRun;
 
-    public TcpServer(int port) {
+    public TcpServer(Context context, int port) {
         this.port = port;
+        this.ip = WifiUtils.getInstance(context.getApplicationContext()).getIp();
     }
 
     public void setTcpServerListener (TcpServerListener listener) {
@@ -39,6 +51,10 @@ public class TcpServer extends Thread {
             return;
         }
         isRun = true;
+
+        if (mOnServerListener != null) {
+            mOnServerListener.onServerStartSuccess(ip, port);
+        }
 
         while (isRun) {
             try {
@@ -70,6 +86,7 @@ public class TcpServer extends Thread {
     }
 
     public interface TcpServerListener {
+        void onServerStartSuccess (String ip, int port);
         void onSererStartFail(Exception e);
         void onAccept (Socket socket);
         void onAcceptError (IOException e);

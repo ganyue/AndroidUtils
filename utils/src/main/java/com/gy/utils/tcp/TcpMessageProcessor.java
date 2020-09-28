@@ -13,6 +13,7 @@ public class TcpMessageProcessor extends Thread{
     private ArrayBlockingQueue<TcpMessage> messages;
     private TcpReceiveListener onReceiveListener;
     private boolean isRun;
+    private String unique;
 
     public TcpMessageProcessor() {
         messages = new ArrayBlockingQueue<>(64);
@@ -27,6 +28,7 @@ public class TcpMessageProcessor extends Thread{
     }
 
     public void setOnReceiveListener (TcpReceiveListener listener) {
+        this.unique = unique;
         onReceiveListener = listener;
     }
 

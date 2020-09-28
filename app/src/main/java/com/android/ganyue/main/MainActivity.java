@@ -18,7 +18,6 @@ import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
-import com.android.ganyue.frg.TcpTestFrg;
 import com.android.ganyue.frg.TestFrg;
 import com.android.ganyue.frg.Udp17000Frg;
 import com.android.ganyue.frg.Udp18000Frg;
@@ -44,7 +43,6 @@ public class MainActivity extends Activity{
             ARecordTestFrg.class,
             HorizontalIndicatorFrg.class,
             WifiConnectTestFrg.class,
-            TcpTestFrg.class,
             UdpTestFrg.class,
             Udp17000Frg.class,
             Udp18000Frg.class,

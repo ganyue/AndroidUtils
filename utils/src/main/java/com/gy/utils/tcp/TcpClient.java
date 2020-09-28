@@ -1,6 +1,9 @@
 package com.gy.utils.tcp;
 
+import android.content.Context;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -21,10 +24,11 @@ public class TcpClient extends Thread{
     private boolean isInited;
     private List<TcpClientListener> tcpClientListeners;
     private boolean isConnected = false;
+    private String unique = "";
 
-    private boolean enableHart = true;
+    private boolean enableHart = false;
 
-    public void addTcpClientListener (TcpClientListener tcpClientListener) {
+    public TcpClient addTcpClientListener (TcpClientListener tcpClientListener) {
         if (tcpClientListeners == null) {
             tcpClientListeners = Collections.synchronizedList(new ArrayList<TcpClientListener>());
         }
@@ -32,30 +36,38 @@ public class TcpClient extends Thread{
         if (!tcpClientListeners.contains(tcpClientListener)) {
             tcpClientListeners.add(tcpClientListener);
         }
+        return this;
     }
 
     public void removeTcpClientListener (TcpClientListener tcpClientListener) {
-        if (tcpClientListeners != null && tcpClientListeners.contains(tcpClientListener)) {
+        if (tcpClientListeners != null) {
             tcpClientListeners.remove(tcpClientListener);
         }
     }
 
-    public TcpClient(Socket socket) {
+    /***
+     * @param unique 用来区分各个client
+     * */
+    public TcpClient(Socket socket, String unique) {
+        isConnected = true;
+        this.unique = unique;
         mSocket = socket;
         InetSocketAddress socketAddress = (InetSocketAddress) mSocket.getRemoteSocketAddress();
         dstIp = socketAddress.getHostName();
         dstPort = socketAddress.getPort();
     }
 
-    public TcpClient(String ip, int port) {
+    public TcpClient(String ip, int port, String unique) {
+        this.unique = unique;
         dstIp = ip;
         dstPort = port;
         isInited = false;
     }
 
-    public void enableHart (boolean enableHart) {
+    public TcpClient enableHart (boolean enableHart) {
         this.enableHart = enableHart;
         if (mSender != null) mSender.enableHart(enableHart);
+        return this;
     }
 
     public boolean isHartEnabled () {
@@ -77,23 +89,34 @@ public class TcpClient extends Thread{
     private void init () {
         if (!isInited) {
             mSender = new TcpSender(mSocket);
-            mReceiver = new TcpReceiver(mSocket);
             mSender.enableHart(enableHart);
             mSender.setTcpSenderListener(tcpSenderListener);
-            mReceiver.setTcpReceiverListener(tcpReceiverListener);
             mSender.start();
+
+            mReceiver = new TcpReceiver(mSocket);
+            mReceiver.setTcpReceiverListener(tcpReceiverListener);
             mReceiver.start();
             isInited = true;
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onSocketConnectSuccess(dstIp, dstPort);
+                    tcpClientListener.onSocketConnectSuccess(unique, dstIp, dstPort);
                 }
             }
         }
     }
 
-    public void send (String msg) {
-        if (mSender != null) mSender.send(msg);
+    @Override
+    public synchronized void start() {
+        if (mSocket != null) init();
+        else super.start();
+    }
+
+    public void sendString (String unique, String msg) {
+        if (mSender != null) mSender.sendString (unique, msg);
+    }
+
+    public void sendStream (String unique, InputStream fIn) {
+        if (mSender != null) mSender.sendStream(unique, fIn);
     }
 
     @Override
@@ -106,7 +129,7 @@ public class TcpClient extends Thread{
                 e.printStackTrace();
                 if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                     for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                        tcpClientListener.onSocketConnectFail(e, dstIp, dstPort);
+                        tcpClientListener.onSocketConnectFail(unique, e, dstIp, dstPort);
                     }
                 }
             }
@@ -121,30 +144,30 @@ public class TcpClient extends Thread{
 
     private TcpSender.TcpSenderListener tcpSenderListener = new TcpSender.TcpSenderListener() {
         @Override
-        public boolean onSendBefore(String msg) {
+        public boolean onSendBefore(SendItem item) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onSendBefore(msg, dstIp, dstPort);
+                    tcpClientListener.onSendBefore(unique, item, dstIp, dstPort);
                 }
             }
             return false;
         }
 
         @Override
-        public void onSendSuccess(String msg) {
+        public void onSendSuccess(SendItem item) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onSendSuccess(msg, dstIp, dstPort);
+                    tcpClientListener.onSendSuccess(unique, item, dstIp, dstPort);
                 }
             }
         }
 
         @Override
-        public void onSendFailed(String msg, Exception e) {
+        public void onSendFailed(SendItem item, Exception e) {
             isConnected = false;
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onSendFailed(msg, e, dstIp, dstPort);
+                    tcpClientListener.onSendFailed(unique, item, e, dstIp, dstPort);
                 }
             }
         }
@@ -155,7 +178,7 @@ public class TcpClient extends Thread{
         public void onReceive(byte[] buf, int offset, int len) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onReceive(new String(buf, offset, len), dstIp, dstPort);
+                    tcpClientListener.onReceive(unique, new String(buf, offset, len), dstIp, dstPort);
                 }
             }
         }
@@ -164,7 +187,7 @@ public class TcpClient extends Thread{
         public void onReceiveError(Exception e) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onReceiveError(e, dstIp, dstPort);
+                    tcpClientListener.onReceiveError(unique, e, dstIp, dstPort);
                 }
             }
         }
@@ -185,12 +208,12 @@ public class TcpClient extends Thread{
     }
 
     public interface TcpClientListener {
-        void onSocketConnectFail (Exception e, String dstIp, int dstPort);
-        void onSocketConnectSuccess (String dstIp, int dstPort);
-        boolean onSendBefore (String msg, String dstIp, int dstPort);
-        void onSendSuccess (String msg, String dstIp, int dstPort);
-        void onSendFailed (String msg, Exception e, String dstIp, int dstPort);
-        void onReceive (String msg, String fromIp, int fromPort);
-        void onReceiveError (Exception e, String fromIp, int fromPort);
+        void onSocketConnectFail (String unique, Exception e, String dstIp, int dstPort);
+        void onSocketConnectSuccess (String unique, String dstIp, int dstPort);
+        boolean onSendBefore (String unique, SendItem item, String dstIp, int dstPort);
+        void onSendSuccess (String unique, SendItem item, String dstIp, int dstPort);
+        void onSendFailed (String unique, SendItem item, Exception e, String dstIp, int dstPort);
+        void onReceive (String unique, String msg, String fromIp, int fromPort);
+        void onReceiveError (String unique, Exception e, String fromIp, int fromPort);
     }
 }
