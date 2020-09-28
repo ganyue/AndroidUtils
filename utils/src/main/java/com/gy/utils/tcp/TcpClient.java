@@ -154,10 +154,10 @@ public class TcpClient extends Thread{
         }
 
         @Override
-        public void onSendSuccess(SendItem item) {
+        public void onSendSuccess(SendItem item, long totalLen) {
             if (tcpClientListeners != null && tcpClientListeners.size() > 0) {
                 for (TcpClientListener tcpClientListener: tcpClientListeners) {
-                    tcpClientListener.onSendSuccess(unique, item, dstIp, dstPort);
+                    tcpClientListener.onSendSuccess(unique, item, totalLen, dstIp, dstPort);
                 }
             }
         }
@@ -211,7 +211,7 @@ public class TcpClient extends Thread{
         void onSocketConnectFail (String unique, Exception e, String dstIp, int dstPort);
         void onSocketConnectSuccess (String unique, String dstIp, int dstPort);
         boolean onSendBefore (String unique, SendItem item, String dstIp, int dstPort);
-        void onSendSuccess (String unique, SendItem item, String dstIp, int dstPort);
+        void onSendSuccess (String unique, SendItem item, long totalLen, String dstIp, int dstPort);
         void onSendFailed (String unique, SendItem item, Exception e, String dstIp, int dstPort);
         void onReceive (String unique, String msg, String fromIp, int fromPort);
         void onReceiveError (String unique, Exception e, String fromIp, int fromPort);

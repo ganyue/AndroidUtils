@@ -32,6 +32,7 @@ public class TestFrg extends BaseFragment{
             public void onClick(View v) {
                 server = new HttpServer(getContext(), 8080)
                         .addAssetHtml("/test", "TestHttpServer/index.html")
+                        .addAssetFile("/file", "TestHttpServer/test.txt")
                         .start();
             }
         });

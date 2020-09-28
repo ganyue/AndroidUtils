@@ -12,6 +12,7 @@ public class SendItem {
     public InputStream in;
     public String msg;
     public String unique;
+    public int length = 0;
 
     static SendItem getStreamItem (String unique, InputStream in) {
         SendItem item = new SendItem();
@@ -28,14 +29,4 @@ public class SendItem {
         item.unique = unique;
         return item;
     }
-
-    static SendItem getStrAndStream (String unique, String msg, InputStream in) {
-        SendItem item = new SendItem();
-        item.type = Type.STRING;
-        item.msg = msg;
-        item.in = in;
-        item.unique = unique;
-        return item;
-    }
-
 }

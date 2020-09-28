@@ -58,6 +58,7 @@ public class TcpSender extends Thread {
         }
         isRun = true;
 
+        long totalLen = 0;
         SendItem item = null;
         while (isRun) {
             try {
@@ -81,18 +82,22 @@ public class TcpSender extends Thread {
                 if (item.type == SendItem.Type.STRING) {
                     byte[] strData = item.msg.getBytes();
                     mSockOutStream.write(strData, 0, strData.length);
+                    item.length = strData.length;
+                    totalLen += strData.length;
                 } else if (item.type == SendItem.Type.STREAM) {
                     byte[] data = new byte[1024];
-                    int len;
+                    int len, sendLen = 0;
                     while ((len = item.in.read(data)) > 0) {
                         mSockOutStream.write(data, 0, len);
+                        sendLen += len;
                     }
+                    item.length = sendLen;
+                    totalLen += sendLen;
                     item.in.close();
                 }
-
                 mSockOutStream.flush();
                 if (mTcpSenderListener != null) {
-                    mTcpSenderListener.onSendSuccess(item);
+                    mTcpSenderListener.onSendSuccess(item, totalLen);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -121,7 +126,7 @@ public class TcpSender extends Thread {
 
     public interface TcpSenderListener {
         boolean onSendBefore (SendItem item);
-        void onSendSuccess (SendItem item);
+        void onSendSuccess (SendItem item, long totalLen);
         void onSendFailed (SendItem item, Exception e);
     }
 }

@@ -6,6 +6,8 @@ import android.util.Log;
 import com.gy.utils.tcp.SendItem;
 import com.gy.utils.tcp.TcpClient;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
@@ -50,7 +52,7 @@ public class HttpClient implements TcpClient.TcpClientListener {
     }
 
     @Override
-    public void onSendSuccess(String unique, SendItem item, String dstIp, int dstPort) {
+    public void onSendSuccess(String unique, SendItem item, long totalLen, String dstIp, int dstPort) {
         Log.d(TAG, "onSendSuccess --> dstIp=" + dstIp + ", dstPort=" + dstPort);
         if (item.unique.equals(sendFinalTag)) {
             release();
@@ -86,8 +88,20 @@ public class HttpClient implements TcpClient.TcpClientListener {
             RequestMapAssetHtml requestMapAssetHtml = (RequestMapAssetHtml) requestMap;
             sendFinalTag = String.valueOf(System.currentTimeMillis());
             try {
-                InputStream fIn = mCxt.getAssets().open(requestMapAssetHtml.assetPath);
+                InputStream fIn = mCxt.getAssets().open(requestMapAssetHtml.filePath);
                 mClient.sendString("", requestMapAssetHtml.getResponseHead());
+                mClient.sendStream(sendFinalTag, fIn);
+            } catch (Exception e) {
+                e.printStackTrace();
+                release();
+                mHttpServer.get().removeClient(this);
+            }
+        } else if (requestMap instanceof RequestMapAssetFile) {
+            RequestMapAssetFile requestMapAssetFile = (RequestMapAssetFile) requestMap;
+            sendFinalTag = String.valueOf(System.currentTimeMillis());
+            try {
+                InputStream fIn =  mCxt.getAssets().open(requestMapAssetFile.filePath);
+                mClient.sendString("", requestMapAssetFile.getResponseHead());
                 mClient.sendStream(sendFinalTag, fIn);
             } catch (Exception e) {
                 e.printStackTrace();

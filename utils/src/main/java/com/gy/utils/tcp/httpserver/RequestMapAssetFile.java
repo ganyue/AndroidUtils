@@ -1,16 +1,19 @@
 package com.gy.utils.tcp.httpserver;
 
 public class RequestMapAssetFile extends RequestMap {
-    public String assetPath;
-    public RequestMapAssetFile(String path, String asPath) {
+    public String filePath;
+    public String fileName;
+    public RequestMapAssetFile(String path, String fPath) {
         super(path);
-        assetPath = asPath;
+        filePath = fPath;
+        int index = fPath.lastIndexOf('/');
+        if (index < 0) fileName = fPath;
+        else fileName = fPath.substring(index);
     }
 
-    @Override
     public String getResponseHead() {
         return "HTTP/1.1 " + 200 + "\r\n" +
-                "Content-Type: text/html\r\n" +
+                "Content-Disposition: attachment; filename=" + fileName + "\r\n" +
                 "\r\n";
     }
 }

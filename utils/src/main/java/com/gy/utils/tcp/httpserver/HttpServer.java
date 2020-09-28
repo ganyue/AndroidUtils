@@ -33,6 +33,11 @@ public class HttpServer implements TcpServer.TcpServerListener {
         return this;
     }
 
+    public HttpServer addAssetFile (String path, String assetPath) {
+        mRequestMap.put(path, new RequestMapAssetFile(path, assetPath));
+        return this;
+    }
+
     public HttpServer start () {
         if (mServer == null) {
             mServer = new TcpServer(mCxt, port);
