@@ -116,7 +116,7 @@ public class TcpClient extends Thread{
     }
 
     public void sendStream (String unique, InputStream fIn) {
-        if (mSender != null) mSender.sendStream(unique, fIn);
+        if (mSender != null && fIn != null) mSender.sendStream(unique, fIn);
     }
 
     @Override

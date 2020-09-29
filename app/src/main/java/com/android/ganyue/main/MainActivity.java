@@ -14,7 +14,6 @@ import com.android.ganyue.application.MApplication;
 import com.android.ganyue.frg.ARecordTestFrg;
 import com.android.ganyue.frg.BannerFrag;
 import com.android.ganyue.frg.DaoTestFrg;
-import com.android.ganyue.frg.FileUtilTestFrg;
 import com.android.ganyue.frg.HorizontalIndicatorFrg;
 import com.android.ganyue.frg.MediaTestFrg;
 import com.android.ganyue.frg.ScrollObservListFrag;
@@ -47,7 +46,6 @@ public class MainActivity extends Activity{
             Udp17000Frg.class,
             Udp18000Frg.class,
             DaoTestFrg.class,
-            FileUtilTestFrg.class,
             MediaTestFrg.class,
             ScrollObservListFrag.class,
             BannerFrag.class,

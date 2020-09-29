@@ -1,5 +1,7 @@
 package com.gy.utils.tcp.httpserver;
 
+import android.content.Context;
+
 public class RequestMapAssetFile extends RequestMap {
     public String filePath;
     public String fileName;

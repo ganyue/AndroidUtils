@@ -45,7 +45,6 @@ public class TcpReceiver extends Thread {
                 }
                 tcpMessageProcessor.onReceive(buff, 0, len);
             } catch (IOException e) {
-                e.printStackTrace();
                 tcpMessageProcessor.onReceiveError(e);
             }
         }

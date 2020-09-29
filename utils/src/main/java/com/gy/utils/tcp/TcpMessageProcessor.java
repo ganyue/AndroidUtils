@@ -48,11 +48,11 @@ public class TcpMessageProcessor extends Thread{
                 } else if (msg.exception != null) {
                     onReceiveListener.onReceiveError(msg.exception);
                 }
-
+            } catch (InterruptedException e) {
+                LogUtils.d("TcpMessageProcessor", "Interrupted");
             } catch (Exception e) {
-                //nothing to do
                 e.printStackTrace();
-                LogUtils.e("yue.gan", "########## error to parse recieve msg!");
+                LogUtils.e("TcpMessageProcessor", "########## error to parse recieve msg!");
             }
         }
     }

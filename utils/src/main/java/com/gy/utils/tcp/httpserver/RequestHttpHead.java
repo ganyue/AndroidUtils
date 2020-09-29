@@ -1,18 +1,23 @@
 package com.gy.utils.tcp.httpserver;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestHttpHead {
+    private static final String TAG = "RequestHttpHead";
+
     public static final String METHOD_GET = "GET";
+    public static final String KEY_REFERER = "Referer";
 
     public Map<String, String> content = new HashMap<>();
     public Map<String, String> params = new HashMap<>();
     public String method;
     public String path;
+    public String referPath;
     public String version;
 
     public RequestHttpHead() {
@@ -26,13 +31,15 @@ public class RequestHttpHead {
             String[] infos = line.split(" ");
             infos[1] = infos[1].trim();
             head.method = infos[0].trim();
-            head.path = infos[1];
+            head.path = infos[1].trim();
             head.version = infos[2].trim();
 
+            int index;
+            /// 解析Head头中的Params
             if (head.method.toUpperCase().contains(METHOD_GET)) {
-                int index = infos[1].indexOf('?');
+                index = head.path.indexOf('?');
                 if (index > 0) {
-                    head.path = infos[1].substring(0, index);
+                    head.path = head.path.substring(0, index);
                     String paramStr = infos[1].substring(index + 1);
                     String[] kvStrs = paramStr.split("&");
                     for (String kvStr: kvStrs) {
@@ -42,14 +49,28 @@ public class RequestHttpHead {
                 }
             }
 
+            // 解析Head
             while ((line = reader.readLine()) != null) {
-                if (!line.contains(":")) continue;
-                String[] item = line.split(":");
-                head.content.put(item[0], item[1]);
+                index = line.indexOf(':');
+                if (index <= 0) continue;
+                head.content.put(line.substring(0, index), line.substring(index + 1));
             }
+
+            // 解析Referer的Path
+            String refererStr = head.content.get(KEY_REFERER);
+            if (refererStr != null) {
+                index = refererStr.lastIndexOf('/');
+                head.referPath = refererStr.substring(index);
+                index = head.referPath.indexOf('?');
+                if (index > 0) {
+                    head.referPath = head.referPath.substring(0, index);
+                }
+            }
+
             return head;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            Log.d(TAG, "parse failed : e="+e);
         }
         return null;
     }

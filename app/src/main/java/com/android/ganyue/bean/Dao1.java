@@ -7,7 +7,7 @@ import com.gy.utils.database.annotation.DBTable;
  *
  */
 
-@DBTable(primaryKey = "integ")
+@DBTable(name = "Dao1")
 public class Dao1 {
     public int integ;
     public String str;

@@ -11,8 +11,9 @@ import java.lang.annotation.Target;
  * 创建简单表，满足应用正常使用就好，
  * 需要用到外键什么的，用到时候再加吧
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DBTable {
+public @interface DBColume {
     String name() default "";
+    boolean primaryKey() default false;
 }

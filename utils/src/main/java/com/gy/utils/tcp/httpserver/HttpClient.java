@@ -1,6 +1,7 @@
 package com.gy.utils.tcp.httpserver;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.gy.utils.tcp.SendItem;
@@ -32,6 +33,9 @@ public class HttpClient implements TcpClient.TcpClientListener {
 
     public void release () {
         mClient.release();
+        if (mHttpServer != null && mHttpServer.get() != null) {
+            mHttpServer.get().removeClient(this);
+        }
     }
 
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ tcp client callback ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ //
@@ -54,79 +58,107 @@ public class HttpClient implements TcpClient.TcpClientListener {
     @Override
     public void onSendSuccess(String unique, SendItem item, long totalLen, String dstIp, int dstPort) {
         Log.d(TAG, "onSendSuccess --> dstIp=" + dstIp + ", dstPort=" + dstPort);
-        if (item.unique.equals(sendFinalTag)) {
-            release();
-            if (mHttpServer != null && mHttpServer.get() != null) mHttpServer.get().removeClient(this);
-        }
+        if (item.unique.equals(sendFinalTag)) release();
     }
 
     @Override
     public void onSendFailed(String unique, SendItem item, Exception e, String dstIp, int dstPort) {
         Log.d(TAG, "onSendFailed --> dstIp=" + dstIp + ", dstPort=" + dstPort);
-        if (mHttpServer != null && mHttpServer.get() != null) {
-            release();
-            mHttpServer.get().removeClient(this);
-        }
+        release();
     }
 
     @Override
     public void onReceive(String unique, String msg, String fromIp, int fromPort) {
-        Log.d(TAG, "onReceive --> msg=" + msg);
+        Log.d(TAG, "onReceive --> msg=" + msg + ", unique=" + unique);
         if (mHttpServer == null || mHttpServer.get() == null) {
             release();
             return;
         }
-        Map<String, RequestMap> map = mHttpServer.get().getRequestMap();
         RequestHttpHead head = RequestHttpHead.parseHead(msg);
-        if (head == null || !map.containsKey(head.path)) {
+        if (head == null) {
             release();
-            mHttpServer.get().removeClient(this);
             return;
         }
+        Map<String, RequestMap> map = mHttpServer.get().getRequestMap();
         RequestMap requestMap = map.get(head.path);
-        if (requestMap instanceof RequestMapAssetHtml) {
-            RequestMapAssetHtml requestMapAssetHtml = (RequestMapAssetHtml) requestMap;
-            sendFinalTag = String.valueOf(System.currentTimeMillis());
-            try {
-                InputStream fIn = mCxt.getAssets().open(requestMapAssetHtml.filePath);
-                mClient.sendString("", requestMapAssetHtml.getResponseHead());
-                mClient.sendStream(sendFinalTag, fIn);
-            } catch (Exception e) {
-                e.printStackTrace();
-                release();
-                mHttpServer.get().removeClient(this);
-            }
-        } else if (requestMap instanceof RequestMapAssetFile) {
-            RequestMapAssetFile requestMapAssetFile = (RequestMapAssetFile) requestMap;
-            sendFinalTag = String.valueOf(System.currentTimeMillis());
-            try {
-                InputStream fIn =  mCxt.getAssets().open(requestMapAssetFile.filePath);
-                mClient.sendString("", requestMapAssetFile.getResponseHead());
-                mClient.sendStream(sendFinalTag, fIn);
-            } catch (Exception e) {
-                e.printStackTrace();
-                release();
-                mHttpServer.get().removeClient(this);
-            }
+        if (requestMap == null && !TextUtils.isEmpty(head.referPath)) {
+            requestMap = map.get(head.referPath);
+        }
+        if (requestMap == null) {
+            release();
+            return;
+        }
+
+        try {
+            processRequest(requestMap, head);
+        } catch (Exception e) {
+            e.printStackTrace();
+            release();
         }
     }
 
     @Override
     public void onReceiveError(String unique, Exception e, String fromIp, int fromPort) {
         Log.d(TAG, "onReceiveError --> fromIp=" + fromIp + ", fromPort=" + fromPort);
-        if (mHttpServer != null && mHttpServer.get() != null) {
-            release();
-            mHttpServer.get().removeClient(this);
-        }
+        release();
     }
     // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ tcp client callback ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ //
-    public WeakReference<HttpServerCallback> mCallback;
-    public void setServerCallback (HttpServerCallback callback) {
-        if (callback == null) mCallback = null;
-        mCallback = new WeakReference<>(callback);
+
+    private void processRequest (RequestMap requestMap, RequestHttpHead head) throws Exception {
+        if (requestMap instanceof RequestMapAssetHtml) {
+            processAssetHtml((RequestMapAssetHtml) requestMap, head);
+        } else if (requestMap instanceof RequestMapAssetFile) {
+            processAssetFile((RequestMapAssetFile) requestMap, head);
+        }
     }
-    public interface HttpServerCallback {
-        void onStartFailed(Exception e);
-        void onRequest(String path);//TODO
+
+    private void processAssetHtml (RequestMapAssetHtml r, RequestHttpHead head) throws Exception {
+        sendFinalTag = String.valueOf(System.currentTimeMillis());
+        String sendFilePath;
+        if (!TextUtils.isEmpty(head.referPath)) {
+            sendFilePath = r.getRelativeRootPath() + head.path;
+        } else {
+            sendFilePath = r.filePath;
+        }
+
+        String sendHeadStr = r.getResponseHead(getContentType(sendFilePath));
+        InputStream fIn = mCxt.getAssets().open(sendFilePath);
+        mClient.sendString("", sendHeadStr);
+        mClient.sendStream(sendFinalTag, fIn);
+    }
+
+    private void processAssetFile (RequestMapAssetFile r, RequestHttpHead head) throws Exception {
+        sendFinalTag = String.valueOf(System.currentTimeMillis());
+        InputStream fIn =  mCxt.getAssets().open(r.filePath);
+        mClient.sendString("", r.getResponseHead());
+        mClient.sendStream(sendFinalTag, fIn);
+    }
+
+    private String getContentType (String path) {
+        int index = path.lastIndexOf('.');
+        if (index < 0) return null;
+        String tail = path.substring(index);
+        switch (tail) {
+            case ".png":
+            case ".jpg":
+            case ".jpeg":
+            case ".ico":
+                return "image/*";
+            case ".html":
+                return "text/html";
+            case ".css":
+                return "text/css";
+            case ".js":
+                return "application/x-javascript";
+            case ".map":
+                return "text/*";
+            case ".eot":
+            case ".svg":
+            case ".ttf":
+            case ".woff":
+            case ".woff2":
+                return "application/octet-stream";
+        }
+        return "text/*";
     }
 }

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
+import com.gy.utils.database.annotation.DBColume;
 import com.gy.utils.database.annotation.DBTable;
 
 import java.lang.reflect.Field;
@@ -18,40 +19,36 @@ import java.util.List;
  *
  * 创建简单表，满足应用正常使用就好
  * 结合注解可以指定表名、主键
- * e.g. @DBTable(primaryKey="xxx")
+ * e.g. @DBTable(name="xxx") 成员变量用 @DBColumn(name="xxx", primaryKey=true)
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-    private Class[] beans;
+    private String[] createSqls;
 
-    public DBHelper (Context context, String dbName, int version, Class[] beans) {
+    public DBHelper (Context context, String dbName,
+                     int version, Class[] beans) {
         super(context, dbName, null, version);
-        this.beans = beans;
+        if (beans != null) {
+            createSqls = new String[beans.length];
+            for (int i = 0; i < beans.length; i++) {
+                createSqls[i] = getCreateSql(beans[i]);
+            }
+        }
     }
 
-    private SQLiteDatabase mSQLiteDataBase;
-
-    public SQLiteDatabase getSQLiteDataBase () {
-        if (mSQLiteDataBase == null) {
-            mSQLiteDataBase = getWritableDatabase();
-        }
-        return mSQLiteDataBase;
+    public SQLiteDatabase getWritableDB () {
+        return getWritableDatabase();
+    }
+    public SQLiteDatabase getReadableDB () {
+        return getReadableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        if (beans == null || beans.length <= 0) {
-            return;
-        }
-
-        String createSql;
-        for (Class bean : beans) {
-            createSql = getCreateSql(bean);
-            if (TextUtils.isEmpty(createSql)) {
-                continue;
-            }
-
-            db.execSQL(createSql);
+        if (createSqls == null || createSqls.length <= 0) return;
+        for (String sql : createSqls) {
+            if (TextUtils.isEmpty(sql)) continue;
+            db.execSQL(sql);
         }
     }
 
@@ -60,69 +57,96 @@ public class DBHelper extends SQLiteOpenHelper {
         //TODO need to be override by child class to update database of certain version
     }
 
-    /**
-     * 查询
-     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=?", new String[]{xxx});
-     */
-    public List query (Class bean, String sql, String[] selectionArgs) {
+    public <T> List<T> query (Class<T> classOfT) {
+        return query(classOfT ,"select * from " + getTableName(classOfT), null);
+    }
+
+    public <T> List<T> query (Class<T> classOfT, int num, int offset) {
+        return query(classOfT ,"select * from " + getTableName(classOfT), null, num, offset);
+    }
+
+        /*** 查询* <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=?", new String[]{xxx});*/
+    public <T> List<T> query (Class<T> classOfT, String sql, String[] selectionArgs) {
         try {
-            SQLiteDatabase db = getSQLiteDataBase();
-            Cursor cursor = db.rawQuery(sql, selectionArgs);
+            SQLiteDatabase db = getReadableDB();
+            Cursor cursor = db.rawQuery(sql, new String[]{});
 
-            List result = cursorToList(bean, cursor);
-
-            if (cursor != null) {
-                cursor.close();
+            if (cursor == null) {
+                db.close();
+                return new ArrayList<>();
             }
+
+            cursor.moveToFirst();
+            List<T> result = cursorToList(classOfT, cursor);
+
+            cursor.close();
+            db.close();
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-            return new ArrayList();
+            return new ArrayList<>();
         }
     }
 
-    /**
-     * 分页查询
-     * <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx", null, 10, 10);
-     */
-    public List query (Class bean, String sql, String[] selectionArgs, int num, int offset) {
-        SQLiteDatabase db = getSQLiteDataBase();
-        sql += " limit " + num + "," + offset;
+    /*** 分页查询* <p> e.g: dbHelper.query(cls,"select * from " + xxx + " where xxx=xxx", null, 10, 10);*/
+    public <T> List<T> query (Class<T> classOfT, String sql, String[] selectionArgs, int num, int offset) {
+        SQLiteDatabase db = getReadableDB();
+        sql += " limit " + num + " OFFSET " + offset;
         Cursor cursor = db.rawQuery(sql, selectionArgs);
 
-        List result = cursorToList(bean, cursor);
-
-        if (cursor != null) {
-            cursor.close();
+        if (cursor == null) {
+            db.close();
+            return new ArrayList<>();
         }
+
+        cursor.moveToFirst();
+        List<T> result = cursorToList(classOfT, cursor);
+
+        cursor.close();
+        db.close();
         return result;
     }
 
-    /**
-     * 更新到表名是Object相应类名的表，该表名获取方法是{@link #getTableName(Class)}
-     * <p> e.g: dbHelper.update(obj, "xxx=xxx", null);
-     */
+    public int update (Object obj) {
+        String whereClause = getTableDefaultWhereClause(obj);
+        if (TextUtils.isEmpty(whereClause)) return 0;
+        return update(obj, whereClause, null);
+    }
+
+    /*** 更新到表名是Object相应类名的表，该表名获取方法是{@link #getTableName(Class)}* <p> e.g: dbHelper.update(obj, "xxx=xxx", null);*/
     public int update (Object obj, String sql, String[] selectionArgs) {
         return update(getTableName(obj.getClass()), obj, sql, selectionArgs);
     }
 
-    /**
-     * 更新到指定名字的表
-     * <p> e.g: dbHelper.update(xxx, obj, "xxx=xxx", null);
-     */
+    /*** 更新到指定名字的表* <p> e.g: dbHelper.update(xxx, obj, "xxx=xxx", null);*/
     public int update (String tableName, Object obj, String sql, String[] selectionArgs) {
         Field[] fields = obj.getClass().getDeclaredFields();
         ContentValues contentValues = new ContentValues();
         for (Field field: fields) {
+            String colName = getColumnName(field);
+            if (TextUtils.isEmpty(colName)) continue;
             try {
                 field.setAccessible(true);
 
-                if (getColumnType(field) == ColumnType.INTEGER) {
-                    contentValues.put(field.getName(), field.getInt(obj));
-                } else if (getColumnType(field) == ColumnType.FLOAT) {
-                    contentValues.put(field.getName(), field.getFloat(obj));
-                } else if (getColumnType(field) == ColumnType.TEXT) {
-                    contentValues.put(field.getName(), ""+field.get(obj));
+                switch (getColumnType(field)) {
+                    case INTEGER:
+                        contentValues.put(field.getName(), field.getInt(obj));
+                        break;
+                    case LONG:
+                        contentValues.put(field.getName(), field.getLong(obj));
+                        break;
+                    case BOOLEAN:
+                        contentValues.put(field.getName(), field.getBoolean(obj)? 1: 0);
+                        break;
+                    case REAL:
+                        contentValues.put(field.getName(), field.getFloat(obj));
+                        break;
+                    case TEXT:
+                        contentValues.put(field.getName(), ""+field.get(obj));
+                        break;
+                    case BLOB:
+                        // TODO 图片等二进制数据
+                        break;
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -130,49 +154,82 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
-        SQLiteDatabase db = getSQLiteDataBase();
-        int result = db.update(tableName, contentValues, sql, selectionArgs);
-        return result;
+        SQLiteDatabase db = getWritableDB();
+        int ret = db.update(tableName, contentValues, sql, selectionArgs);
+        db.close();
+        return ret;
     }
 
-    /**
-     * 删除的表名见方法：{@link #getTableName(Class)}
-     * <p> e.g: dbHelper.delete(cls, "xxx=xxx", null);
-     */
-    public int delete (Class bean, String sql, String[] selectionArgs) {
-        return delete(getTableName(bean), sql, selectionArgs);
+    /*** 删除的表名见方法：{@link #getTableName(Class)}* <p> e.g: dbHelper.delete(cls, "xxx=xxx", null);*/
+    public <T> int delete (Class<T> classOfT, String sql, String[] selectionArgs) {
+        return delete(getTableName(classOfT), sql, selectionArgs);
     }
 
-    /**
-     * 删除
-     * <p> e.g: dbHelper.delete(xxx, "xxx=xxx", null);
-     */
+    /*** 删除* <p> e.g: dbHelper.delete(xxx, "xxx=xxx", null);*/
     public int delete (String tableName, String sql, String[] selectionArgs) {
-        SQLiteDatabase db = getSQLiteDataBase();
-        int result = db.delete(tableName, sql, selectionArgs);
-        return result;
+        SQLiteDatabase db = getWritableDB();
+        int ret = db.delete(tableName, sql, selectionArgs);
+        db.close();
+        return ret;
     }
 
-    public long insertOrReplace(Object obj) {
-        return insertOrReplace(getTableName(obj.getClass()), obj);
+    public <T> int delete (T objOfT) {
+        String whereClause = getTableDefaultWhereClause(objOfT);
+        if (TextUtils.isEmpty(whereClause)) return 0;
+        return delete(objOfT.getClass(), getTableDefaultWhereClause(objOfT), null);
     }
-    /**
-     * 插入
-     * <p>如果插入不成功，直接替换掉</p>
-     */
-    public long insertOrReplace(String tableName, Object obj) {
+
+    private String getTableDefaultWhereClause (Object obj) {
+        StringBuilder sqlPrimaryKey = new StringBuilder();
+        Field[] fields = obj.getClass().getDeclaredFields();
+
+        for (Field field: fields) {
+            String colName = getColumnName(field);
+            if (TextUtils.isEmpty(colName)) continue;
+            if (!isPrimaryKey(field)) continue;
+            try {
+                field.setAccessible(true);
+                if (sqlPrimaryKey.length() <= 0) {
+                    sqlPrimaryKey.append(colName).append("=").append(field.get(obj));
+                } else {
+                    sqlPrimaryKey.append(" AND ").append(colName).append("=").append(field.get(obj));
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return sqlPrimaryKey.toString();
+    }
+
+    /*** 插入* <p>如果插入不成功，直接替换掉</p>*/
+    public long insertOrReplace(Object obj) {
+        String tableName = getTableName(obj.getClass());
         Field[] fields = obj.getClass().getDeclaredFields();
         ContentValues contentValues = new ContentValues();
         for (Field field: fields) {
+            String colName = getColumnName(field);
+            if (TextUtils.isEmpty(colName)) continue;
             try {
                 field.setAccessible(true);
-
-                if (getColumnType(field) == ColumnType.INTEGER) {
-                    contentValues.put(field.getName(), field.getInt(obj));
-                } else if (getColumnType(field) == ColumnType.FLOAT) {
-                    contentValues.put(field.getName(), field.getFloat(obj));
-                } else if (getColumnType(field) == ColumnType.TEXT) {
-                    contentValues.put(field.getName(), ""+field.get(obj));
+                switch (getColumnType(field)) {
+                    case INTEGER:
+                        contentValues.put(field.getName(), field.getInt(obj));
+                        break;
+                    case LONG:
+                        contentValues.put(field.getName(), field.getLong(obj));
+                        break;
+                    case BOOLEAN:
+                        contentValues.put(field.getName(), field.getBoolean(obj)? 1: 0);
+                        break;
+                    case REAL:
+                        contentValues.put(field.getName(), field.getFloat(obj));
+                        break;
+                    case TEXT:
+                        contentValues.put(field.getName(), ""+field.get(obj));
+                        break;
+                    case BLOB:
+                        // TODO 图片等二进制数据
+                        break;
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -180,9 +237,10 @@ public class DBHelper extends SQLiteOpenHelper {
             }
         }
 
-        SQLiteDatabase db = getSQLiteDataBase();
-        long result = db.insertWithOnConflict(tableName, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-        return result;
+        SQLiteDatabase db = getWritableDB();
+        long ret = db.insertWithOnConflict(tableName, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+        return ret;
     }
 
     /** e.g: isExist(tableName, "xx=?", new String[]{xx}) */
@@ -190,15 +248,22 @@ public class DBHelper extends SQLiteOpenHelper {
         return getColumnCount(tableName, whereClaus, args) > 0;
     }
 
-    /**
-     * 查询数据总数
-     */
-    public int getColumnCount (Class bean) {
-        return getColumnCount(getTableName(bean));
+    public <T> boolean isExist (Class<T> classOfT, String whereClaus, String[] args) {
+        return isExist(getTableName(classOfT), whereClaus, args);
+    }
+
+    /*** 查询数据总数*/
+    public <T> int getColumnCount (Class<T> classOfT) {
+        return getColumnCount(getTableName(classOfT));
+    }
+
+    /** e.g: isExist(TTT, "xx=?", new String[]{xx}) */
+    public <T> int getColumnCount (Class<T> classOfT, String whereClaus, String[] args) {
+        return getColumnCount(getTableName(classOfT), whereClaus, args);
     }
 
     public int getColumnCount(String tableName, String whereClaus, String[] args) {
-        SQLiteDatabase db = getSQLiteDataBase();
+        SQLiteDatabase db = getReadableDB();
         Cursor cursor = db.rawQuery("select count(*) from " + tableName + " where " + whereClaus, args);
         if (cursor == null || cursor.getCount() <= 0) {
             if (cursor != null) {
@@ -211,11 +276,12 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getInt(0);
 
         cursor.close();
+        db.close();
         return count;
     }
 
     public int getColumnCount (String tableName) {
-        SQLiteDatabase db = getSQLiteDataBase();
+        SQLiteDatabase db = getReadableDB();
         Cursor cursor = db.rawQuery("select count(*) from " + tableName, null);
         if (cursor == null || cursor.getCount() <= 0) {
             if (cursor != null) {
@@ -228,43 +294,57 @@ public class DBHelper extends SQLiteOpenHelper {
         int count = cursor.getInt(0);
 
         cursor.close();
+        db.close();
         return count;
     }
 
-    /**
-     * 根据查询得到的Cursor生成对应的实例列表
-     */
-    public List cursorToList (Class bean, Cursor cursor) {
+    /*** 根据查询得到的Cursor生成对应的实例列表*/
+    public <T> List<T> cursorToList (Class<T> classOfT, Cursor cursor) {
+        List<T> result = new ArrayList<>();
         if (cursor == null || cursor.getCount() <= 0) {
-            return null;
+            return result;
         }
-        List result = new ArrayList();
 
-        Field[] fields = bean.getDeclaredFields();
-        int[] columnIndexs = new int[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            columnIndexs[i] = cursor.getColumnIndex(fields[i].getName());
+        Field[] fields = classOfT.getDeclaredFields();
+        List<Field> columnFields = new ArrayList<>(fields.length);
+        List<Integer> columnIndexes = new ArrayList<>(fields.length);
+        for (Field field : fields) {
+            String colName = getColumnName(field);
+            if (TextUtils.isEmpty(colName)) continue;
+            field.setAccessible(true);
+            columnFields.add(field);
+            columnIndexes.add(cursor.getColumnIndex(colName));
         }
 
         int count = cursor.getCount();
         for (int i = 0; i < count; i++) {
             cursor.moveToPosition(i);
             try {
-                Object obj = bean.newInstance();
-                for (int j = 0; j < columnIndexs.length; j++) {
-                    if (columnIndexs[j] <= -1) {
+                T obj = classOfT.newInstance();
+                for (int j = 0; j < columnIndexes.size(); j++) {
+                    if (columnIndexes.get(j) <= -1) {
                         continue;
                     }
-
-                    if (getColumnType(fields[j]) == ColumnType.INTEGER) {
-                        fields[j].setAccessible(true);
-                        fields[j].set(obj, cursor.getInt(columnIndexs[j]));
-                    } else if (getColumnType(fields[j]) == ColumnType.FLOAT) {
-                        fields[j].setAccessible(true);
-                        fields[j].set(obj, cursor.getFloat(columnIndexs[j]));
-                    } else if (getColumnType(fields[j]) == ColumnType.TEXT) {
-                        fields[j].setAccessible(true);
-                        fields[j].set(obj, cursor.getString(columnIndexs[j]));
+                    Field field = columnFields.get(j);
+                    switch (getColumnType(field)) {
+                        case INTEGER:
+                            field.set(obj, cursor.getInt(columnIndexes.get(j)));
+                            break;
+                        case LONG:
+                            field.set(obj, cursor.getLong(columnIndexes.get(j)));
+                            break;
+                        case BOOLEAN:
+                            field.set(obj, cursor.getInt(columnIndexes.get(j)) > 0);
+                            break;
+                        case REAL:
+                            field.set(obj, cursor.getFloat(columnIndexes.get(j)));
+                            break;
+                        case TEXT:
+                            field.set(obj, cursor.getString(columnIndexes.get(j)));
+                            break;
+                        case BLOB:
+                            // TODO 图片等二进制数据
+                            break;
                     }
                 }
                 result.add(obj);
@@ -272,107 +352,109 @@ public class DBHelper extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
         }
-
         return result;
     }
 
-    public String getCreateSql (Class bean) {
-        return getCreateSql(bean, getTableName(bean));
-    }
+    /*** 生成创建表的sql语句*/
+    public <T> String getCreateSql (Class<T> classOfT) {
+        String tableName = getTableName(classOfT);
+        StringBuilder createSqlStr = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
+        List<String> primaryKeys = new ArrayList<>();
+        createSqlStr.append(tableName);
 
-    /**
-     * 生成创建表的sql语句
-     */
-    public String getCreateSql (Class bean, String tableName) {
-        String createSqlStr = "create table if not exists ";
-        String[] primaryKey = getTablePrimaryKeys(bean);
-        createSqlStr += tableName;
+        Field[] fields = classOfT.getDeclaredFields();
 
-        Field[] fields = bean.getDeclaredFields();
-
-        if (fields == null || fields.length <= 0) {
-            throw new IllegalArgumentException("there no filed in class" + bean.getSimpleName());
+        if (fields.length <= 0) {
+            throw new IllegalArgumentException("there no filed in class" + classOfT.getSimpleName());
         }
 
-        createSqlStr += " (";
-        String fieldName;
+        createSqlStr.append(" (");
         for (Field field : fields) {
-            fieldName = field.getName();
-            if (getColumnType(field) == ColumnType.INTEGER) {
-                createSqlStr += fieldName + " integer,";
-            } else if (getColumnType(field) == ColumnType.FLOAT) {
-                createSqlStr += fieldName + " float,";
-            } else if (getColumnType(field) == ColumnType.TEXT) {
-                createSqlStr += fieldName + " text,";
-            }
+            String colName = getColumnName(field);
+            if (TextUtils.isEmpty(colName)) continue;
+            if (isPrimaryKey(field)) primaryKeys.add(colName);
+            createSqlStr.append(colName).append(" ").append(getColumnType(field).name).append(",");
         }
 
-        if (primaryKey != null && primaryKey.length > 0) {
-            createSqlStr += " primary key (" + primaryKey[0];
-            if (primaryKey.length > 1) {
-                for (int i = 1; i < primaryKey.length; i++) {
-                    createSqlStr += "," + primaryKey[i];
-                }
+        if (primaryKeys.size() > 0) {
+            createSqlStr.append(" PRIMARY KEY (").append(primaryKeys.get(0));
+            for (int i = 1; i < primaryKeys.size(); i++) {
+                createSqlStr.append(",").append(primaryKeys.get(i));
             }
-            createSqlStr += ")";
+            createSqlStr.append(")");
         }
 
         if (createSqlStr.charAt(createSqlStr.length() - 1) == ',') {
-            createSqlStr = createSqlStr.substring(0, createSqlStr.length() - 1);
+            createSqlStr = new StringBuilder(createSqlStr.substring(0, createSqlStr.length() - 1));
         }
 
-        createSqlStr += ")";
-        return createSqlStr;
+        createSqlStr.append(")");
+        return createSqlStr.toString();
     }
 
-    /**
-     * 获取数据表名字
-     */
-    public String getTableName (Class bean) {
-        String name = null;
-        if (bean.isAnnotationPresent(DBTable.class)) {
-            DBTable dbTable = (DBTable) bean.getAnnotation(DBTable.class);
-            name = dbTable.tableName();
+    /*** 获取数据表名字*/
+    public static <T> String getTableName (Class<T> classOfT) {
+        String name = "";
+        if (classOfT.isAnnotationPresent(DBTable.class)) {
+            DBTable dbTable = classOfT.getAnnotation(DBTable.class);
+            name = dbTable == null? null: dbTable.name().toLowerCase();
         }
         if (TextUtils.isEmpty(name)) {
-            name = bean.getSimpleName();
+            name = classOfT.getSimpleName().toLowerCase();
         }
-
-        return name.toLowerCase();
+        return name;
     }
 
-    /**
-     * 获取数据表主键
-     */
-    public String[] getTablePrimaryKeys (Class bean) {
-        String[] primaryKeys = null;
-        if (bean.isAnnotationPresent(DBTable.class)) {
-            DBTable dbTable = (DBTable) bean.getAnnotation(DBTable.class);
-            primaryKeys = dbTable.primaryKey();
+    private String getColumnName (Field field) {
+        if (field.isAnnotationPresent(DBColume.class)) {
+            DBColume col = field.getAnnotation(DBColume.class);
+            if (col == null) return null;
+            String colName = col.name();
+            if (TextUtils.isEmpty(colName)) colName = field.getName();
+            return colName;
         }
-
-        return primaryKeys;
+        return null;
     }
 
-    /**
-     * 目前只支持三种类型数据，int, float, text. 后期如需其他类型数据，再添加吧
-     */
-    public int getColumnType (Field field) {
+    private boolean isPrimaryKey (Field field) {
+        if (field.isAnnotationPresent(DBColume.class)) {
+            DBColume col = field.getAnnotation(DBColume.class);
+            return col != null && col.primaryKey();
+        }
+        return false;
+    }
+
+    /*** 目前只支持三种类型数据，int, float, text. 后期如需其他类型数据，再添加吧*/
+    private ColumnType getColumnType (Field field) {
         String fieldTypeName = field.getType().getSimpleName().toLowerCase();
-        if (fieldTypeName.equals("int") || fieldTypeName.equals("integer")) {
-            return ColumnType.INTEGER;
-        } else if (fieldTypeName.equals("float")) {
-            return ColumnType.FLOAT;
-        } else if (fieldTypeName.equals("string")) {
-            return ColumnType.TEXT;
+        switch (fieldTypeName) {
+            case "int":
+            case "integer":
+                return ColumnType.INTEGER;
+            case "boolean":
+                return ColumnType.BOOLEAN;
+            case "float":
+            case "double":
+                return ColumnType.REAL;
+            case "long":
+                return ColumnType.LONG;
+            case "string":
+                return ColumnType.TEXT;
+            default:
+                return ColumnType.BLOB;
         }
-        return ColumnType.UNKOWN;
     }
 
-    class ColumnType {
-        public static final int UNKOWN = 0;
-        public static final int INTEGER = 1;
-        public static final int FLOAT = 2;
-        public static final int TEXT = 3;
+    private enum ColumnType {
+        INTEGER("INTEGER"), // short int long
+        LONG("INTEGER"), // short int long
+        BOOLEAN("INTEGER"), // boolean 用integer false=0, true=1
+        REAL("REAL"),       // 浮点型数据
+        TEXT("TEXT"),       // 字符数组 字符串
+        BLOB("BLOB");       // 主要保存二进制数据，譬如图片、文件等
+        final String name;
+        ColumnType (String name) {
+            this.name = name;
+        }
     }
 }

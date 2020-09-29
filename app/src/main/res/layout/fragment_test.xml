@@ -4,19 +4,24 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center">
     <TextView
         android:id="@+id/mVStart"
-        android:layout_width="60dp"
-        android:layout_height="30dp"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:gravity="center"
         android:text="start"
+        android:textColor="@android:color/white"
         android:background="@color/colorPrimary"/>
 
     <TextView
         android:id="@+id/mVStop"
-        android:layout_width="60dp"
-        android:layout_height="30dp"
+        android:layout_width="180dp"
+        android:layout_height="60dp"
+        android:gravity="center"
         android:layout_marginTop="60dp"
         android:text="stop"
+        android:textColor="@android:color/white"
         android:background="@color/colorAccent"/>
 </LinearLayout>

@@ -33,12 +33,14 @@ public class TestFrg extends BaseFragment{
                 server = new HttpServer(getContext(), 8080)
                         .addAssetHtml("/test", "TestHttpServer/index.html")
                         .addAssetFile("/file", "TestHttpServer/test.txt")
+                        .addAssetFile("/file", "TestHttpServer/test.txt")
                         .start();
             }
         });
         mVStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                server.stop();
             }
         });
 
