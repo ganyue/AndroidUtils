@@ -138,9 +138,9 @@ public class HttpClient implements TcpClient.TcpClientListener {
         sendFinalTag = String.valueOf(System.currentTimeMillis());
         String sendHtmlStr;
         if (!TextUtils.isEmpty(head.referPath)) {
-            sendHtmlStr = r.getHtmlSupplier().getReferHtml();
+            sendHtmlStr = r.getHtmlSupplier().getReferHtml(head.referPath, head);
         } else {
-            sendHtmlStr = r.getHtmlSupplier().getHtml();
+            sendHtmlStr = r.getHtmlSupplier().getHtml(head);
         }
 
         if (TextUtils.isEmpty(sendHtmlStr)) {

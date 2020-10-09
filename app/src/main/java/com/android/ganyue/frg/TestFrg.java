@@ -10,6 +10,7 @@ import com.android.ganyue.R;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.tcp.httpserver.HttpServer;
+import com.gy.utils.tcp.httpserver.RequestHttpHead;
 import com.gy.utils.tcp.httpserver.RequestMapCustomHtmlResFromAssets;
 
 /**
@@ -51,12 +52,12 @@ public class TestFrg extends BaseFragment{
 
     private RequestMapCustomHtmlResFromAssets.HtmlSupplier supplier = new RequestMapCustomHtmlResFromAssets.HtmlSupplier() {
         @Override
-        public String getHtml() {
+        public String getHtml(RequestHttpHead head) {
             return "this is test for CustomHtmlResFromAssets";
         }
 
         @Override
-        public String getReferHtml() {
+        public String getReferHtml(String refer, RequestHttpHead head) {
             return null;
         }
     };

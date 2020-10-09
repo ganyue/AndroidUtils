@@ -12,6 +12,7 @@ public class RequestHttpHead {
 
     public static final String METHOD_GET = "GET";
     public static final String KEY_REFERER = "Referer";
+    public static final String KEY_HOST = "Host";
 
     public Map<String, String> content = new HashMap<>();
     public Map<String, String> params = new HashMap<>();
@@ -53,7 +54,7 @@ public class RequestHttpHead {
             while ((line = reader.readLine()) != null) {
                 index = line.indexOf(':');
                 if (index <= 0) continue;
-                head.content.put(line.substring(0, index), line.substring(index + 1));
+                head.content.put(line.substring(0, index), line.substring(index + 1).trim());
             }
 
             // 解析Referer的Path
@@ -73,5 +74,9 @@ public class RequestHttpHead {
             Log.d(TAG, "parse failed : e="+e);
         }
         return null;
+    }
+
+    public String getHost () {
+        return content.get(KEY_HOST);
     }
 }

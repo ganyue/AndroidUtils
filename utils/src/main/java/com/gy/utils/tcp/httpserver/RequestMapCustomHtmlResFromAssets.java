@@ -27,7 +27,7 @@ public class RequestMapCustomHtmlResFromAssets extends RequestMap {
     }
 
     public interface HtmlSupplier {
-        String getHtml ();
-        String getReferHtml ();
+        String getHtml (RequestHttpHead head);
+        String getReferHtml (String refer, RequestHttpHead head);
     }
 }
