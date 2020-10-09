@@ -7,8 +7,6 @@ import android.util.Log;
 import com.gy.utils.tcp.SendItem;
 import com.gy.utils.tcp.TcpClient;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
@@ -109,6 +107,8 @@ public class HttpClient implements TcpClient.TcpClientListener {
             processAssetHtml((RequestMapAssetHtml) requestMap, head);
         } else if (requestMap instanceof RequestMapAssetFile) {
             processAssetFile((RequestMapAssetFile) requestMap, head);
+        } else if (requestMap instanceof RequestMapCustomHtmlResFromAssets) {
+            processCustomHtmlResFromAssets((RequestMapCustomHtmlResFromAssets) requestMap, head);
         }
     }
 
@@ -132,6 +132,27 @@ public class HttpClient implements TcpClient.TcpClientListener {
         InputStream fIn =  mCxt.getAssets().open(r.filePath);
         mClient.sendString("", r.getResponseHead());
         mClient.sendStream(sendFinalTag, fIn);
+    }
+
+    private void processCustomHtmlResFromAssets (RequestMapCustomHtmlResFromAssets r, RequestHttpHead head) throws Exception {
+        sendFinalTag = String.valueOf(System.currentTimeMillis());
+        String sendHtmlStr;
+        if (!TextUtils.isEmpty(head.referPath)) {
+            sendHtmlStr = r.getHtmlSupplier().getReferHtml();
+        } else {
+            sendHtmlStr = r.getHtmlSupplier().getHtml();
+        }
+
+        if (TextUtils.isEmpty(sendHtmlStr)) {
+            String sendFilePath = r.getRelativeRootPath() + head.path;
+            String sendHeadStr = r.getResponseHead(getContentType(sendFilePath));
+            InputStream fIn = mCxt.getAssets().open(sendFilePath);
+            mClient.sendString("", sendHeadStr);
+            mClient.sendStream(sendFinalTag, fIn);
+        } else {
+            mClient.sendString("", r.getResponseHead(null));
+            mClient.sendString(sendFinalTag, sendHtmlStr);
+        }
     }
 
     private String getContentType (String path) {

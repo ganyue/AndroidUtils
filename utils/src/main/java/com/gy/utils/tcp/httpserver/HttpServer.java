@@ -28,6 +28,12 @@ public class HttpServer implements TcpServer.TcpServerListener {
         mCxt = cxt.getApplicationContext();
     }
 
+    public HttpServer addCustomHtmlResFromAssets (String path, String resAssetsPath,
+                                                  RequestMapCustomHtmlResFromAssets.HtmlSupplier supplier) {
+        mRequestMap.put(path, new RequestMapCustomHtmlResFromAssets(path, resAssetsPath, supplier));
+        return this;
+    }
+
     public HttpServer addAssetHtml (String path, String assetPath) {
         mRequestMap.put(path, new RequestMapAssetHtml(path, assetPath));
         return this;

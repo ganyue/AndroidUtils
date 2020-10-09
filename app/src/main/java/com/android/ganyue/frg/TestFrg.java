@@ -10,6 +10,7 @@ import com.android.ganyue.R;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.tcp.httpserver.HttpServer;
+import com.gy.utils.tcp.httpserver.RequestMapCustomHtmlResFromAssets;
 
 /**
  * created by yue.gan 18-9-22
@@ -33,7 +34,7 @@ public class TestFrg extends BaseFragment{
                 server = new HttpServer(getContext(), 8080)
                         .addAssetHtml("/test", "TestHttpServer/index.html")
                         .addAssetFile("/file", "TestHttpServer/test.txt")
-                        .addAssetFile("/file", "TestHttpServer/test.txt")
+                        .addCustomHtmlResFromAssets("/custom", "TestHttpServer", supplier)
                         .start();
             }
         });
@@ -46,6 +47,19 @@ public class TestFrg extends BaseFragment{
 
 
     }
+
+
+    private RequestMapCustomHtmlResFromAssets.HtmlSupplier supplier = new RequestMapCustomHtmlResFromAssets.HtmlSupplier() {
+        @Override
+        public String getHtml() {
+            return "this is test for CustomHtmlResFromAssets";
+        }
+
+        @Override
+        public String getReferHtml() {
+            return null;
+        }
+    };
 
     @Override
     public void onClick(View v) {
