@@ -5,4 +5,6 @@ public abstract class RequestMap {
     public RequestMap(String p) {
         path = p;
     }
+
+    protected abstract void release ();
 }

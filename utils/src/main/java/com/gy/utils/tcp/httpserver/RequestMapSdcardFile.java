@@ -1,9 +1,9 @@
 package com.gy.utils.tcp.httpserver;
 
-public class RequestMapAssetFile extends RequestMap {
+public class RequestMapSdcardFile extends RequestMap {
     public String filePath;
     public String fileName;
-    public RequestMapAssetFile(String path, String fPath) {
+    public RequestMapSdcardFile(String path, String fPath) {
         super(path);
         filePath = fPath;
         int index = fPath.lastIndexOf('/');

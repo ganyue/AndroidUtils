@@ -20,4 +20,8 @@ public class RequestMapAssetHtml  extends RequestMap {
                 "Content-Type: " + (TextUtils.isEmpty(contentType)? "text/html" : contentType) + "\r\n" +
                 "\r\n";
     }
+
+    @Override
+    protected void release() {
+    }
 }

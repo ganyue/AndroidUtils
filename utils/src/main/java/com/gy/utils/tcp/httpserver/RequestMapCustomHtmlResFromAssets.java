@@ -26,6 +26,11 @@ public class RequestMapCustomHtmlResFromAssets extends RequestMap {
                 "\r\n";
     }
 
+    @Override
+    protected void release() {
+        mHtmlSupplier = null;
+    }
+
     public interface HtmlSupplier {
         String getHtml (RequestHttpHead head);
         String getReferHtml (String refer, RequestHttpHead head);

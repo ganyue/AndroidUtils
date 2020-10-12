@@ -44,6 +44,11 @@ public class HttpServer implements TcpServer.TcpServerListener {
         return this;
     }
 
+    public HttpServer addSdcardFile (String path, String sdcardPath) {
+        mRequestMap.put(path, new RequestMapSdcardFile(path, sdcardPath));
+        return this;
+    }
+
     public HttpServer start () {
         if (mServer == null) {
             mServer = new TcpServer(mCxt, port);
@@ -54,9 +59,25 @@ public class HttpServer implements TcpServer.TcpServerListener {
     }
 
     public HttpServer stop () {
-        mServer.release();
+        if (mServer != null) mServer.release();
         mServer = null;
         return this;
+    }
+
+    public void release () {
+        for (RequestMap r: mRequestMap.values()) {
+            r.release();
+        }
+        List<HttpClient> clients = new ArrayList<>(mClients);
+        for (HttpClient client: clients) {
+            try {
+                client.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        clients.clear();
+        stop();
     }
 
     public Map<String, RequestMap> getRequestMap () {
@@ -71,6 +92,9 @@ public class HttpServer implements TcpServer.TcpServerListener {
     @Override
     public void onServerStartSuccess(String ip, int port) {
         Log.d(TAG, "onServerStartSuccess --> ip=" + ip + ", port=" + port);
+        if (mCallback != null && mCallback.get() != null) {
+            mCallback.get().onStartSuccess(ip, port);
+        }
     }
 
     @Override
@@ -99,6 +123,6 @@ public class HttpServer implements TcpServer.TcpServerListener {
     }
     public interface HttpServerCallback {
         void onStartFailed (Exception e);
-        void onRequest (String path);//TODO
+        void onStartSuccess (String ip, int port);//TODO
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.gy.utils.tcp.SendItem;
 import com.gy.utils.tcp.TcpClient;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
@@ -107,6 +108,8 @@ public class HttpClient implements TcpClient.TcpClientListener {
             processAssetHtml((RequestMapAssetHtml) requestMap, head);
         } else if (requestMap instanceof RequestMapAssetFile) {
             processAssetFile((RequestMapAssetFile) requestMap, head);
+        } else if (requestMap instanceof RequestMapSdcardFile) {
+            processSdcardFile((RequestMapSdcardFile) requestMap, head);
         } else if (requestMap instanceof RequestMapCustomHtmlResFromAssets) {
             processCustomHtmlResFromAssets((RequestMapCustomHtmlResFromAssets) requestMap, head);
         }
@@ -134,24 +137,50 @@ public class HttpClient implements TcpClient.TcpClientListener {
         mClient.sendStream(sendFinalTag, fIn);
     }
 
+    private void processSdcardFile (RequestMapSdcardFile r, RequestHttpHead head) throws Exception {
+        sendFinalTag = String.valueOf(System.currentTimeMillis());
+        InputStream fIn =  new FileInputStream(r.filePath);
+        mClient.sendString("", r.getResponseHead());
+        mClient.sendStream(sendFinalTag, fIn);
+    }
+
     private void processCustomHtmlResFromAssets (RequestMapCustomHtmlResFromAssets r, RequestHttpHead head) throws Exception {
         sendFinalTag = String.valueOf(System.currentTimeMillis());
         String sendHtmlStr;
         if (!TextUtils.isEmpty(head.referPath)) {
-            sendHtmlStr = r.getHtmlSupplier().getReferHtml(head.referPath, head);
+            sendHtmlStr = r.getHtmlSupplier() == null? null: r.getHtmlSupplier().getReferHtml(head.referPath, head);
         } else {
-            sendHtmlStr = r.getHtmlSupplier().getHtml(head);
+            sendHtmlStr = r.getHtmlSupplier() == null? null: r.getHtmlSupplier().getHtml(head);
         }
 
-        if (TextUtils.isEmpty(sendHtmlStr)) {
+        if (sendHtmlStr == null || sendHtmlStr.length() <= 0) {
             String sendFilePath = r.getRelativeRootPath() + head.path;
             String sendHeadStr = r.getResponseHead(getContentType(sendFilePath));
             InputStream fIn = mCxt.getAssets().open(sendFilePath);
             mClient.sendString("", sendHeadStr);
             mClient.sendStream(sendFinalTag, fIn);
+        } else if (sendHtmlStr.startsWith("redirect:")) {
+            redirect(sendHtmlStr);
         } else {
             mClient.sendString("", r.getResponseHead(null));
             mClient.sendString(sendFinalTag, sendHtmlStr);
+        }
+    }
+
+    private void redirect (String path) {
+        if (path.startsWith("redirect:")) path = path.substring("redirect:".length()).trim();
+        Map<String, RequestMap> map = mHttpServer.get().getRequestMap();
+        RequestMap requestMap = map.get(path);
+        if (requestMap == null) {
+            release();
+            return;
+        }
+
+        try {
+            processRequest(requestMap, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            release();
         }
     }
 
