@@ -26,4 +26,5 @@ dependencies {
     implementation project(':appbase')
     implementation project(':widget')
     implementation project(':utils')
+    implementation project(':kline')
 }
