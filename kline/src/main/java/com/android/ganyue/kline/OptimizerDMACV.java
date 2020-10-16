@@ -1,10 +1,12 @@
 package com.android.ganyue.kline;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.util.Log;
 
 import com.gy.utils.log.LogUtils;
+import com.gy.utils.preference.SharedPreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class OptimizerDMACV extends Thread {
     public OptimizerDMACV (Context cxt) {
         this.cxt = cxt.getApplicationContext();
         LogUtils.enableLogToFile(cxt, true);
+        SharedPreferenceUtils.getInstance(cxt);
     }
 
     @Override
@@ -46,15 +49,16 @@ public class OptimizerDMACV extends Thread {
                 stocks.add(parser.parseSync("tdx/sh/lday/" + p));
             }
 
+            SharedPreferenceUtils sputils = SharedPreferenceUtils.getInstance(cxt);
             // 运算量太大，只算 p5 = 5; p6 = 20;
 //            int p1MIN = 30, p1MAX = 40;
 //            int p2MIN = 10, p2MAX = 20;
 //            int p3MIN = -25, p3MAX = -15;
 //            int p4MIN = -20, p4MAX = -10;
-            int p1MIN = 32, p1MAX = 37;
-            int p2MIN = 12, p2MAX = 17;
-            int p3MIN = -23, p3MAX = -17;
-            int p4MIN = -15, p4MAX = -10;
+            int p1MIN = sputils.getInt("p1min", 32), p1MAX = sputils.getInt("p1max", 37);
+            int p2MIN = sputils.getInt("p2min", 12), p2MAX = sputils.getInt("p2max", 17);
+            int p3MIN = sputils.getInt("p3min", -23), p3MAX = sputils.getInt("p3max", -17);
+            int p4MIN = sputils.getInt("p4min", -15), p4MAX = sputils.getInt("p4max", -10);
             int p5 = 10;
             int p6 = 20;
             int p1, p2, p3, p4;
@@ -144,10 +148,13 @@ public class OptimizerDMACV extends Thread {
                             p4++;
                         }
                         p3++;
+                        sputils.saveInt("p3min", p3);
                     }
                     p2++;
+                    sputils.saveInt("p2min", p2);
                 }
                 p1++;
+                sputils.saveInt("p1min", p1);
             }
 
         } catch (Exception e) {
