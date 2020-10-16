@@ -1,5 +1,6 @@
 package com.gy.utils.strictmode;
 
+import android.content.Context;
 import android.os.StrictMode;
 
 import com.gy.utils.log.LogUtils;
@@ -9,11 +10,11 @@ import com.gy.utils.log.LogUtils;
  */
 public class StrictModeUtils {
 
-    public static void startDebugMode () {
+    public static void startDebugMode (Context context) {
         startVmStrictMode();
         startThreadStrictMode();
         LogUtils.enableLog(true);
-        LogUtils.enableLogToFile(true);
+        LogUtils.enableLogToFile(context, true);
     }
 
     private static void startVmStrictMode () {

@@ -4,16 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Environment;
 import android.util.Log;
-
-import com.gy.utils.file.FileUtils;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -25,7 +24,6 @@ import java.util.concurrent.ArrayBlockingQueue;
  * <p>2、使用广播打开关闭日志：am broadcast -a log.enable(log.disable、log2file.enable、log2file.disable)</p>
  * <p>3、代码中直接使用
  * <p>{@link LogUtils#enableLog(boolean)}</p>
- * <p>{@link LogUtils#enableLogToFile(boolean)}</p>
  * <p>{@link LogUtils#enableLogToFile(Context, boolean)} </p>
  * <p>打开/关闭日志</p>
  */
@@ -34,15 +32,6 @@ public class LogUtils {
     private static boolean isLogEnabled = false;
     private static boolean isLogToFileEnabled = false;
     private static LogThread logThread;
-    private static final String DEFAULT_LOG_DIR = "" + Environment.getExternalStorageDirectory() + "/tmp/logs";
-
-    static {
-        //如果日志文件夹存在，直接打开日志
-        File file = new File(DEFAULT_LOG_DIR);
-        if (file.exists() && file.isDirectory()) {
-            enableLogToFile(true);
-        }
-    }
 
     public static void enableLog (boolean enable) {
         isLogEnabled = enable;
@@ -51,17 +40,12 @@ public class LogUtils {
         i("******************↑ ↑ ↑ log begin ↑ ↑ ↑******************");
     }
 
-    public static void enableLogToFile (boolean enable) {
-        enableLogToFile(null, enable);
-    }
-
     public static void enableLogToFile (Context context, boolean enable) {
         isLogEnabled = enable;
         isLogToFileEnabled = enable;
         if (enable && logThread == null) {
             if (logQueue == null) logQueue = new ArrayBlockingQueue<>(128);
-            if (context == null) logThread = new LogThread();
-            else logThread = new LogThread(context.getExternalCacheDir());
+            logThread = new LogThread(new File (context.getExternalCacheDir(), "logs"));
             logThread.start();
             i("******************↓ ↓ ↓ log begin ↓ ↓ ↓******************");
             i("***  logFileDir: " + logThread.getLogFileDir().getPath());
@@ -156,6 +140,7 @@ public class LogUtils {
     private static void v2f(String str) {l2f(str, Log.VERBOSE); }
 
     private static class LogItem {
+        static SimpleDateFormat logDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         long time;
         String msg;
         int level;
@@ -163,6 +148,35 @@ public class LogUtils {
             this.time = time;
             this.msg = msg;
             this.level = level;
+        }
+
+        public String toHtmlString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<p");
+            switch (level) {
+                case Log.INFO:
+                    stringBuilder.append(" style='color:green'>");
+                    break;
+                case Log.WARN:
+                    stringBuilder.append(" style='color:yellow'>");
+                    break;
+                case Log.ERROR:
+                    stringBuilder.append(" style='color:red'>");
+                    break;
+                default:
+                    stringBuilder.append(">");
+            }
+            stringBuilder.append("[time-->&nbsp");
+            stringBuilder.append(logDateFormat.format(new Date(time)));
+            stringBuilder.append("&nbsp]&nbsp");
+            stringBuilder.append(msg);
+            stringBuilder.append("</p>");
+            return stringBuilder.toString();
+        }
+
+        @Override
+        public String toString() {
+            return "\r\n[time--> " + logDateFormat.format(new Date(time)) + " ] " + msg;
         }
     }
 
@@ -174,17 +188,14 @@ public class LogUtils {
      * 文件日志线程
      */
     private static class LogThread extends Thread {
-        private File logFileDir = new File (DEFAULT_LOG_DIR);
+        private File logFileDir;
         private String logFileName = "log";
         private int writeCount = 0;
-        private SimpleDateFormat logDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        private SimpleDateFormat logFileNameDateFormat = new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault());
         private final long MAX_LOG_SIZE = 10 * 1024 * 1024;
 
         File getLogFileDir () {
             return logFileDir;
-        }
-
-        LogThread() {
         }
 
         LogThread(File logFileDir) {
@@ -194,7 +205,7 @@ public class LogUtils {
         }
 
         private void writeCrashLogSync (Throwable t) {
-            logFileName = "log_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date()) + "_crash";
+            logFileName = "log_" + logFileNameDateFormat.format(new Date()) + "_crash";
             logFileName += ".html";
             if (!logFileDir.exists() && !logFileDir.mkdirs()) return;
 
@@ -203,15 +214,10 @@ public class LogUtils {
             t.printStackTrace(pw);
             String logStr = sw.toString();
             logStr = logStr.replaceAll("\n\t", "\n\t<br\\>");
+            LogItem logItem = new LogItem(System.currentTimeMillis(), logStr, Log.ERROR);
             try {
                 FileOutputStream fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
-
-                String logHtmlStr = "<p style='color:red'>" +
-                        "[time-->&nbsp" +
-                        logDateFormat.format(new Date()) +
-                        "&nbsp]&nbsp" +
-                        "Throwable : " + logStr + "<br\\>" +
-                        "</p><br\\>\n\t\n\t";
+                String logHtmlStr = logItem.toHtmlString() + "<br\\>\n\t\n\t";
                 fOut.write(logHtmlStr.getBytes());
                 fOut.close();
             } catch (Exception e) {
@@ -221,22 +227,20 @@ public class LogUtils {
 
         private void checkLogFileSize () {
             if (!logFileDir.exists() && !logFileDir.mkdirs()) return;
-            long fileSize = FileUtils.getFileSize(logFileDir.getAbsolutePath());
+            long fileSize = getFileSize(logFileDir);
             if (fileSize > MAX_LOG_SIZE) {
-                FileUtils.deleteFiles(logFileDir.getPath(), null);
+                deleteFiles(logFileDir);
             }
         }
 
         @Override
         public void run() {
-
             checkLogFileSize();
-            logFileName = "log_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
+            logFileName = "log_" + logFileNameDateFormat.format(new Date());
             logFileName += ".html";
             try {
                 File logFile = new File(logFileDir, logFileName);
                 FileOutputStream fOut = new FileOutputStream(logFile, true);
-                StringBuilder stringBuilder = new StringBuilder();
                 while (isLogToFileEnabled) {
                     LogItem logItem = logQueue.take();
                     if (!logFile.exists()) {
@@ -244,27 +248,7 @@ public class LogUtils {
                         closeClosable(fOut);
                         fOut = new FileOutputStream(new File(logFileDir, logFileName), true);
                     }
-                    stringBuilder.append("<p");
-                    switch (logItem.level) {
-                        case Log.INFO:
-                            stringBuilder.append(" style='color:green'>");
-                            break;
-                        case Log.WARN:
-                            stringBuilder.append(" style='color:yellow'>");
-                            break;
-                        case Log.ERROR:
-                            stringBuilder.append(" style='color:red'>");
-                            break;
-                        default:
-                            stringBuilder.append(">");
-                    }
-                    stringBuilder.append("[time-->&nbsp");
-                    stringBuilder.append(logDateFormat.format(new Date()));
-                    stringBuilder.append("&nbsp]&nbsp");
-                    stringBuilder.append(logItem.msg);
-                    stringBuilder.append("</p>");
-                    fOut.write(stringBuilder.toString().getBytes());
-                    stringBuilder.setLength(0);
+                    fOut.write(logItem.toHtmlString().getBytes());
 
                     writeCount++;
                     if (writeCount >= 3000) {
@@ -276,6 +260,61 @@ public class LogUtils {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        private long getFileSize (File file) {
+            if (!file.exists()) {
+                return 0;
+            }
+            long size = 0;
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                if (files == null) {
+                    return 0;
+                }
+                for (File f: files) {
+                    size += getFileSize(f);
+                }
+            } else {
+                try {
+                    FileInputStream fin = new FileInputStream(file);
+                    FileChannel fileChannel = fin.getChannel();
+                    size = fileChannel.size();
+                    fileChannel.close();
+                    fin.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return size;
+        }
+
+        public static void deleteFiles(File file) {
+            if (!file.exists()) return;
+            if (!file.isDirectory()) {
+                safeDeleteFile(file);
+                return;
+            }
+            File[] files = file.listFiles();
+            if (files == null || files.length <= 0) {
+                safeDeleteFile(file);
+                return;
+            }
+            for (File f : files) {
+                deleteFiles(f);
+            }
+            safeDeleteFile(file);
+        }
+
+        public static void safeDeleteFile (File file) {
+            if (file == null || !file.exists()) return;
+            boolean result = file.delete();
+            if (result || file.isDirectory()) return;
+            final File to = new File(file.getParentFile(), "tmp_" + System.currentTimeMillis());
+            //重命名是为了防止文件名字超过系统限制导致的无法删除的情形
+            result = file.renameTo(to);
+            if (!result) return;
+            if (!to.delete()) d("File Delete Failed path -> " + file.getPath());
         }
 
         private void closeClosable (Closeable closeable) {

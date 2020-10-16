@@ -13,6 +13,8 @@ public class DayInfo {
     public int volV;  // 24 ~ 27 字节：成交量（手）
     public int extra; // 28 ~ 31 字节：保留，一般都是0
 
+    public float rate;
+
     public DayInfo(byte[] data) {
         int tmp;
         tmp = (data[3] & 0x000000ff) << 24;
@@ -66,9 +68,10 @@ public class DayInfo {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "date=%d, open=%.2f, high=%.2f, " +
-                "low=%.2f, close=%.2f, " + "volA=%d, volV=%d, extra=%d",
-                date, open, high, low, close, volA, volV, extra);
+        return String.format(Locale.getDefault(),
+                "date=%d, rate=%.2f, open=%.2f, close=%.2f, " +
+                        "high=%.2f, low=%.2f, volA=%d, volV=%d, extra=%d",
+                date, rate, open, close, high, low, volA, volV, extra);
     }
 
     @Override
@@ -90,6 +93,8 @@ public class DayInfo {
                 return close;
             case VOL:
                 return volV;
+            case RATE:
+                return rate;
         }
         return 0;
     }
@@ -99,6 +104,7 @@ public class DayInfo {
         HIGH,
         LOW,
         CLOSE,
-        VOL
+        VOL,
+        RATE
     }
 }

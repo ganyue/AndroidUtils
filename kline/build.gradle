@@ -23,5 +23,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: "libs_excel", include: ["*.jar"])
     implementation project(path: ':utils')
 }

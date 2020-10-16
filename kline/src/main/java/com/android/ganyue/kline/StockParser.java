@@ -62,8 +62,13 @@ public class StockParser extends Thread {
         InputStream in = mContext.getAssets().open(path);
         List<DayInfo> ret = new ArrayList<>();
         byte[] buf = new byte[32];
+        float prevClose = 0;
         while (in.read(buf) == 32) {
-            ret.add(new DayInfo(buf));
+            DayInfo info = new DayInfo(buf);
+            if (prevClose == 0) info.rate = 0;
+            else info.rate = ((int)((info.close - prevClose)/prevClose * 10000))/100f;
+            prevClose = info.close;
+            ret.add(info);
         }
         return ret;
     }

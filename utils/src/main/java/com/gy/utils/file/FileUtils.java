@@ -2,6 +2,7 @@ package com.gy.utils.file;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -207,10 +208,14 @@ public class FileUtils {
      * 只能删除单个文件，一旦传入的参数是一个directory而且里面有其他文件，那么这个方法将无法完成删除
      */
     public static void safeDelete (File file) {
-        final File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
+        if (file == null || !file.exists()) return;
+        boolean result = file.delete();
+        if (result || file.isDirectory()) return;
+        final File to = new File(file.getParentFile(), "tmp_" + System.currentTimeMillis());
         //重命名是为了防止文件名字超过系统限制导致的无法删除的情形
-        file.renameTo(to);
-        to.delete();
+        result = file.renameTo(to);
+        if (!result) return;
+        if (!to.delete()) Log.d("FileUtils", "File Delete Failed path -> " + file.getPath());
     }
 
     enum TaskType {

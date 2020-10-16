@@ -29,12 +29,12 @@ public class DefaultCrashHandler implements Thread.UncaughtExceptionHandler{
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        LogUtils.enableLogToFile(true);
+        LogUtils.enableLogToFile(mContext.get(), true);
         LogUtils.e("********** ↓ ↓ ↓ ↓ ↓ ↓ crash log ↓ ↓ ↓ ↓ ↓ ↓ **********");
         LogUtils.e(""+getStackTrace(ex));
         LogUtils.e("********** ↑ ↑ ↑ ↑ ↑ ↑ crash log ↑ ↑ ↑ ↑ ↑ ↑ **********");
         LogUtils.crashLog(ex);
-        LogUtils.enableLogToFile(false);
+        LogUtils.enableLogToFile(mContext.get(), false);
         Log.e("yue.gan", "unCaughtException : " + ex.toString());
         ex.printStackTrace();
 

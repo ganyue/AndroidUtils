@@ -64,6 +64,7 @@ public class TestFrg extends BaseFragment{
                                 Log.d("yue.gan", "parse result : " + path + " code=" + stock.code);
 
                                 List<DayInfo> dayInfos = stock.getCustomFormulaResult();
+//                                List<DayInfo> dayInfos = stock.dayInfos;
                                 for (DayInfo info: dayInfos) {
                                     Log.d("yue.gan", info.toString());
                                 }
@@ -73,7 +74,7 @@ public class TestFrg extends BaseFragment{
                             public void onError(String path, String msg, Exception e) {
                                 e.printStackTrace();
                             }
-                        }).parseStockAsync("sh/lday/sh600008.day");
+                        }).parseStockAsync("sz002083.day");
             }
         });
     }
