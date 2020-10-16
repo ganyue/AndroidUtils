@@ -57,17 +57,23 @@ public class StockParser extends Thread {
         }
     }
 
+    public Stock parseSync (String path) throws IOException {
+        List<DayInfo> dayInfos = parseDayInfoSync(path);
+        return new Stock(path, dayInfos);
+    }
 
     private List<DayInfo> parseDayInfoSync(String path) throws IOException {
         InputStream in = mContext.getAssets().open(path);
         List<DayInfo> ret = new ArrayList<>();
         byte[] buf = new byte[32];
-        float prevClose = 0;
+        float prevClose = 0.01f;
+        int prevDate = 0;
         while (in.read(buf) == 32) {
             DayInfo info = new DayInfo(buf);
-            if (prevClose == 0) info.rate = 0;
-            else info.rate = ((int)((info.close - prevClose)/prevClose * 10000))/100f;
+            info.rate = ((int)((info.close - prevClose)/prevClose * 10000))/100f;
+            info.preDate = prevDate;
             prevClose = info.close;
+            prevDate = info.date;
             ret.add(info);
         }
         return ret;

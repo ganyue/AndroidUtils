@@ -1,5 +1,6 @@
 package com.android.ganyue.frg;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.android.ganyue.R;
 import com.android.ganyue.kline.DayInfo;
+import com.android.ganyue.kline.OptimizerDMACV;
 import com.android.ganyue.kline.Stock;
 import com.android.ganyue.kline.StockParser;
 import com.gy.appbase.fragment.BaseFragment;
@@ -56,25 +58,26 @@ public class TestFrg extends BaseFragment{
         mVParse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StockParser parser = new StockParser();
-                parser.init(v.getContext())
-                        .setParseCallback(new StockParser.OnParseCallback() {
-                            @Override
-                            public void onResult(String path, Stock stock) {
-                                Log.d("yue.gan", "parse result : " + path + " code=" + stock.code);
-
-                                List<DayInfo> dayInfos = stock.getCustomFormulaResult();
-//                                List<DayInfo> dayInfos = stock.dayInfos;
-                                for (DayInfo info: dayInfos) {
-                                    Log.d("yue.gan", info.toString());
-                                }
-                            }
-
-                            @Override
-                            public void onError(String path, String msg, Exception e) {
-                                e.printStackTrace();
-                            }
-                        }).parseStockAsync("sz002083.day");
+                new OptimizerDMACV(v.getContext()).start();
+//                StockParser parser = new StockParser();
+//                parser.init(v.getContext())
+//                        .setParseCallback(new StockParser.OnParseCallback() {
+//                            @Override
+//                            public void onResult(String path, Stock stock) {
+//                                Log.d("yue.gan", "parse result : " + path + " code=" + stock.code);
+//
+//                                List<DayInfo> dayInfos = stock.getCustomFormulaResult();
+////                                List<DayInfo> dayInfos = stock.dayInfos;
+//                                for (DayInfo info: dayInfos) {
+//                                    Log.d("yue.gan", info.toString());
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(String path, String msg, Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }).parseStockAsync("sz/lday/sz002083.day");
             }
         });
     }
