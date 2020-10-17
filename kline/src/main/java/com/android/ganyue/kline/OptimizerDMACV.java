@@ -176,7 +176,7 @@ public class OptimizerDMACV extends Thread {
 
         List<DayInfo> infos = new ArrayList<>();
         for (int i = 0; i < stock.dayInfos.size(); i++) {
-            if (var3[i] <= -p3 && var4[i] <= -p4) infos.add(stock.dayInfos.get(i));
+            if (var3[i] <= p3 && var4[i] <= p4) infos.add(stock.dayInfos.get(i));
         }
         return infos;
     }
