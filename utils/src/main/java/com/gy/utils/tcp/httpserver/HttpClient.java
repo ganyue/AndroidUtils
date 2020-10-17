@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.util.Map;
 
-public class HttpClient implements TcpClient.TcpClientListener {
+public class HttpClient implements TcpClient.TcpClientListener, IHttpClient {
     private static final String TAG = "HttpClient";
 
     private Context mCxt;
@@ -21,6 +21,7 @@ public class HttpClient implements TcpClient.TcpClientListener {
     private TcpClient mClient;
     private String unique;
     private String sendFinalTag;
+    private RequestMap mRequestMap;
 
     public HttpClient(Context cxt, Socket socket, HttpServer server) {
         mCxt = cxt.getApplicationContext();
@@ -34,6 +35,13 @@ public class HttpClient implements TcpClient.TcpClientListener {
         mClient.release();
         if (mHttpServer != null && mHttpServer.get() != null) {
             mHttpServer.get().removeClient(this);
+        }
+
+        if (mRequestMap != null && mRequestMap instanceof RequestMapWebSocket) {
+            if (((RequestMapWebSocket)mRequestMap).getCallback() != null) {
+                ((RequestMapWebSocket) mRequestMap).getCallback().onWebSocketClose(this);
+            }
+            mRequestMap = null;
         }
     }
 
@@ -73,23 +81,31 @@ public class HttpClient implements TcpClient.TcpClientListener {
             release();
             return;
         }
+
+        if (mRequestMap != null && mRequestMap instanceof RequestMapWebSocket) {
+            if (((RequestMapWebSocket)mRequestMap).getCallback() != null) {
+                ((RequestMapWebSocket) mRequestMap).getCallback().onWebSocketReceive(this, msg);
+            }
+            return;
+        }
+
         RequestHttpHead head = RequestHttpHead.parseHead(msg);
         if (head == null) {
             release();
             return;
         }
         Map<String, RequestMap> map = mHttpServer.get().getRequestMap();
-        RequestMap requestMap = map.get(head.path);
-        if (requestMap == null && !TextUtils.isEmpty(head.referPath)) {
-            requestMap = map.get(head.referPath);
+        mRequestMap = map.get(head.path);
+        if (mRequestMap == null && !TextUtils.isEmpty(head.referPath)) {
+            mRequestMap = map.get(head.referPath);
         }
-        if (requestMap == null) {
+        if (mRequestMap == null) {
             release();
             return;
         }
 
         try {
-            processRequest(requestMap, head);
+            processRequest(mRequestMap, head);
         } catch (Exception e) {
             e.printStackTrace();
             release();
@@ -112,6 +128,8 @@ public class HttpClient implements TcpClient.TcpClientListener {
             processSdcardFile((RequestMapSdcardFile) requestMap, head);
         } else if (requestMap instanceof RequestMapCustomHtmlResFromAssets) {
             processCustomHtmlResFromAssets((RequestMapCustomHtmlResFromAssets) requestMap, head);
+        } else if (requestMap instanceof RequestMapWebSocket) {
+            processWebSocket((RequestMapWebSocket) requestMap, head);
         }
     }
 
@@ -160,14 +178,18 @@ public class HttpClient implements TcpClient.TcpClientListener {
             mClient.sendString("", sendHeadStr);
             mClient.sendStream(sendFinalTag, fIn);
         } else if (sendHtmlStr.startsWith("redirect:")) {
-            redirect(sendHtmlStr);
+            redirect(sendHtmlStr, head);
         } else {
             mClient.sendString("", r.getResponseHead(null));
             mClient.sendString(sendFinalTag, sendHtmlStr);
         }
     }
 
-    private void redirect (String path) {
+    private void processWebSocket (RequestMapWebSocket r, RequestHttpHead head) throws Exception {
+        if (r.getCallback() != null) r.getCallback().onWebSocketConnect(this);
+    }
+
+    private void redirect (String path, RequestHttpHead head) {
         if (path.startsWith("redirect:")) path = path.substring("redirect:".length()).trim();
         Map<String, RequestMap> map = mHttpServer.get().getRequestMap();
         RequestMap requestMap = map.get(path);
@@ -177,7 +199,8 @@ public class HttpClient implements TcpClient.TcpClientListener {
         }
 
         try {
-            processRequest(requestMap, null);
+            head.referPath = null;
+            processRequest(requestMap, head);
         } catch (Exception e) {
             e.printStackTrace();
             release();
@@ -210,5 +233,15 @@ public class HttpClient implements TcpClient.TcpClientListener {
                 return "application/octet-stream";
         }
         return "text/*";
+    }
+
+    @Override
+    public void sendMsg(String msg) {
+        mClient.sendString("", msg);
+    }
+
+    @Override
+    public void close() {
+        release();
     }
 }

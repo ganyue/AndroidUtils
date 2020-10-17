@@ -43,11 +43,23 @@ public class TcpSender extends Thread {
 
     public void sendString(String unique, String msg) {
         if (TextUtils.isEmpty(msg)) return;
+        if (!isRun) {
+            if (mTcpSenderListener != null) {
+                mTcpSenderListener.onSendFailed(SendItem.getStrItem(unique, msg),
+                        new Exception("Sender is not Running"));
+            }
+        }
         mMessage.offer(SendItem.getStrItem(unique, msg));
     }
 
     public void sendStream (String unique, InputStream fIn) {
         if (fIn == null) return;
+        if (!isRun) {
+            if (mTcpSenderListener != null) {
+                mTcpSenderListener.onSendFailed(SendItem.getStreamItem(unique, fIn),
+                        new Exception("Sender is not Running"));
+            }
+        }
         mMessage.offer(SendItem.getStreamItem(unique, fIn));
     }
 

@@ -27,4 +27,5 @@ dependencies {
     implementation project(':widget')
     implementation project(':utils')
     implementation project(':kline')
+    implementation project(':logcat')
 }

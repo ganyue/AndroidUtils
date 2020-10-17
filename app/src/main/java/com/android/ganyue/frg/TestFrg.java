@@ -13,6 +13,7 @@ import com.android.ganyue.kline.DayInfo;
 import com.android.ganyue.kline.OptimizerDMACV;
 import com.android.ganyue.kline.Stock;
 import com.android.ganyue.kline.StockParser;
+import com.android.ganyue.logcat.LogUtils;
 import com.gy.appbase.fragment.BaseFragment;
 import com.gy.appbase.inject.ViewInject;
 import com.gy.utils.tcp.httpserver.HttpServer;
@@ -36,6 +37,7 @@ public class TestFrg extends BaseFragment{
     }
 
     private HttpServer server;
+    int count = 0;
     @Override
     protected void initViews(View view) {
         mVStart.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +60,11 @@ public class TestFrg extends BaseFragment{
         mVParse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new OptimizerDMACV(v.getContext()).start();
+                LogUtils.enableLogServer(v.getContext(),true, 8088);
+                LogUtils.d("test " + count++);
+//                new OptimizerDMACV(v.getContext()).start();
+
+
 //                StockParser parser = new StockParser();
 //                parser.init(v.getContext())
 //                        .setParseCallback(new StockParser.OnParseCallback() {

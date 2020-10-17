@@ -1,9 +1,9 @@
 package com.gy.utils.tcp.httpserver;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.gy.utils.tcp.TcpClient;
 import com.gy.utils.tcp.TcpServer;
 
 import java.io.IOException;
@@ -20,12 +20,21 @@ public class HttpServer implements TcpServer.TcpServerListener {
     private Context mCxt;
     private TcpServer mServer;
     private int port = 8088;
+    private String ip;
     private List<HttpClient> mClients = new ArrayList<>();
     private Map<String, RequestMap> mRequestMap = new HashMap<>();
 
     public HttpServer (Context cxt, int port) {
         this.port = port;
         mCxt = cxt.getApplicationContext();
+    }
+
+    public String getHostAddress () {
+        return TextUtils.isEmpty(ip)? null: ip + ":" + port;
+    }
+
+    public boolean hasPath (String path) {
+        return mRequestMap.containsKey(path);
     }
 
     public HttpServer addCustomHtmlResFromAssets (String path, String resAssetsPath,
@@ -46,6 +55,11 @@ public class HttpServer implements TcpServer.TcpServerListener {
 
     public HttpServer addSdcardFile (String path, String sdcardPath) {
         mRequestMap.put(path, new RequestMapSdcardFile(path, sdcardPath));
+        return this;
+    }
+
+    public HttpServer addWebSocket (String path, RequestMapWebSocket.OnWebSocketCallback callback) {
+        mRequestMap.put(path, new RequestMapWebSocket(path, callback));
         return this;
     }
 
@@ -92,6 +106,8 @@ public class HttpServer implements TcpServer.TcpServerListener {
     @Override
     public void onServerStartSuccess(String ip, int port) {
         Log.d(TAG, "onServerStartSuccess --> ip=" + ip + ", port=" + port);
+        this.ip = ip;
+        this.port = port;
         if (mCallback != null && mCallback.get() != null) {
             mCallback.get().onStartSuccess(ip, port);
         }
@@ -117,9 +133,10 @@ public class HttpServer implements TcpServer.TcpServerListener {
     // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ tcp server callback ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ //
 
     public WeakReference<HttpServerCallback> mCallback;
-    public void setServerCallback (HttpServerCallback callback) {
+    public HttpServer setServerCallback (HttpServerCallback callback) {
         if (callback == null) mCallback = null;
-        mCallback = new WeakReference<>(callback);
+        else mCallback = new WeakReference<>(callback);
+        return this;
     }
     public interface HttpServerCallback {
         void onStartFailed (Exception e);
