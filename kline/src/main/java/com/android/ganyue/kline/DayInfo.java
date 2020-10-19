@@ -9,12 +9,15 @@ public class DayInfo {
     public float high;  // 08 ~ 11 字节：最高价
     public float low;   // 12 ~ 15 字节：最低价
     public float close; // 16 ~ 19 字节：收盘价
-    public int volA;    // 20 ~ 23 字节：成交额（元）
+    public float volA;    // 20 ~ 23 字节：成交额（元）
     public int volV;    // 24 ~ 27 字节：成交量（手）
     public int extra;   // 28 ~ 31 字节：保留，一般都是0
 
     public float rate;  // 涨幅 （当天收盘价 - 前天收盘价）/ 前天收盘价
     public int preDate; // 上个交易日的日期
+
+    public DayInfo() {
+    }
 
     public DayInfo(byte[] data) {
         int tmp;

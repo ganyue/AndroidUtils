@@ -3,11 +3,16 @@ package com.android.ganyue.kline;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Stock {
 
     public String path;
     public String code;
+    public String name;
     public List<DayInfo> dayInfos;
+
+    public Stock() {
+    }
 
     public Stock (String path, List<DayInfo> infos) {
         this.path = path;

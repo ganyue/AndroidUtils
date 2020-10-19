@@ -1,9 +1,6 @@
 package com.android.ganyue.kline;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.util.Log;
 
 import com.gy.utils.log.LogUtils;
 import com.gy.utils.preference.SharedPreferenceUtils;
@@ -26,22 +23,20 @@ import java.util.Locale;
  */
 public class OptimizerDMACV extends Thread {
 
-    private Context cxt;
-    public OptimizerDMACV (Context cxt) {
-        this.cxt = cxt.getApplicationContext();
-        LogUtils.enableLogToFile(cxt, true);
-        SharedPreferenceUtils.getInstance(cxt);
+    String rootDir = "";
+
+    public OptimizerDMACV () {
+    }
+
+    private int getPref () {
+
     }
 
     @Override
     public void run() {
         try {
-            AssetManager am = cxt.getAssets();
             List<Stock> stocks = new ArrayList<>();
-            String[] szDay = am.list("tdx/sz/lday");
-            String[] shDay = am.list("tdx/sh/lday");
             StockParser parser = new StockParser();
-            parser.init(cxt);
             for (String p: szDay) {
                 stocks.add(parser.parseSync("tdx/sz/lday/" + p));
             }

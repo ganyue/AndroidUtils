@@ -1,7 +1,11 @@
 package com.android.ganyue.kline;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -15,10 +19,9 @@ public class StockParser extends Thread {
     private Context mContext;
     private boolean mStoped = false;
     private boolean mInited = false;
-    public StockParser init (Context cxt) {
+    public StockParser init () {
         if (mInited) return this;
-        mContext = cxt.getApplicationContext();
-        mTaskQueue = new ArrayBlockingQueue<String>(64);
+        mTaskQueue = new ArrayBlockingQueue<>(5120);
         start();
         mStoped = false;
         mInited = true;
@@ -44,8 +47,7 @@ public class StockParser extends Thread {
             String path = "";
             try {
                 path = mTaskQueue.take();
-                List<DayInfo> dayInfos = parseDayInfoSync(path);
-                Stock stock = new Stock(path, dayInfos);
+                Stock stock = parseSync(path);
                 if (mCallback != null && mCallback.get() != null) {
                     mCallback.get().onResult(path, stock);
                 }
@@ -57,26 +59,59 @@ public class StockParser extends Thread {
         }
     }
 
+    /**
+     * 数据结构:
+     *
+     * 600056 中国医药 日线 前复权
+     *       日期	    开盘	    最高	    最低	    收盘	    成交量	    成交额
+     * 20080902,1.58,1.69,1.52,1.62,680179,6646526.00
+     *
+     * @param path .
+     * @return .
+     * @throws IOException .
+     */
     public Stock parseSync (String path) throws IOException {
-        List<DayInfo> dayInfos = parseDayInfoSync(path);
-        return new Stock(path, dayInfos);
-    }
+        Stock stock = new Stock();
+        stock.path = path;
+        BufferedReader reader = new BufferedReader(new FileReader(path));
 
-    private List<DayInfo> parseDayInfoSync(String path) throws IOException {
-        InputStream in = mContext.getAssets().open(path);
-        List<DayInfo> ret = new ArrayList<>();
-        byte[] buf = new byte[32];
-        float prevClose = 0.01f;
-        int prevDate = 0;
-        while (in.read(buf) == 32) {
-            DayInfo info = new DayInfo(buf);
-            info.rate = ((int)((info.close - prevClose)/prevClose * 10000))/100f;
-            info.preDate = prevDate;
-            prevClose = info.close;
-            prevDate = info.date;
-            ret.add(info);
+        String stockHeadStr = reader.readLine();
+        if (TextUtils.isEmpty(stockHeadStr)) return null;
+        String[] stockHeads = stockHeadStr.split(" ");
+        stock.code = stockHeads[0];
+        stock.name = stockHeads[1];
+
+        String stockListHeadStr = reader.readLine();
+        if (TextUtils.isEmpty(stockListHeadStr)) return null;
+
+        String line;
+        List<DayInfo> dayInfos = new ArrayList<>();
+        DayInfo prevInfo = null;
+        while ((line = reader.readLine()) != null) {
+            String[] stockInfos = line.split(",");
+            DayInfo info = new DayInfo();
+            info.date = Integer.parseInt(stockInfos[0]);
+            info.open = Float.parseFloat(stockInfos[1]);
+            info.high = Float.parseFloat(stockInfos[2]);
+            info.low = Float.parseFloat(stockInfos[3]);
+            info.close = Float.parseFloat(stockInfos[4]);
+            info.volV = Integer.parseInt(stockInfos[5]);
+            info.volA = Float.parseFloat(stockInfos[6]);
+
+            if (prevInfo == null) {
+                prevInfo = info;
+                info.rate = 0;
+                info.preDate = info.date;
+            } else {
+                info.rate = ((int)((info.close - prevInfo.close) / prevInfo.close * 10000)) * 100f;
+                info.preDate = prevInfo.date;
+            }
+            dayInfos.add(info);
         }
-        return ret;
+        if (dayInfos.size() <= 0) return null;
+        stock.dayInfos = dayInfos;
+
+        return stock;
     }
 
     public StockParser setParseCallback (OnParseCallback callback) {
