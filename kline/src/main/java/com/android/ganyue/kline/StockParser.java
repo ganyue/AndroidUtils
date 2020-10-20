@@ -1,13 +1,8 @@
 package com.android.ganyue.kline;
 
-import android.content.Context;
-import android.text.TextUtils;
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +11,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class StockParser extends Thread {
 
     private ArrayBlockingQueue<String> mTaskQueue;
-    private Context mContext;
     private boolean mStoped = false;
     private boolean mInited = false;
     public StockParser init () {
@@ -30,7 +24,6 @@ public class StockParser extends Thread {
 
     public void release () {
         mStoped = true;
-        mContext = null;
         mTaskQueue.clear();
         mCallback = null;
         interrupt();
@@ -76,13 +69,13 @@ public class StockParser extends Thread {
         BufferedReader reader = new BufferedReader(new FileReader(path));
 
         String stockHeadStr = reader.readLine();
-        if (TextUtils.isEmpty(stockHeadStr)) return null;
+        if (stockHeadStr == null || stockHeadStr.length() <= 0) return null;
         String[] stockHeads = stockHeadStr.split(" ");
         stock.code = stockHeads[0];
         stock.name = stockHeads[1];
 
         String stockListHeadStr = reader.readLine();
-        if (TextUtils.isEmpty(stockListHeadStr)) return null;
+        if (stockListHeadStr == null || stockListHeadStr.length() <= 0) return null;
 
         String line;
         List<DayInfo> dayInfos = new ArrayList<>();
@@ -106,6 +99,7 @@ public class StockParser extends Thread {
                 info.rate = ((int)((info.close - prevInfo.close) / prevInfo.close * 10000)) * 100f;
                 info.preDate = prevInfo.date;
             }
+            info.index = dayInfos.size();
             dayInfos.add(info);
         }
         if (dayInfos.size() <= 0) return null;

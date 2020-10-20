@@ -1,13 +1,16 @@
 package com.android.ganyue.kline;
 
-import android.content.res.AssetManager;
-
-import com.gy.utils.log.LogUtils;
-import com.gy.utils.preference.SharedPreferenceUtils;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 
 /**
@@ -23,138 +26,168 @@ import java.util.Locale;
  */
 public class OptimizerDMACV extends Thread {
 
-    String rootDir = "";
+    String mRootDir = "/home/ph/桌面/stock/";
+    File mStocksDir = new File(mRootDir, "export"); // 历史记录位置
+    File mPropFile = new File(mRootDir, "prop.txt"); // 记录计算位置，下次可以接着上次位置计算
+    File mResultFile = new File(mRootDir, "result.txt"); // 计算结果输出文件
+    File mMaxResultFile = new File(mRootDir, "resultMax.txt"); // 计算结果筛选最大值输出文件
+    File mStockResultDir = new File(mRootDir, "stockResult"); // 各个股票各种计算结果
 
     public OptimizerDMACV () {
     }
 
-    private int getPref () {
+    private Properties mProperties = new Properties();
+    private boolean mIsPropertiesLoaded = false;
+    private int getPref (String key, int defVal) throws Exception {
+        if (!mIsPropertiesLoaded && mPropFile.exists()) {
+            mIsPropertiesLoaded = true;
+            InputStream in = new FileInputStream(mPropFile);
+            mProperties.load(in);
+            in.close();
+        }
+        return Integer.parseInt(mProperties.getProperty(key, "" + defVal));
+    }
 
+    private void setPref (String key, int val) throws Exception {
+        mProperties.setProperty(key, "" + val);
+        OutputStream out = new FileOutputStream(mPropFile);
+        mProperties.store(out, "");
+        out.close();
     }
 
     @Override
     public void run() {
         try {
+
             List<Stock> stocks = new ArrayList<>();
             StockParser parser = new StockParser();
-            for (String p: szDay) {
-                stocks.add(parser.parseSync("tdx/sz/lday/" + p));
-            }
-            for (String p: shDay) {
-                stocks.add(parser.parseSync("tdx/sh/lday/" + p));
+            String[] stockFiles = mStocksDir.list();
+            for (String p: stockFiles) {
+                stocks.add(parser.parseSync(p));
             }
 
-            SharedPreferenceUtils sputils = SharedPreferenceUtils.getInstance(cxt);
-            // 运算量太大，只算 p5 = 5; p6 = 20;
-//            int p1MIN = 30, p1MAX = 40;
-//            int p2MIN = 10, p2MAX = 20;
-//            int p3MIN = -25, p3MAX = -15;
-//            int p4MIN = -20, p4MAX = -10;
-            int p1MIN = sputils.getInt("p1min", 32), p1MAX = sputils.getInt("p1max", 37);
-            int p2MIN = sputils.getInt("p2min", 12), p2MAX = sputils.getInt("p2max", 17);
-            int p3MIN = sputils.getInt("p3min", -23), p3MAX = sputils.getInt("p3max", -17);
-            int p4MIN = sputils.getInt("p4min", -15), p4MAX = sputils.getInt("p4max", -10);
-            int p5 = 10;
-            int p6 = 20;
+            int p1MIN = getPref("p1min", 30), p1MAX = getPref("p1max", 40);
+            int p2MIN = getPref("p2min", 10), p2MAX = getPref("p2max", 20);
+            int p3MIN = getPref("p3min", -30), p3MAX = getPref("p3max", -15);
+            int p4MIN = getPref("p4min", -20), p4MAX = getPref("p4max", -10);
+            // 运算量太大，只算 p5 = 10; p6 = 20;
+            int p5 = 10; // 止损位置
+            int p6 = 20; // 最大持有天数
             int p1, p2, p3, p4;
+            float prevResult = 0;
+
+            FileOutputStream resultOutStream = new FileOutputStream(mResultFile, true);
+            FileOutputStream maxResultOutStream = new FileOutputStream(mMaxResultFile, true);
+            mStockResultDir.mkdirs();
+
+        	System.out.println("starting !!!");
+        	resultOutStream.write("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ starting !!! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓".getBytes());
 
             p1 = p1MIN;
-            while(p1 < p1MAX) {
+            while(p1 <= p1MAX) {
                 p2 = p2MIN;
-                while(p2 < p2MAX) {
+                while(p2 <= p2MAX) {
                     p3 = p3MIN;
-                    while(p3 < p3MAX) {
+                    while(p3 <= p3MAX) {
                         p4 = p4MIN;
-                        while(p4 < p4MAX) {
-                            int count = 0;
-                            int success = 0;
+                        while(p4 <= p4MAX) {
+                            int count = 0; // 总买入次数
+                            int success = 0; // 总成功次数
+                            int averageP6 = 0;
+
+                            String paramStr = String.format(Locale.getDefault(),
+                                    "p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d",
+                                    p1, p2, p3, p4, p5, p6);
+
                             for (Stock stock: stocks) {
-                                List<DayInfo> infos = getDMACVResult(stock, p1, p2, p3, p4);
-                                int size = stock.dayInfos.size();
-                                DayInfo prevInfo = null;
-                                DayInfo prevBuyInfo = null;
-                                int prevBuyIndex = 0;
-                                for (DayInfo info: infos) {
-                                    String infoLogStr = stock.code;
+                                boolean writeStockResult =
+                                                stock.code.equals("002206") ||
+                                                stock.code.equals("601118") ||
+                                                stock.code.equals("002083");
+                                FileOutputStream of = null;
+                                if (writeStockResult) {
+                                    of = new FileOutputStream(new File(mStockResultDir, stock.code), true);
+                                }
+                                List<DayInfo> infos = getDMACVResult(stock, p1, p2, p3, p4); // 公式计算结果
+                                int maxSize = stock.dayInfos.size();
+                                int soldDate = 0;
+                                for (int i = 0; i < infos.size(); i++) {
+                                    DayInfo info = infos.get(i);
 
                                     // 信号出来时候距离最后一条日线数据不足止损天数不考虑
-                                    int index = stock.dayInfos.indexOf(info);
-                                    if (index + p6 >= size) continue;
+                                    if (info.index + p6 >= maxSize) continue;
+                                    if (info.date < soldDate) continue;//还在持有不考虑买入
 
-                                    // 本次出现信号地点距离上次信号地点不足止损天数不考虑
-                                    if(prevBuyInfo != null && prevBuyIndex != 0 &&
-                                            index - prevBuyIndex < p6) {
-                                        continue;
-                                    }
-
-                                    // 连续信号不买卖
-                                    if (prevInfo != null && info.preDate == prevInfo.date) {
-                                        prevInfo = info;
-                                        continue;
-                                    }
-                                    prevInfo = info;
-                                    prevBuyInfo = info;
-                                    prevBuyIndex = index;
-
-                                    // 买入
+                                    String infoLogStr = "";
+                                    if (writeStockResult) infoLogStr = stock.code + " " + stock.name + " start->" + info.date;
                                     count++;
 
-                                    infoLogStr += " buy --> " + info.date + " params --> ";
-                                    infoLogStr += String.format(Locale.getDefault(),
-                                            "p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d ret --> ",
-                                            p1, p2, p3, p4, p5, p6);
-
-                                    // 计算是否有止损出现
-                                    float salePrice = info.close * (1 - p5 / 100f);
-                                    boolean sold = false;
-                                    for (int i = 1; i <= p6; i++) {
-                                        DayInfo tmp = stock.dayInfos.get(index + i);
-                                        if (tmp.close < salePrice) {
-                                            infoLogStr += "failed sold " + tmp.date;
-                                            sold = true;
+                                    float successClose = info.close * 1.05f;
+                                    float failedClose = info.close * (1 - p5 / 100f);
+                                    int j = 1;
+                                    for (; j <= p6; j++) {
+                                        DayInfo tmp = stock.dayInfos.get(info.index + j);
+                                        if (tmp.close > successClose) {//止盈
+                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " success";
+                                            soldDate = tmp.date;
+                                            success++;
+                                            averageP6 += j;
                                             break;
+                                        } else if (tmp.close < failedClose) {//止损
+                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed";
+                                            soldDate = tmp.date;
                                         }
                                     }
-                                    if (sold) {
-                                        LogUtils.dd(infoLogStr);
-                                        continue;
+                                    if (j > p6) {
+                                        //被迫卖出
+                                        DayInfo tmp = stock.dayInfos.get(info.index + p6);
+                                        if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed";
+                                        soldDate = tmp.date;
                                     }
 
-                                    // 计算到止损日时，是否有涨2个点
-                                    salePrice = info.close * 1.02f;
-                                    DayInfo endInfo = stock.dayInfos.get(index + p6);
-                                    if (endInfo.close > salePrice) {
-                                        success ++;
-                                        infoLogStr += "success!!! " + endInfo.date;
-                                    } else {
-                                        infoLogStr += "failed loss " + endInfo.date;
+                                    if (writeStockResult && of != null) {
+                                        infoLogStr += paramStr;
+                                        of.write(infoLogStr.getBytes());
                                     }
 
-                                    LogUtils.dd(infoLogStr);
+                                }
+                                if (of != null) {
+                                    of.close();
                                 }
                             }
 
                             float result = count == 0? 0: 1f*success/count;
-                            LogUtils.d(String.format(Locale.getDefault(),
-                                    "result=%.2f, p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d",
-                                    result, p1, p2, p3, p4, p5, p6));
-
+                            int avc = success == 0? 0: averageP6/success;
+                            String resultStr = String.format(Locale.getDefault(),
+                                    "%s result=%.6f, p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d count=%d, avc=%d",
+                                    getDateStr(), result, p1, p2, p3, p4, p5, p6, count, avc);
+                            System.out.println(resultStr);
+                            resultOutStream.write(resultStr.getBytes());
+                            if (result > prevResult) {
+                                prevResult = result;
+                                maxResultOutStream.write(resultStr.getBytes());
+                            }
 
                             p4++;
                         }
                         p3++;
-                        sputils.saveInt("p3min", p3);
+                        setPref("p3min", p3);
                     }
                     p2++;
-                    sputils.saveInt("p2min", p2);
+                    setPref("p2min", p2);
                 }
                 p1++;
-                sputils.saveInt("p1min", p1);
+                setPref("p1min", p1);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("[ HH:mm:ss ] ", Locale.getDefault());
+    private String getDateStr () {
+        return simpleDateFormat.format(new Date());
     }
 
     public List<DayInfo> getDMACVResult (Stock stock, int p1, int p2, int p3, int p4) {

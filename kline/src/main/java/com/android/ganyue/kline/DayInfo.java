@@ -15,6 +15,7 @@ public class DayInfo {
 
     public float rate;  // 涨幅 （当天收盘价 - 前天收盘价）/ 前天收盘价
     public int preDate; // 上个交易日的日期
+    public int index; // 本次日线数据在所有数据List中的位置
 
     public DayInfo() {
     }

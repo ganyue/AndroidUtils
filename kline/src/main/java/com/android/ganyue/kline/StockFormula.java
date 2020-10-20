@@ -1,7 +1,5 @@
 package com.android.ganyue.kline;
 
-import android.text.PrecomputedText;
-
 public class StockFormula {
 
     public static float[] sumPercent (Stock stock, DayInfo.Type type, int n) {
