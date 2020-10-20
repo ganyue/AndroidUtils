@@ -1,8 +1,11 @@
 package com.android.ganyue.kline;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +69,9 @@ public class StockParser extends Thread {
     public Stock parseSync (String path) throws IOException {
         Stock stock = new Stock();
         stock.path = path;
-        BufferedReader reader = new BufferedReader(new FileReader(path));
+        FileInputStream fin = new FileInputStream(path);
+        InputStreamReader inR = new InputStreamReader(fin, "GBK");
+        BufferedReader reader = new BufferedReader(inR);
 
         String stockHeadStr = reader.readLine();
         if (stockHeadStr == null || stockHeadStr.length() <= 0) return null;
@@ -82,14 +87,15 @@ public class StockParser extends Thread {
         DayInfo prevInfo = null;
         while ((line = reader.readLine()) != null) {
             String[] stockInfos = line.split(",");
+            if (stockInfos.length < 7) continue;
             DayInfo info = new DayInfo();
             info.date = Integer.parseInt(stockInfos[0]);
             info.open = Float.parseFloat(stockInfos[1]);
             info.high = Float.parseFloat(stockInfos[2]);
             info.low = Float.parseFloat(stockInfos[3]);
             info.close = Float.parseFloat(stockInfos[4]);
-            info.volV = Integer.parseInt(stockInfos[5]);
-            info.volA = Float.parseFloat(stockInfos[6]);
+            info.volV = Long.parseLong(stockInfos[5]);
+            info.volA = Double.parseDouble(stockInfos[6]);
 
             if (prevInfo == null) {
                 prevInfo = info;
@@ -105,6 +111,9 @@ public class StockParser extends Thread {
         if (dayInfos.size() <= 0) return null;
         stock.dayInfos = dayInfos;
 
+        closeClosable(reader);
+        closeClosable(inR);
+        closeClosable(fin);
         return stock;
     }
 
@@ -116,5 +125,12 @@ public class StockParser extends Thread {
     public interface OnParseCallback {
         void onResult (String path, Stock stock);
         void onError(String path, String msg, Exception e);
+    }
+
+    private void closeClosable (Closeable c) {
+        try {
+            c.close();
+        } catch (Exception e) {
+        }
     }
 }

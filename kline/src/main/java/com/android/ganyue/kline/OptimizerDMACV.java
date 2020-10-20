@@ -61,9 +61,15 @@ public class OptimizerDMACV extends Thread {
 
             List<Stock> stocks = new ArrayList<>();
             StockParser parser = new StockParser();
-            String[] stockFiles = mStocksDir.list();
-            for (String p: stockFiles) {
-                stocks.add(parser.parseSync(p));
+            File[] stockFiles = mStocksDir.listFiles();
+            for (File f: stockFiles) {
+                Stock stock = parser.parseSync(f.getPath());
+                if (stock == null) {
+                    System.out.println("parse failed -> " + f.getPath());
+                    f.delete();
+                } else {
+                    stocks.add(stock);
+                }
             }
 
             int p1MIN = getPref("p1min", 30), p1MAX = getPref("p1max", 40);
@@ -81,7 +87,7 @@ public class OptimizerDMACV extends Thread {
             mStockResultDir.mkdirs();
 
         	System.out.println("starting !!!");
-        	resultOutStream.write("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ starting !!! ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓".getBytes());
+        	resultOutStream.write("↓↓↓↓↓ starting !!! ↓↓↓↓↓\r\n".getBytes());
 
             p1 = p1MIN;
             while(p1 <= p1MAX) {
@@ -128,20 +134,20 @@ public class OptimizerDMACV extends Thread {
                                     for (; j <= p6; j++) {
                                         DayInfo tmp = stock.dayInfos.get(info.index + j);
                                         if (tmp.close > successClose) {//止盈
-                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " success";
+                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " success\r\n";
                                             soldDate = tmp.date;
                                             success++;
                                             averageP6 += j;
                                             break;
                                         } else if (tmp.close < failedClose) {//止损
-                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed";
+                                            if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed\r\n";
                                             soldDate = tmp.date;
                                         }
                                     }
                                     if (j > p6) {
                                         //被迫卖出
                                         DayInfo tmp = stock.dayInfos.get(info.index + p6);
-                                        if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed";
+                                        if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed\r\n";
                                         soldDate = tmp.date;
                                     }
 
@@ -159,7 +165,7 @@ public class OptimizerDMACV extends Thread {
                             float result = count == 0? 0: 1f*success/count;
                             int avc = success == 0? 0: averageP6/success;
                             String resultStr = String.format(Locale.getDefault(),
-                                    "%s result=%.6f, p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d count=%d, avc=%d",
+                                    "%s result=%.6f, p1=%02d, p2=%02d, p3=%02d, p4=%02d, p5=%02d, p6=%02d count=%d, avc=%d\r\n",
                                     getDateStr(), result, p1, p2, p3, p4, p5, p6, count, avc);
                             System.out.println(resultStr);
                             resultOutStream.write(resultStr.getBytes());
