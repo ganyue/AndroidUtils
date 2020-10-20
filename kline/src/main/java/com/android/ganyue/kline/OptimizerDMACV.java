@@ -111,12 +111,19 @@ public class OptimizerDMACV extends Thread {
                                                 stock.code.equals("601118") ||
                                                 stock.code.equals("002083");
                                 FileOutputStream of = null;
-                                if (writeStockResult) {
-                                    of = new FileOutputStream(new File(mStockResultDir, stock.code), true);
-                                }
                                 List<DayInfo> infos = getDMACVResult(stock, p1, p2, p3, p4); // 公式计算结果
                                 int maxSize = stock.dayInfos.size();
                                 int soldDate = 0;
+
+                                if (writeStockResult) {
+                                    of = new FileOutputStream(new File(mStockResultDir, stock.code), true);
+                                    of.write("↓↓↓↓↓ KLines ↓↓↓↓↓\r\n".getBytes());
+                                    for (DayInfo i: infos) {
+                                        String str = i.toString() + "\r\n";
+                                        of.write(str.getBytes());
+                                    }
+                                }
+
                                 for (int i = 0; i < infos.size(); i++) {
                                     DayInfo info = infos.get(i);
 
@@ -142,6 +149,7 @@ public class OptimizerDMACV extends Thread {
                                         } else if (tmp.close < failedClose) {//止损
                                             if (writeStockResult) infoLogStr += " sold->" + tmp.date + " failed\r\n";
                                             soldDate = tmp.date;
+                                            break;
                                         }
                                     }
                                     if (j > p6) {
