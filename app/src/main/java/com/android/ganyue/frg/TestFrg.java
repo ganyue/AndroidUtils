@@ -60,8 +60,19 @@ public class TestFrg extends BaseFragment{
         mVParse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LogUtils.enableLogServer(v.getContext(),true, 8088);
-                LogUtils.d("test " + count++);
+
+                String str = "\n";
+                for (int i = 361; i < 722; i++) {
+                    str+="<dimen name=\"dp_"+i+"\">"+ i +"dp</dimen>\n";
+                    if ((i - 361) % 100 == 0) {
+                        Log.d("devel", str);
+                        str = "\n";
+                    }
+                }
+                Log.d("devel", str);
+
+//                LogUtils.enableLogServer(v.getContext(),true, 8088);
+//                LogUtils.d("test " + count++);
 //                new OptimizerDMACV(v.getContext()).start();
 
 

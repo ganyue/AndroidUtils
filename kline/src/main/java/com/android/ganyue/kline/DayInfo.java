@@ -75,8 +75,8 @@ public class DayInfo {
     public String toString() {
         return String.format(Locale.getDefault(),
                 "date=%d, rate=%.2f, open=%.2f, close=%.2f, " +
-                        "high=%.2f, low=%.2f, volA=%d, volV=%d, extra=%d",
-                date, rate, open, close, high, low, volA, volV, extra);
+                        "high=%.2f, low=%.2f, volA=%s, volV=%s, extra=%s",
+                date, rate, open, close, high, low, ""+volA, ""+volV, ""+extra);
     }
 
     @Override
