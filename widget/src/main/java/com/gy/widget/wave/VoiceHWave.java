@@ -6,11 +6,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +23,23 @@ public class VoiceHWave extends View {
         super(context);
     }
 
-    public VoiceHWave(Context context, @Nullable AttributeSet attrs) {
+    public VoiceHWave(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public VoiceHWave(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public VoiceHWave(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
     private final String TAG = "VoiceHWave";
     private int mWidth;                                 // 可显示宽度 （view测量宽度 - 左右padding）
     private int mHeight;                                // 可显示高度 （view测量高度 - 上下padding）
-    private int mUpdateMillis = 100;                    // 刷新间隔 （毫秒，一般100ms以内肉眼都看不出卡顿）
+    private final int mUpdateMillis = 100;              // 刷新间隔 （毫秒，一般100ms以内肉眼都看不出卡顿）
     private float mLineWidth = 2;                       // 线宽 (dp 需要在init中转换成px)
     private float mLineCap = 2;                         // 线与线之间间隔 (dp 需要在init中转换成px)
     private float mLineStep = mLineWidth + mLineCap;    // 步长 (dp 需要在init中转换成px)
     private List<Line> mLines;                          // 需要绘制的线
-    private int mLineHLevel = 8;                        // 线高分级 （把line高度分成几个级别）
+    private final int mLineHLevel = 8;                  // 线高分级 （把line高度分成几个级别）
     private float[] mLineHLevels;                       // 分级后的每级别的线高
     private float[] mLineStartYs;                       // 每个级别线对应的线绘制的起始Y（提前计算，节省计算时间）
     private float[] mLineEndYs;                         // 每个级别线对应的线绘制的结束Y（提前计算，节省计算时间）
@@ -49,12 +48,10 @@ public class VoiceHWave extends View {
     private boolean mIsMeasured = false;                // 是否已经测量完毕，只有onMeasure后才可以绘制
     private boolean mStartMove = false;                 // 是否开始移动mLines的坐标，最后一个线段超框后需要开始移动
     private float startReuseX;                          // 判断是否要把第一条线放到最后的标准（最后一条线移动到需要添加下调线的时候）
-    private AtomicInteger mCurVolume = new AtomicInteger(0);
+    private final AtomicInteger mCurVolume = new AtomicInteger(0);
 
 
-    private int mLineColor = Color.BLACK;               // 线颜色
     private Paint mLinePaint;                           // 画笔
-    private float density;                              // 像素密度，用来重新计算线宽，线间距（dp转px）
 
     private HandlerThread mWorkThread;
     private Handler mWorkHandler;
@@ -87,8 +84,10 @@ public class VoiceHWave extends View {
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLinePaint.setStrokeWidth(mLineWidth);
         mLinePaint.setStyle(Paint.Style.FILL);
-        mLinePaint.setColor(mLineColor);
-        density = getContext().getResources().getDisplayMetrics().density;
+        // 线颜色
+        mLinePaint.setColor(Color.BLACK);
+        // 像素密度，用来重新计算线宽，线间距（dp转px）
+        float density = getContext().getResources().getDisplayMetrics().density;
         mLineWidth = mLineWidth * density;
         mLineCap = mLineCap * density;
         mLineStep = mLineWidth + mLineCap;
@@ -146,10 +145,10 @@ public class VoiceHWave extends View {
     }
 
     @Override
-    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+    protected void onVisibilityChanged(View changedView, int visibility) {
         mWorkHandler.removeCallbacksAndMessages(null);
         if (visibility == VISIBLE && mIsStarted) {
-            mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
+            mWorkHandler.postDelayed(mAnimRunnable, mUpdateMillis);
         }
     }
 
@@ -161,20 +160,22 @@ public class VoiceHWave extends View {
 
     public void stop () {
         Log.i(TAG, "stop");
+        if (!mIsStarted) return;
         mIsStarted = false;
         mWorkHandler.removeCallbacksAndMessages(null);
     }
 
     private void startAnim () {
+        if (mIsStarted) return;
         mIsStarted = true;
         mWorkHandler.removeCallbacksAndMessages(null);
-        mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
+        mWorkHandler.postDelayed(mAnimRunnable, mUpdateMillis);
     }
 
-    private Runnable mAnimRunable = new Runnable() {
+    private final Runnable mAnimRunnable = new Runnable() {
         @Override
         public void run() {
-            if (mWorkHandler != null) mWorkHandler.postDelayed(mAnimRunable, mUpdateMillis);
+            if (mWorkHandler != null) mWorkHandler.postDelayed(mAnimRunnable, mUpdateMillis);
             addLine();
             postInvalidate();
         }

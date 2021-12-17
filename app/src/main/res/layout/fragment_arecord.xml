@@ -23,13 +23,37 @@
         app:voicewave_line_color="@android:color/holo_red_dark"
         app:voicewave_line_update_interval="100"/>
 
+
+    <LinearLayout
+        android:id="@+id/llyt_sco"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/vw_voiceWave">
+        <Button
+            android:id="@+id/btn_scoStart"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:text="ScoStart"
+            android:layout_below="@id/btn_stop_record"/>
+
+        <Button
+            android:id="@+id/btn_scoStop"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:text="ScoStop"
+            android:layout_below="@id/btn_stop_record"/>
+    </LinearLayout>
+
     <Button
         android:id="@+id/btn_record"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="record"
         android:layout_marginTop="@dimen/widget_normal_padding"
-        android:layout_below="@id/vw_voiceWave"/>
+        android:layout_below="@id/llyt_sco"/>
 
     <Button
         android:id="@+id/btn_stop_record"
@@ -45,12 +69,35 @@
         android:text="play"
         android:layout_below="@id/btn_stop_record"/>
 
+    <LinearLayout
+        android:id="@+id/llyt_playLR"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:layout_below="@id/btn_play">
+        <Button
+            android:id="@+id/btn_playL"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:text="playL"
+            android:layout_below="@id/btn_stop_record"/>
+
+        <Button
+            android:id="@+id/btn_playR"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:text="playR"
+            android:layout_below="@id/btn_stop_record"/>
+    </LinearLayout>
+
     <Button
         android:id="@+id/btn_stop_play"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="stop play"
-        android:layout_below="@id/btn_play"/>
+        android:layout_below="@id/llyt_playLR"/>
 
     <Button
         android:id="@+id/btn_delete"

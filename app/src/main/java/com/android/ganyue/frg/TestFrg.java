@@ -1,12 +1,19 @@
 package com.android.ganyue.frg;
 
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.ganyue.R;
 import com.android.ganyue.kline.DayInfo;
@@ -20,7 +27,14 @@ import com.gy.utils.tcp.httpserver.HttpServer;
 import com.gy.utils.tcp.httpserver.RequestHttpHead;
 import com.gy.utils.tcp.httpserver.RequestMapCustomHtmlResFromAssets;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Locale;
+
+import link.zhidou.scan.translation.service.IScanEventCallback;
+import link.zhidou.scan.translation.service.IScanEventDispatcherService;
 
 /**
  * created by yue.gan 18-9-22
@@ -36,6 +50,56 @@ public class TestFrg extends BaseFragment{
         return inflater.inflate(R.layout.fragment_test, container, false);
     }
 
+    private IScanEventCallback.Stub scanEventCallback = new IScanEventCallback.Stub() {
+        @Override
+        public void onScanStart() throws RemoteException {
+            Log.d("test", "onScanStart");
+        }
+
+        @Override
+        public void onScanning(String intermediateResult) throws RemoteException {
+            Log.d("test", "onScanning intermediateResult="+intermediateResult);
+
+        }
+
+        @Override
+        public void onScanStop(String finalResult) throws RemoteException {
+            Log.d("test", "onScanStop finalResult="+finalResult);
+
+        }
+    };
+
+    private IScanEventDispatcherService scanEventDispatcherService;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("test", "onServiceConnected");
+            try {
+                scanEventDispatcherService = IScanEventDispatcherService.Stub.asInterface(service);
+                scanEventDispatcherService.registerScanCallback(scanEventCallback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d("test", "onServiceDisconnected");
+        }
+    };
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d("test", "onDetach");
+        try {
+            scanEventDispatcherService.unRegisterScanCallback(scanEventCallback);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        getContext().unbindService(serviceConnection);
+    }
+
     private HttpServer server;
     int count = 0;
     @Override
@@ -43,11 +107,24 @@ public class TestFrg extends BaseFragment{
         mVStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                server = new HttpServer(getContext(), 8080)
-                        .addAssetHtml("/test", "TestHttpServer/index.html")
-                        .addAssetFile("/file", "TestHttpServer/test.txt")
-                        .addCustomHtmlResFromAssets("/custom", "TestHttpServer", supplier)
-                        .start();
+//                Intent intent = new Intent("link.zhidou.scan.translation.PureScanText");
+////                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivityForResult(intent, 0);
+
+
+                Intent i = new Intent();
+                i.setComponent(new ComponentName("link.zhidou.scan.translation",
+                        "link.zhidou.scan.translation.service.ScanEventDispatcherService"));
+                getContext().bindService(i, serviceConnection, Service.BIND_AUTO_CREATE);
+
+
+
+
+//                server = new HttpServer(getContext(), 8080)
+//                        .addAssetHtml("/test", "TestHttpServer/index.html")
+//                        .addAssetFile("/file", "TestHttpServer/test.txt")
+//                        .addCustomHtmlResFromAssets("/custom", "TestHttpServer", supplier)
+//                        .start();
             }
         });
         mVStop.setOnClickListener(new View.OnClickListener() {
@@ -61,15 +138,31 @@ public class TestFrg extends BaseFragment{
             @Override
             public void onClick(View v) {
 
-                String str = "\n";
-                for (int i = 361; i < 722; i++) {
-                    str+="<dimen name=\"dp_"+i+"\">"+ i +"dp</dimen>\n";
-                    if ((i - 361) % 100 == 0) {
-                        Log.d("devel", str);
-                        str = "\n";
+                try {
+                    File f = new File(getContext().getExternalCacheDir(), "serial.txt");
+                    FileOutputStream fout = new FileOutputStream(f);
+                    int startNum = 0x2F7;
+                    int i = startNum;
+                    for (; i < startNum + 800; i++) {
+                        Log.d("devel", "write : " + (i - startNum + 1));
+                        fout.write(String.format(Locale.getDefault(), "%06xAA014E\n", i)
+                                .toUpperCase().getBytes());
                     }
+                    fout.close();
+                    Log.d("devel", "done");
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                Log.d("devel", str);
+
+//                String str = "\n";
+//                for (int i = 361; i < 722; i++) {
+//                    str+="<dimen name=\"dp_"+i+"\">"+ i +"dp</dimen>\n";
+//                    if ((i - 361) % 100 == 0) {
+//                        Log.d("devel", str);
+//                        str = "\n";
+//                    }
+//                }
+//                Log.d("devel", str);
 
 //                LogUtils.enableLogServer(v.getContext(),true, 8088);
 //                LogUtils.d("test " + count++);
@@ -120,5 +213,14 @@ public class TestFrg extends BaseFragment{
     @Override
     public void activityCall(int type, Object extra) {
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) {
+            Toast.makeText(getContext(), "null", Toast.LENGTH_SHORT).show();
+        } else
+        Toast.makeText(getContext(), data.getStringExtra("scan_result"), Toast.LENGTH_SHORT).show();
     }
 }

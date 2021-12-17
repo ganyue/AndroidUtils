@@ -660,7 +660,8 @@
     <dimen name="dp_658">658dp</dimen>
     <dimen name="dp_659">659dp</dimen>
     <dimen name="dp_660">660dp</dimen>
-    <dimen name="dp_661">661dp</dimen><dimen name="dp_662">662dp</dimen>
+    <dimen name="dp_661">661dp</dimen>
+    <dimen name="dp_662">662dp</dimen>
     <dimen name="dp_663">663dp</dimen>
     <dimen name="dp_664">664dp</dimen>
     <dimen name="dp_665">665dp</dimen>
@@ -749,4 +750,14 @@
     <dimen name="sp_34">34sp</dimen>
     <dimen name="sp_36">36sp</dimen>
     <dimen name="sp_38">38sp</dimen>
+    <dimen name="sp_40">40sp</dimen>
+    <dimen name="sp_42">42sp</dimen>
+    <dimen name="sp_43">43sp</dimen>
+    <dimen name="sp_44">44sp</dimen>
+    <dimen name="sp_45">45sp</dimen>
+    <dimen name="sp_46">46sp</dimen>
+    <dimen name="sp_47">47sp</dimen>
+    <dimen name="sp_48">48sp</dimen>
+    <dimen name="sp_49">49sp</dimen>
+    <dimen name="sp_50">50sp</dimen>
 </resources>

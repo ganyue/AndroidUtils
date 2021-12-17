@@ -6,61 +6,52 @@ import android.media.MediaRecorder;
 
 import com.gy.utils.log.LogUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yue.gan on 2016/8/6.
  *
  */
 public class AudioRecordInfo {
+    public int source = MediaRecorder.AudioSource.MIC;
+    public int rate;
+    public int format;
+    public int channel;
+    public int bufSize;
 
-    private static AudioRecordInfo mInstance;
+    private AudioRecordInfo () {}
 
-    public static AudioRecordInfo getInstance () {
-        if (mInstance == null) {
-            mInstance = new AudioRecordInfo();
-        }
-        return mInstance;
+    private AudioRecordInfo (int rate, int channel, int format) {
+        this.rate = rate;
+        this.channel = channel;
+        this.format = format;
+        bufSize = AudioRecord.getMinBufferSize(rate, channel, format);
     }
 
-    public int audioSource = MediaRecorder.AudioSource.MIC;
-    public int audioRate;
-    public int audioFormat;
-    public int audioRecordConfig;
-    public int audioRecordMinBuffSize;
-
-    public void changeInfo (int rate, int config, int format) {
-        audioRate = rate;
-        audioRecordConfig = config;
-        audioFormat = format;
-        audioRecordMinBuffSize = AudioRecord.getMinBufferSize(rate, config, format);
-    }
-
-    public AudioRecordInfo () {
-        int[] rates = new int[]{44100, 22050, 11025, 8000};
+    /**
+     * 如果得不到结果 检查权限，需要录音权限。
+     * @return 所有支持的频率、声道、采音格式组合，任取一个都可以成功创建AudioRecord来录音
+     */
+    public static List<AudioRecordInfo> getAllValidInfo () {
+        ArrayList<AudioRecordInfo> ret = new ArrayList<>();
+        int[] rates = new int[]{44100, 22050, 16000, 11025, 8000};
         for (int rate : rates) {
-            short[] format1 = new short[]{AudioFormat.ENCODING_PCM_16BIT, AudioFormat.ENCODING_PCM_8BIT};
-            for (short format : format1) {
-                short[] recordConfig = new short[]{AudioFormat.CHANNEL_IN_STEREO, AudioFormat.CHANNEL_IN_MONO};
-                for (short channelConfig : recordConfig) {
+            short[] formats = new short[]{AudioFormat.ENCODING_PCM_16BIT, AudioFormat.ENCODING_PCM_8BIT};
+            for (short format : formats) {
+                short[] channels = new short[]{AudioFormat.CHANNEL_IN_STEREO, AudioFormat.CHANNEL_IN_MONO};
+                for (short channel : channels) {
+                    AudioRecordInfo info = new AudioRecordInfo(rate, channel, format);
                     try {
-                        audioRate = rate;
-                        audioFormat = format;
-                        audioRecordConfig = channelConfig;
-
-                        audioRecordMinBuffSize = AudioRecord.getMinBufferSize(rate, channelConfig, format);
-
-                        if (audioRecordMinBuffSize != AudioRecord.ERROR_BAD_VALUE) {
-                            // check if we can instantiate and have a success
-
+                        if (info.bufSize != AudioRecord.ERROR_BAD_VALUE) {
                             AudioRecord recorder = new AudioRecord(
-                                    audioSource,
-                                    rate,
-                                    channelConfig,
-                                    format,
-                                    audioRecordMinBuffSize);
-
+                                    info.source,
+                                    info.rate,
+                                    info.channel,
+                                    info.format,
+                                    info.bufSize);
                             if (recorder.getState() == AudioRecord.STATE_INITIALIZED) {
-                                recorder.release();
-                                return;
+                                ret.add(info);
                             }
                             recorder.release();
                         }
@@ -70,5 +61,27 @@ public class AudioRecordInfo {
                 }
             }
         }
+        return ret;
+    }
+
+    public static AudioRecordInfo get(int rate, int channel, int format) {
+        AudioRecordInfo info = new AudioRecordInfo(rate, channel, format);
+        try {
+            if (info.bufSize != AudioRecord.ERROR_BAD_VALUE) {
+                AudioRecord recorder = new AudioRecord(
+                        info.source,
+                        info.rate,
+                        info.channel,
+                        info.format,
+                        info.bufSize);
+                if (recorder.getState() == AudioRecord.STATE_INITIALIZED) {
+                    return info;
+                }
+                recorder.release();
+            }
+        } catch (Exception e) {
+            LogUtils.d("yue.gan", rate + "Exception, keep trying.");
+        }
+        return null;
     }
 }

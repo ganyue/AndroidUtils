@@ -78,7 +78,12 @@ public class MainActivity extends Activity{
 
         MApplication.getWifiUtils().addOnNetworkChangedListener(onNetworkChangedListener);
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN}, 0);
     }
 
     private void addData (String dataKey, String dataVal, List<Map<String, ?>> container) {

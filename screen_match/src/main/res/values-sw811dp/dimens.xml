@@ -748,4 +748,14 @@
 	<dimen name="sp_34">76.5944sp</dimen>
 	<dimen name="sp_36">81.1000sp</dimen>
 	<dimen name="sp_38">85.6056sp</dimen>
+	<dimen name="sp_40">90.1111sp</dimen>
+	<dimen name="sp_42">94.6167sp</dimen>
+	<dimen name="sp_43">96.8694sp</dimen>
+	<dimen name="sp_44">99.1222sp</dimen>
+	<dimen name="sp_45">101.3750sp</dimen>
+	<dimen name="sp_46">103.6278sp</dimen>
+	<dimen name="sp_47">105.8806sp</dimen>
+	<dimen name="sp_48">108.1333sp</dimen>
+	<dimen name="sp_49">110.3861sp</dimen>
+	<dimen name="sp_50">112.6389sp</dimen>
 </resources>
