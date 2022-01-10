@@ -141,12 +141,12 @@ public class TestFrg extends BaseFragment{
                 try {
                     File f = new File(getContext().getExternalCacheDir(), "serial.txt");
                     FileOutputStream fout = new FileOutputStream(f);
-                    int startNum = 0x2F7;
+                    int startNum = 0x617;
                     int i = startNum;
-                    for (; i < startNum + 800; i++) {
-                        Log.d("devel", "write : " + (i - startNum + 1));
-                        fout.write(String.format(Locale.getDefault(), "%06xAA014E\n", i)
-                                .toUpperCase().getBytes());
+                    for (; i < startNum + 1229; i++) {
+                        String formatStr = String.format(Locale.getDefault(), "%06xAA014E\n", i).toUpperCase();
+                        fout.write(formatStr.getBytes());
+                        Log.d("devel", "write : " + (i - startNum + 1) + ", " + formatStr);
                     }
                     fout.close();
                     Log.d("devel", "done");
